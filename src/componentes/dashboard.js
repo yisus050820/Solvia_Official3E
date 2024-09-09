@@ -28,78 +28,29 @@ const NAVIGATION = [
   },
     
   {
-    segment: 'users',
-    title: 'Usuarios',
+    segment: 'voluntarios',
+    title: 'Voluntarios',
     icon: <People />,
     children: [
       {
-        segment: 'coordinadores',
-        title: 'Coordinadores',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'donadores',
-        title: 'Donadores',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'voluntarios',
-        title: 'Voluntarios',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'beneficiarios',
-        title: 'Beneficiarios',
-        icon: <PersonIcon />,
+        segment: 'otros voluntarios',
+        title: 'Otros Voluntarios',
+        icon: <EmojiPeople />,
       },
     ],
   },
- 
+
   {
-    segment: 'reportes',
-    title: 'Reportes',
+    segment: 'feedback',
+    title: 'Feedback',
     icon: <DescriptionIcon />,
-    children: [
-        {
-          segment: 'usuarios',
-          title: 'Usuarios',
-          icon: <PersonIcon />,
-        },
-        {
-          segment: 'donaciones',
-          title: 'Donaciones',
-          icon: <Paid />,
-        },
-        {
-          segment: 'programas',
-          title: 'Programas',
-          icon: <Event />,
-        },
-      
-      ],
+
   },
   {
-    segment: 'asignaciones',
-    title: 'Asignaciones',
+    segment: 'progrmas inscritos',
+    title: 'Programas Inscritos',
     icon: <AssignmentInd />,
-    children: [
-        {
-          segment: 'donador-beneficiario',
-          title: 'Donador/Beneficiario',
-          icon: <VolunteerActivism />,
-        },
-        {
-          segment: 'voluntarios-programas',
-          title: 'Voluntarios/Programas',
-          icon: <EmojiPeople />,
-        },
-        {
-          segment: 'presupuesto/programa',
-          title: 'Presupuesto/Programa',
-          icon: <AttachMoney />,
-        },
-      
-      ],
+
   },
     
 ];

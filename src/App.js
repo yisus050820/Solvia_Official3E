@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import Registro from './componentes/Registro';
 import Login from './componentes/Login';
+import DashboardLayoutBasic from './componentes/dashboard' ;
 
 function App() {
   const location = useLocation();
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Registro />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<DashboardLayoutBasic />} />
       </Routes>
     </AnimatePresence>
   );
