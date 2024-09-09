@@ -15,6 +15,7 @@ import Event from '@mui/icons-material/Event';
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 const NAVIGATION = [
   {
@@ -26,82 +27,79 @@ const NAVIGATION = [
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
-    
   {
-    segment: 'users',
-    title: 'Usuarios',
-    icon: <People />,
+    segment: 'informes',
+    title: 'Informes',
+    icon: <DescriptionIcon />,
     children: [
       {
-        segment: 'coordinadores',
-        title: 'Coordinadores',
+        segment: 'informes-generales',
+        title: 'Informes Generales',
+        icon: <DescriptionIcon />,
+      },
+      {
+        segment: 'informes-impacto',
+        title: 'Informes Gde Impacto',
+        icon: <DescriptionIcon />,
+      },
+    ],
+  },
+  {
+    segment: 'seguimiento',
+    title: 'Seguimiento de Donaciones',
+    icon: <Paid />,
+    children: [
+      {
+        segment: 'historial',
+        title: 'Historial de Donaciones',
+        icon: <Paid />,
+      },
+      {
+        segment: 'estado-actual',
+        title: 'Estado de Donaciones Actuales',
+        icon: <Paid />,
+      },
+    ],
+  },
+  {
+    segment: 'comunicacion',
+    title: 'Comunicación con la ONG',
+    icon: <ChatBubbleIcon />,
+    children: [
+      {
+        segment: 'contacto',
+        title: 'Contactar al Equipo',
+        icon: <ChatBubbleIcon />,
+      },
+      {
+        segment: 'preguntas-frecuentes',
+        title: 'Preguntas Frecuentes',
+        icon: <ChatBubbleIcon />,
+      },
+      {
+        segment: 'actualizaciones',
+        title: 'Actualizaciones y Noticias',
+        icon: <ChatBubbleIcon />,
+      },
+    ],
+  },
+  {
+    segment: 'beneficiarios',
+    title: 'Beneficiarios',
+    icon: <PersonIcon />,
+    children: [
+      {
+        segment: 'ver-beneficiarios',
+        title: 'Ver Beneficiarios',
         icon: <PersonIcon />,
       },
       {
-        segment: 'donadores',
-        title: 'Donadores',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'voluntarios',
-        title: 'Voluntarios',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'beneficiarios',
-        title: 'Beneficiarios',
+        segment: 'historias',
+        title: 'Historias de Beneficiarios',
         icon: <PersonIcon />,
       },
     ],
   },
- 
-  {
-    segment: 'reportes',
-    title: 'Reportes',
-    icon: <DescriptionIcon />,
-    children: [
-        {
-          segment: 'usuarios',
-          title: 'Usuarios',
-          icon: <PersonIcon />,
-        },
-        {
-          segment: 'donaciones',
-          title: 'Donaciones',
-          icon: <Paid />,
-        },
-        {
-          segment: 'programas',
-          title: 'Programas',
-          icon: <Event />,
-        },
-      
-      ],
-  },
-  {
-    segment: 'asignaciones',
-    title: 'Asignaciones',
-    icon: <AssignmentInd />,
-    children: [
-        {
-          segment: 'donador-beneficiario',
-          title: 'Donador/Beneficiario',
-          icon: <VolunteerActivism />,
-        },
-        {
-          segment: 'voluntarios-programas',
-          title: 'Voluntarios/Programas',
-          icon: <EmojiPeople />,
-        },
-        {
-          segment: 'presupuesto/programa',
-          title: 'Presupuesto/Programa',
-          icon: <AttachMoney />,
-        },
-      
-      ],
-  },
-    
 ];
 
 const demoTheme = createTheme({
