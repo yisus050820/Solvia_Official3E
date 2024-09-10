@@ -4,17 +4,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import PersonIcon from '@mui/icons-material/Person';
-import People from '@mui/icons-material/People';
-import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import Paid from '@mui/icons-material/Paid';
 import Event from '@mui/icons-material/Event';
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
-import EmojiPeople from '@mui/icons-material/EmojiPeople';
-import AttachMoney from '@mui/icons-material/AttachMoney';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 
 const NAVIGATION = [
   {
@@ -28,79 +22,36 @@ const NAVIGATION = [
   },
     
   {
-    segment: 'users',
-    title: 'Usuarios',
-    icon: <People />,
+    segment: 'programas',
+    title: 'Programas',
+    icon: <Event />,
     children: [
       {
-        segment: 'coordinadores',
-        title: 'Coordinadores',
-        icon: <PersonIcon />,
+        segment: 'disponibles',
+        title: 'Programas disponibles',
+        icon: <Event />,
       },
       {
-        segment: 'donadores',
-        title: 'Donadores',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'voluntarios',
-        title: 'Voluntarios',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'beneficiarios',
-        title: 'Beneficiarios',
-        icon: <PersonIcon />,
+        segment: 'actuales',
+        title: 'Mis programas',
+        icon: <Event />,
       },
     ],
   },
  
   {
-    segment: 'reportes',
-    title: 'Reportes',
-    icon: <DescriptionIcon />,
-    children: [
-        {
-          segment: 'usuarios',
-          title: 'Usuarios',
-          icon: <PersonIcon />,
-        },
-        {
-          segment: 'donaciones',
-          title: 'Donaciones',
-          icon: <Paid />,
-        },
-        {
-          segment: 'programas',
-          title: 'Programas',
-          icon: <Event />,
-        },
-      
-      ],
+    segment: 'ayuda',
+    title: 'Ayuda recibida',
+    icon: <VolunteerActivism />,
+    
   },
   {
-    segment: 'asignaciones',
-    title: 'Asignaciones',
-    icon: <AssignmentInd />,
-    children: [
-        {
-          segment: 'donador-beneficiario',
-          title: 'Donador/Beneficiario',
-          icon: <VolunteerActivism />,
-        },
-        {
-          segment: 'voluntarios-programas',
-          title: 'Voluntarios/Programas',
-          icon: <EmojiPeople />,
-        },
-        {
-          segment: 'presupuesto/programa',
-          title: 'Presupuesto/Programa',
-          icon: <AttachMoney />,
-        },
-      
-      ],
+    segment: 'feedback',
+    title: 'Feedback',
+    icon: <RateReviewIcon />,
+   
   },
+
     
 ];
 
