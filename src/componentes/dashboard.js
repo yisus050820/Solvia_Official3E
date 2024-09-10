@@ -23,34 +23,29 @@ const NAVIGATION = [
   },
   {
     segment: 'dashboard',
-    title: 'Dashboard',
+    title: 'Centro de control',
     icon: <DashboardIcon />,
   },
     
   {
-    segment: 'users',
-    title: 'Usuarios',
+    segment: 'asignaciones',
+    title: 'Asignaciones',
     icon: <People />,
     children: [
       {
-        segment: 'coordinadores',
-        title: 'Coordinadores',
-        icon: <PersonIcon />,
+        segment: 'asignarprogram',
+        title: 'Nuevo Programa',
+        icon: <People />,
       },
       {
-        segment: 'donadores',
-        title: 'Donadores',
-        icon: <PersonIcon />,
+        segment: 'asignarben',
+        title: 'Nuevo beneficiario',
+        icon: <VolunteerActivism />,
       },
       {
-        segment: 'voluntarios',
-        title: 'Voluntarios',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'beneficiarios',
-        title: 'Beneficiarios',
-        icon: <PersonIcon />,
+        segment: 'asigarvol',
+        title: 'Nuevo voluntario',
+        icon: <EmojiPeople />,
       },
     ],
   },
@@ -80,28 +75,62 @@ const NAVIGATION = [
   },
   {
     segment: 'asignaciones',
-    title: 'Asignaciones',
-    icon: <AssignmentInd />,
+    title: 'Presupuesto',
+    icon: <AttachMoney />,
     children: [
-        {
-          segment: 'donador-beneficiario',
-          title: 'Donador/Beneficiario',
-          icon: <VolunteerActivism />,
-        },
-        {
-          segment: 'voluntarios-programas',
-          title: 'Voluntarios/Programas',
-          icon: <EmojiPeople />,
-        },
         {
           segment: 'presupuesto/programa',
           title: 'Presupuesto/Programa',
           icon: <AttachMoney />,
         },
+        {
+          segment: 'presupuesto/becas',
+          title: 'Presupuesto/Becas',
+          icon: <AttachMoney />,
+        },
       
       ],
   },
-    
+  {
+    segment: 'programas',
+    title: 'Actividades',
+    icon: <People />,
+    children: [
+      {
+        segment: 'actividades',
+        title: 'Actividades disponibles',
+        icon: <People />,
+      },
+      {
+        segment: 'act',
+        title: 'Actividades totales',
+        icon: <People />,
+      },
+    ]
+  },
+  {
+    segment: 'graficas',
+    title: 'Graficas',
+    icon: <People />,
+    children: [
+      {
+        segment: 'graficvol',
+        title: 'Graficas/Voluntarios',
+        icon: <People />,
+      },
+      {
+        segment: 'graficben',
+        title: 'Graficas/Beneficiarios',
+        icon: <People />,
+      },
+      {
+        segment: 'graficdon',
+        title: 'Graficas/Donaciones',
+        icon: <People />,
+      },
+    ]
+  },
+
 ];
 
 const demoTheme = createTheme({
