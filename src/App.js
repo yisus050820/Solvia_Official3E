@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import Registro from './componentes/Registro';
 import Login from './componentes/Login';
-import DashboardLayoutBasic from './componentes/dashboard';
+import DashboardLayoutBasic from './componentes/dashboardAdmin';
 
 function App() {
   const location = useLocation();

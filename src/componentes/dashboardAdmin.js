@@ -26,6 +26,11 @@ const NAVIGATION = [
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
+  {
+    segment: 'todos-programas',
+    title: 'Programas',
+    icon: <Event />,
+  },
     
   {
     segment: 'users',
@@ -37,6 +42,7 @@ const NAVIGATION = [
         title: 'Coordinadores',
         icon: <PersonIcon />,
       },
+      
       {
         segment: 'donadores',
         title: 'Donadores',
