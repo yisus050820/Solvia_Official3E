@@ -65,7 +65,7 @@ const AsignacionesVol_Pro = () => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="voluntario-label">Selecciona un Voluntario</InputLabel>
+                <InputLabel id="voluntario-label" sx={{ color: 'black' }}>Selecciona un Voluntario</InputLabel>
                 <Select
                   labelId="voluntario-label"
                   value={voluntarioSeleccionado}
@@ -82,7 +82,7 @@ const AsignacionesVol_Pro = () => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label">Selecciona un Programa</InputLabel>
+                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}

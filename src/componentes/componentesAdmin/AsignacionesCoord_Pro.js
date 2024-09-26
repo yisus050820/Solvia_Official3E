@@ -65,7 +65,7 @@ const AsignacionesCoord_Pro = () => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="coordinador-label">Selecciona un Coordinador</InputLabel>
+                <InputLabel id="coordinador-label" sx={{ color: 'black' }}>Selecciona un Coordinador</InputLabel>
                 <Select
                   labelId="coordinador-label"
                   value={coordinadorSeleccionado}
@@ -82,7 +82,7 @@ const AsignacionesCoord_Pro = () => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label">Selecciona un Programa</InputLabel>
+                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
