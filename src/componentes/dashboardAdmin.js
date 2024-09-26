@@ -15,6 +15,23 @@ import Event from '@mui/icons-material/Event';
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
+import SettingsIcon from '@mui/icons-material/Settings';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+
+// Importaciones de los formularios hijos
+import ProgramasCrud from './componentesAdmin/ProgramasCrud';
+import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
+import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
+import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
+import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
+import UsuariosCrud from './componentesAdmin/UsuariosCrud';
+import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
+import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
+import AsignacionesCoord_Pro from './componentesAdmin/AsignacionesCoord_Pro';
+import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
+import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
+
 
 const NAVIGATION = [
   {
@@ -22,49 +39,37 @@ const NAVIGATION = [
     title: 'Opciones',
   },
   {
-    segment: 'dashboard',
-    title: 'Dashboard',
+    segment: 'configuracion-perfil',
+    title: 'Mi perfil',
     icon: <DashboardIcon />,
   },
-  {
-    segment: 'todos-programas',
-    title: 'Programas',
-    icon: <Event />,
-  },
-    
   {
     segment: 'users',
     title: 'Usuarios',
     icon: <People />,
+  },
+  {
+    segment: 'programas',
+    title: 'Programas',
+    icon: <Event />,
     children: [
       {
-        segment: 'coordinadores',
-        title: 'Coordinadores',
-        icon: <PersonIcon />,
-      },
-      
-      {
-        segment: 'donadores',
-        title: 'Donadores',
-        icon: <PersonIcon />,
+        segment: 'gestionar-programas',
+        title: 'Gestionar programas',
+        icon: <SettingsIcon />,
       },
       {
-        segment: 'voluntarios',
-        title: 'Voluntarios',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'beneficiarios',
-        title: 'Beneficiarios',
-        icon: <PersonIcon />,
-      },
+        segment: 'todos-programas',
+        title: 'Todos los programas',
+        icon: <Event />,
+      }
     ],
-  },
- 
+  },  
+  
   {
     segment: 'reportes',
     title: 'Reportes',
-    icon: <DescriptionIcon />,
+    icon: <BarChartIcon />,
     children: [
         {
           segment: 'usuarios',
@@ -90,8 +95,8 @@ const NAVIGATION = [
     icon: <AssignmentInd />,
     children: [
         {
-          segment: 'donador-beneficiario',
-          title: 'Donador/Beneficiario',
+          segment: 'beneficiario-programa',
+          title: 'Beneficiario/Programa',
           icon: <VolunteerActivism />,
         },
         {
@@ -100,7 +105,12 @@ const NAVIGATION = [
           icon: <EmojiPeople />,
         },
         {
-          segment: 'presupuesto/programa',
+          segment: 'coordinador-programa',
+          title: 'Coordinador/Programa',
+          icon: <SupervisorAccountIcon />,
+        },
+        {
+          segment: 'presupuesto-programa',
           title: 'Presupuesto/Programa',
           icon: <AttachMoney />,
         },
@@ -131,16 +141,32 @@ function DemoPageContent({ pathname }) {
     <Box
       sx={{
         py: 4,
+        px: 6, // Ajustamos el padding horizontal
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
+        justifyContent: 'flex-start', // Aseguramos que los items estén hacia el inicio
+        alignItems: 'flex-start', // Los alineamos a la izquierda
+        textAlign: 'left', // El texto alineado a la izquierda
+        width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      <Typography>Dashboard content for {pathname}</Typography>
+      {pathname === '/dashboard' && <Typography>Dashboard principal</Typography>}
+      {pathname === '/users' && <UsuariosCrud />}
+      {pathname === '/programas/gestionar-programas' && <ProgramasCrud />}
+      {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
+      {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
+      {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}
+      {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
+      {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
+      {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
+      {pathname === '/asignaciones/coordinador-programa' && <AsignacionesCoord_Pro />}
+      {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
+      {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
     </Box>
   );
 }
+
+
 
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
