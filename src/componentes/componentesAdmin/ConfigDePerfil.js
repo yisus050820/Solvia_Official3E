@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, Typography, Avatar, TextField, Grid, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle } from 'react-icons/fa';
+import { Box } from '@mui/material';
 
 const PerfilUsuario = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    name: 'John',
+    email: 'Correo: john.doe@example.com',
     role: 'Coordinador',
-    description: 'Responsable de varios programas de ayuda social en la comunidad',
+    description: 'Descripción: Responsable de varios programas de ayuda social en la comunidad',
     profile_picture: 'https://via.placeholder.com/300', // Imagen de perfil predeterminada
   });
 
@@ -80,7 +81,7 @@ const PerfilUsuario = () => {
                     variant="contained"
                     component="label"
                     color="primary"
-                    sx={{ backgroundColor: 'yellow', color: 'black' }}
+                    sx={{ backgroundColor: '#60b4c7', color: 'black' }}
                   >
                     Cambiar Foto
                     <input
@@ -114,24 +115,38 @@ const PerfilUsuario = () => {
                 <>
                   {/* Formulario de edición */}
                   <TextField
-                    label="Nombre"
                     name="name"
                     value={editInfo.name}
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
+                    placeholder="Escribe tu nombre" // Placeholder para el campo de nombre
                     sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
+                    InputProps={{
+                      style: { color: 'black' },
+                    }}
+                    InputLabelProps={{
+                      shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
+                      style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
+                    }}
                   />
                   <TextField
-                    label="Correo"
                     name="email"
                     value={editInfo.email}
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
+                    placeholder="Escribe tu correo" // Placeholder para el campo de correo
                     sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
+                    InputProps={{
+                      style: { color: 'black' },
+                    }}
+                    InputLabelProps={{
+                      shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
+                      style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
+                    }}
                   />
                 </>
               )}
@@ -145,7 +160,6 @@ const PerfilUsuario = () => {
               </Typography>
             ) : (
               <TextField
-                label="Descripción"
                 name="description"
                 value={editInfo.description}
                 onChange={handleChange}
@@ -153,7 +167,16 @@ const PerfilUsuario = () => {
                 rows={3}
                 fullWidth
                 variant="outlined"
+                margin="dense"
+                placeholder="Agrega una descripción" // Placeholder para el campo de descripción
                 sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 4 }}
+                InputProps={{
+                  style: { color: 'black' },
+                }}
+                InputLabelProps={{
+                  shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
+                  style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
+                }}
               />
             )}
             <div className="flex justify-end space-x-4">

@@ -71,6 +71,11 @@ const AsignacionesCoord_Pro = () => {
                   value={coordinadorSeleccionado}
                   onChange={(e) => setCoordinadorSeleccionado(e.target.value)}
                   label="Selecciona un Coordinador"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: coordinadorSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {coordinadores.map((coordinador) => (
                     <MenuItem key={coordinador.id} value={coordinador.id}>
@@ -88,6 +93,11 @@ const AsignacionesCoord_Pro = () => {
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>

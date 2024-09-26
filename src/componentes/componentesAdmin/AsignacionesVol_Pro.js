@@ -71,6 +71,11 @@ const AsignacionesVol_Pro = () => {
                   value={voluntarioSeleccionado}
                   onChange={(e) => setVoluntarioSeleccionado(e.target.value)}
                   label="Selecciona un Voluntario"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: voluntarioSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {voluntarios.map((voluntario) => (
                     <MenuItem key={voluntario.id} value={voluntario.id}>
@@ -88,6 +93,11 @@ const AsignacionesVol_Pro = () => {
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>

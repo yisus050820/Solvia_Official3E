@@ -71,6 +71,11 @@ const AsignacionesBen_Pro = () => {
                   value={beneficiarioSeleccionado}
                   onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}
                   label="Selecciona un Beneficiario"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: beneficiarioSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {beneficiarios.map((beneficiario) => (
                     <MenuItem key={beneficiario.id} value={beneficiario.id}>
@@ -88,6 +93,11 @@ const AsignacionesBen_Pro = () => {
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -194,3 +204,4 @@ const AsignacionesBen_Pro = () => {
 };
 
 export default AsignacionesBen_Pro;
+

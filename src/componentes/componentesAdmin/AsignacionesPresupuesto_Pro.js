@@ -65,6 +65,11 @@ const AsignacionPresupuesto_Pro = () => {
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -81,7 +86,12 @@ const AsignacionPresupuesto_Pro = () => {
                 value={presupuesto}
                 onChange={(e) => setPresupuesto(e.target.value)}
                 type="number"
-                sx={{ backgroundColor: '#fff', borderRadius: '5px', '& .MuiInputBase-input': { color: 'black' }, '& .MuiInputLabel-root': { color: 'black' },}}
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '5px',
+                  '& .MuiInputBase-input': { color: 'black' },
+                  '& .MuiInputLabel-root': { color: 'black' },
+                }}
               />
             </Grid>
           </Grid>
