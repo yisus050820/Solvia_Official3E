@@ -25,7 +25,6 @@ const AsignacionesBen_Pro = () => {
   const handleAsignar = () => {
     if (beneficiarioSeleccionado && programaSeleccionado) {
       const nuevaAsignacion = {
-        id: asignaciones.length + 1,
         beneficiario: beneficiarios.find(b => b.id === beneficiarioSeleccionado).nombre,
         programa: programas.find(p => p.id === programaSeleccionado).nombre,
       };
@@ -125,7 +124,6 @@ const AsignacionesBen_Pro = () => {
             <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
-                  <TableCell sx={{ color: '#fff' }}>ID</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Beneficiario</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Programa</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
@@ -142,7 +140,6 @@ const AsignacionesBen_Pro = () => {
                       transition={{ duration: 0.5 }}
                       style={{ borderBottom: '1px solid #4a5568' }}
                     >
-                      <TableCell sx={{ color: '#fff' }}>{asignacion.id}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.beneficiario}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>

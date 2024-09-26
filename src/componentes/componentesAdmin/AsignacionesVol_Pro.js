@@ -25,7 +25,6 @@ const AsignacionesVol_Pro = () => {
   const handleAsignar = () => {
     if (voluntarioSeleccionado && programaSeleccionado) {
       const nuevaAsignacion = {
-        id: asignaciones.length + 1,
         voluntario: voluntarios.find(v => v.id === voluntarioSeleccionado).nombre,
         programa: programas.find(p => p.id === programaSeleccionado).nombre,
       };
@@ -125,7 +124,6 @@ const AsignacionesVol_Pro = () => {
             <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
-                  <TableCell sx={{ color: '#fff' }}>ID</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Voluntario</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Programa</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
@@ -142,7 +140,6 @@ const AsignacionesVol_Pro = () => {
                       transition={{ duration: 0.5 }}
                       style={{ borderBottom: '1px solid #4a5568' }}
                     >
-                      <TableCell sx={{ color: '#fff' }}>{asignacion.id}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.voluntario}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>

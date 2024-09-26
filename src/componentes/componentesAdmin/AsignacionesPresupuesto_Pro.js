@@ -19,7 +19,6 @@ const AsignacionPresupuesto_Pro = () => {
   const handleAsignar = () => {
     if (programaSeleccionado && presupuesto > 0) {
       const nuevaAsignacion = {
-        id: asignaciones.length + 1,
         programa: programas.find(p => p.id === programaSeleccionado).nombre,
         presupuesto: Number(presupuesto).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
       };
@@ -112,7 +111,6 @@ const AsignacionPresupuesto_Pro = () => {
             <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
-                  <TableCell sx={{ color: '#fff' }}>ID</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Programa</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Presupuesto Asignado</TableCell>
                   <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
@@ -129,7 +127,6 @@ const AsignacionPresupuesto_Pro = () => {
                       transition={{ duration: 0.5 }}
                       style={{ borderBottom: '1px solid #4a5568' }}
                     >
-                      <TableCell sx={{ color: '#fff' }}>{asignacion.id}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>{asignacion.presupuesto}</TableCell>
                       <TableCell sx={{ color: '#fff' }}>
