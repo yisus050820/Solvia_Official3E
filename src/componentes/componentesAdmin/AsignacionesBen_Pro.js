@@ -13,7 +13,18 @@ const AsignacionesBen_Pro = () => {
   const beneficiarios = [
     { id: 1, nombre: 'Carlos Pérez' },
     { id: 2, nombre: 'María López' },
-    { id: 3, nombre: 'Luis Ramírez' },
+    { id: 3, nombre: 'Luis Ramirez' },
+    { id: 4, nombre: 'Daniel Villanueva' },
+    { id: 5, nombre: 'Victor Larios' },
+    { id: 6, nombre: 'Annelise Cabrales' },
+    { id: 7, nombre: 'Jesus Enriquez' },
+    { id: 1, nombre: 'Carlos Pérez' },
+    { id: 2, nombre: 'María López' },
+    { id: 3, nombre: 'Luis Ramirez' },
+    { id: 4, nombre: 'Daniel Villanueva' },
+    { id: 5, nombre: 'Victor Larios' },
+    { id: 6, nombre: 'Annelise Cabrales' },
+    { id: 7, nombre: 'Jesus Enriquez' },
   ];
 
   const programas = [
@@ -75,6 +86,14 @@ const AsignacionesBen_Pro = () => {
                       color: beneficiarioSeleccionado ? 'black' : 'inherit',
                     }
                   }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
+                  }}
                 >
                   {beneficiarios.map((beneficiario) => (
                     <MenuItem key={beneficiario.id} value={beneficiario.id}>
@@ -115,7 +134,7 @@ const AsignacionesBen_Pro = () => {
               whileTap="tap"
               onClick={handleAsignar}
             >
-              <FaPlus /> Asignar
+              <FaPlus />
             </motion.button>
           </div>
 

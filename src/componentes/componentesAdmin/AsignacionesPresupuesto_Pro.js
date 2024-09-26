@@ -102,7 +102,7 @@ const AsignacionPresupuesto_Pro = () => {
               whileTap="tap"
               onClick={handleAsignar}
             >
-              <FaPlus /> Asignar
+              <FaPlus />
             </motion.button>
           </div>
 

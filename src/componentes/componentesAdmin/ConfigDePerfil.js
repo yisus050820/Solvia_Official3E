@@ -188,7 +188,7 @@ const PerfilUsuario = () => {
                   whileTap="tap"
                   onClick={() => setIsEditing(true)}
                 >
-                  <FaEdit /> Editar
+                  <FaEdit />
                 </motion.button>
               ) : (
                 <div className="flex space-x-4">

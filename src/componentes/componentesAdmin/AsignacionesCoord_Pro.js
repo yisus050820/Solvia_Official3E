@@ -75,6 +75,14 @@ const AsignacionesCoord_Pro = () => {
                       color: coordinadorSeleccionado ? 'black' : 'inherit',
                     }
                   }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
+                  }}
                 >
                   {coordinadores.map((coordinador) => (
                     <MenuItem key={coordinador.id} value={coordinador.id}>
@@ -115,7 +123,7 @@ const AsignacionesCoord_Pro = () => {
               whileTap="tap"
               onClick={handleAsignar}
             >
-              <FaPlus /> Asignar
+              <FaPlus />
             </motion.button>
           </div>
 

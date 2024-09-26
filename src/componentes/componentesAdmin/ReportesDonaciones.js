@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
-import { FaDollarSign, FaHandHoldingUsd, FaChartPie } from 'react-icons/fa';
+import { FaDollarSign, FaHandHoldingUsd, FaChartPie, FaMoneyBillWave} from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { MoneyOff } from '@mui/icons-material';
 
 const dataDonaciones = [
   { name: 'Enero', donaciones: 400 },
@@ -23,7 +24,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const ReportesDonaciones = () => {
   // Simulación de datos para las tarjetas
   const [totalDonaciones, setTotalDonaciones] = useState(5000);
-  const [nuevasDonaciones, setNuevasDonaciones] = useState(500); // Nuevas donaciones en la última semana
+  const [totalGastos, setNuevasDonaciones] = useState(500); // Ntotal de gastos
   const [promedioPorUsuario, setPromedioPorUsuario] = useState(150); // Promedio de donaciones por usuario
 
   useEffect(() => {
@@ -52,10 +53,10 @@ const ReportesDonaciones = () => {
           <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaHandHoldingUsd className="text-blue-500 mr-2" size={40} />
+                <FaMoneyBillWave className="text-blue-500 mr-2" size={40} />
                 <div>
-                  <Typography variant="h4">${nuevasDonaciones}</Typography>
-                  <Typography variant="subtitle1">Nuevas Donaciones (Última Semana)</Typography>
+                  <Typography variant="h4">${totalGastos}</Typography>
+                  <Typography variant="subtitle1">Total de gastos</Typography>
                 </div>
               </div>
             </CardContent>

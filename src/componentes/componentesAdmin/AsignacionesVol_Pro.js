@@ -75,6 +75,14 @@ const AsignacionesVol_Pro = () => {
                       color: voluntarioSeleccionado ? 'black' : 'inherit',
                     }
                   }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
+                  }}
                 >
                   {voluntarios.map((voluntario) => (
                     <MenuItem key={voluntario.id} value={voluntario.id}>
@@ -115,7 +123,7 @@ const AsignacionesVol_Pro = () => {
               whileTap="tap"
               onClick={handleAsignar}
             >
-              <FaPlus /> Asignar
+              <FaPlus />
             </motion.button>
           </div>
 
