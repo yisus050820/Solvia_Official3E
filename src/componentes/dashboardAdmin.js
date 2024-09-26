@@ -150,7 +150,6 @@ function DemoPageContent({ pathname }) {
         width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      {pathname === '/dashboard' && <Typography>Dashboard principal</Typography>}
       {pathname === '/users' && <UsuariosCrud />}
       {pathname === '/programas/gestionar-programas' && <ProgramasCrud />}
       {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
@@ -175,7 +174,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutBasic(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/configuracion-perfil');
 
   const router = React.useMemo(() => {
     return {
