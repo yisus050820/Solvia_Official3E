@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
@@ -6,11 +7,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
 const CrudUsuarios = () => {
-  const [data, setData] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Coordinador', description: 'Admin of the system', profile_picture: defaultProfilePicture, password: 'password123' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Voluntario', description: 'Volunteer in multiple events', profile_picture: defaultProfilePicture, password: 'password123' },
-  ]);
-
+  const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -19,6 +16,7 @@ const CrudUsuarios = () => {
   const [editUser, setEditUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [filtroRol, setFiltroRol] = useState('');
+
 
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'Coordinador', description: '', profile_picture: defaultProfilePicture, password: '' });
