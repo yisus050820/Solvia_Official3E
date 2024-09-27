@@ -120,6 +120,29 @@ app.post('/login', (req, res) => {
 });
 
 
+
+
+
+//CRUD ADMIN///
+
+//USUARIOS
+app.post('/register', upload.single('profile_picture'), (req, res) => {
+  const { name, email, password, role, description } = req.body;
+
+  // Verifica si el usuario ya existe
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err);
+      return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
+    }
+
+    
+
+  });
+});
+
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
