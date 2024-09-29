@@ -47,7 +47,7 @@ const NAVIGATION = [
   },
   {
     segment: 'feedback',
-    title: 'Feedback',
+    title: 'Feedback de actividades',
     icon: <RateReviewIcon />,
    
   },
