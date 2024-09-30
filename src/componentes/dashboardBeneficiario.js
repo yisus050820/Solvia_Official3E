@@ -9,6 +9,17 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Event from '@mui/icons-material/Event';
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import { FaIconName } from 'react-icons/fa';
+import { Feedback } from '@mui/icons-material';
+
+
+// Importaciones de los formularios hijos
+import PerfilUsuario from './componentesBeneficiario/ConfigDePerfil';
+import TarjetasProgramas from './componentesBeneficiario/TarjetasProgramas';
+import ProgramasInscrito from './componentesBeneficiario/ProgramasInscrito';
+import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
+import Calificar from './componentesBeneficiario/Feedback';
+
 
 const NAVIGATION = [
   {
@@ -16,8 +27,8 @@ const NAVIGATION = [
     title: 'Opciones',
   },
   {
-    segment: 'dashboard',
-    title: 'Dashboard',
+    segment: 'configuracion-perfil',
+    title: 'Mi perfil',
     icon: <DashboardIcon />,
   },
     
@@ -48,7 +59,7 @@ const NAVIGATION = [
   {
     segment: 'feedback',
     title: 'Feedback de actividades',
-    icon: <RateReviewIcon />,
+    icon: <Feedback />,
    
   },
 
@@ -76,13 +87,22 @@ function DemoPageContent({ pathname }) {
     <Box
       sx={{
         py: 4,
+        px: 6, // Ajustamos el padding horizontal
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
+        justifyContent: 'flex-start', // Aseguramos que los items estén hacia el inicio
+        alignItems: 'flex-start', // Los alineamos a la izquierda
+        textAlign: 'left', // El texto alineado a la izquierda
+        width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      <Typography>Dashboard content for {pathname}</Typography>
+    
+      {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
+      {pathname === '/programas/disponibles' && <TarjetasProgramas />}
+      {pathname === '/programas/actuales' && <ProgramasInscrito />}
+      {pathname === '/ayuda' && <AyudaRecibida />}
+      {pathname === '/feedback' && <Calificar />}
+      
     </Box>
   );
 }
