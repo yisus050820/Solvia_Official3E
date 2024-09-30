@@ -18,17 +18,16 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 
 // Importaciones de los formularios hijos
-import ProgramasCrud from './componentesAdmin/ProgramasCrud';
-import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
-import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
-import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
-import UsuariosCrud from './componentesAdmin/UsuariosCrud';
-import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
-import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
-import AsignacionesCoord_Pro from './componentesAdmin/AsignacionesCoord_Pro';
-import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
-import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
+import ProgramasCrud from './componentesCoordi/ProgramasCrud';
+import ReportesDonaciones from './componentesCoordi/ReportesDonaciones';
+import ReportesProgramasAyuda from './componentesCoordi/ReportesProgramasAyuda';
+import ReportesUsuarios from './componentesCoordi/ReportesUsuarios';
+import TarjetasProgramas from './componentesCoordi/TarjetasProgramas';
+import UsuariosCrud from './componentesCoordi/UsuariosCrud';
+import AsignacionesBen_Pro from './componentesCoordi/AsignacionesBen_Pro';
+import AsignacionesVol_Pro from './componentesCoordi/AsignacionesVol_Pro';
+import AsignacionPresupuesto_Pro from './componentesCoordi/AsignacionesPresupuesto_Pro';
+import PerfilUsuario from './componentesCoordi/ConfigDePerfil';
 
 
 const NAVIGATION = [
