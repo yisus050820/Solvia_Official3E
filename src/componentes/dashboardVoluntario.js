@@ -16,6 +16,10 @@ import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 
+import UsuariosCrud from './componentesAdmin/UsuariosCrud';
+import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
+
+
 const NAVIGATION = [
   {
     kind: 'header',
@@ -33,7 +37,7 @@ const NAVIGATION = [
     icon: <People />,
     children: [
       {
-        segment: 'otros voluntarios',
+        segment: 'otros-voluntarios',
         title: 'Otros Voluntarios',
         icon: <EmojiPeople />,
       },
@@ -47,7 +51,7 @@ const NAVIGATION = [
 
   },
   {
-    segment: 'progrmas inscritos',
+    segment: 'programas-inscritos',
     title: 'Programas Inscritos',
     icon: <AssignmentInd />,
 
@@ -76,13 +80,17 @@ function DemoPageContent({ pathname }) {
     <Box
       sx={{
         py: 4,
+        px: 6, // Ajustamos el padding horizontal
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
+        justifyContent: 'flex-start', // Aseguramos que los items estén hacia el inicio
+        alignItems: 'flex-start', // Los alineamos a la izquierda
+        textAlign: 'left', // El texto alineado a la izquierda
+        width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      <Typography>Dashboard content for {pathname}</Typography>
+      {pathname === '/voluntarios/otros-voluntarios' && <UsuariosCrud />}
+      {pathname === '/programas-inscritos' && <AsignacionesVol_Pro />}
     </Box>
   );
 }
@@ -94,7 +102,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutBasic(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/configuracion-perfil');
 
   const router = React.useMemo(() => {
     return {
