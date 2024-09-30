@@ -6,14 +6,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import PersonIcon from '@mui/icons-material/Person';
-<<<<<<< HEAD:src/componentes/dashboard.js
-import PaidIcon from '@mui/icons-material/Paid';
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import GroupIcon from '@mui/icons-material/Group';
-import EventIcon from '@mui/icons-material/Event';
-=======
 import People from '@mui/icons-material/People';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import Paid from '@mui/icons-material/Paid';
@@ -38,7 +30,6 @@ import AsignacionesCoord_Pro from './componentesAdmin/AsignacionesCoord_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 
->>>>>>> 5dab1b3b9d67a8323bf26069badd304ea925ea9f:src/componentes/dashboardAdmin.js
 
 const NAVIGATION = [
   {
@@ -51,40 +42,6 @@ const NAVIGATION = [
     icon: <DashboardIcon />,
   },
   {
-<<<<<<< HEAD:src/componentes/dashboard.js
-    segment: 'donaciones',
-    title: 'Donaciones',
-    icon: <VolunteerActivismIcon />,
-    children: [
-      {
-        segment: 'donar',
-        title: 'Donar',
-        icon: <LocalAtmIcon />,
-      },
-      {
-        segment: 'seguimiento',
-        title: 'Seguimiento de Donaciones',
-        icon: <PaidIcon />,
-        children: [
-          {
-            segment: 'historial',
-            title: 'Historial de Donaciones',
-            icon: <PaidIcon />,
-          },
-          {
-            segment: 'estado-actual',
-            title: 'Estado de Donaciones Actuales',
-            icon: <PaidIcon />,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    segment: 'informes',
-    title: 'Informes',
-    icon: <DescriptionIcon />,
-=======
     segment: 'users',
     title: 'Usuarios',
     icon: <People />,
@@ -111,50 +68,30 @@ const NAVIGATION = [
     segment: 'reportes',
     title: 'Reportes',
     icon: <BarChartIcon />,
->>>>>>> 5dab1b3b9d67a8323bf26069badd304ea925ea9f:src/componentes/dashboardAdmin.js
     children: [
-      {
-        segment: 'informes-generales',
-        title: 'Informes Generales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: 'informes-impacto',
-        title: 'Informes Gde Impacto',
-        icon: <DescriptionIcon />,
-      },
-    ],
+        {
+          segment: 'usuarios',
+          title: 'Usuarios',
+          icon: <PersonIcon />,
+        },
+        {
+          segment: 'donaciones',
+          title: 'Donaciones',
+          icon: <Paid />,
+        },
+        {
+          segment: 'programas',
+          title: 'Programas',
+          icon: <Event />,
+        },
+      
+      ],
   },
   {
-    segment: 'beneficiarios-programas',
-    title: 'Beneficiarios y Programas',
-    icon: <GroupIcon />,
+    segment: 'asignaciones',
+    title: 'Asignaciones',
+    icon: <AssignmentInd />,
     children: [
-<<<<<<< HEAD:src/componentes/dashboard.js
-      {
-        segment: 'ver-personas',
-        title: 'Ver Personas',
-        icon: <PersonIcon />,
-      },
-      {
-        segment: 'ver-programas',
-        title: 'Ver Programas',
-        icon: <EventIcon />,
-      },
-    ],
-  },
-  {
-    segment: 'comunicacion',
-    title: 'Comunicación con la ONG',
-    icon: <ChatBubbleIcon />,
-    children: [
-      {
-        segment: 'contacto',
-        title: 'Contactar con un coordinador',
-        icon: <ChatBubbleIcon />,
-      },
-    ],
-=======
         {
           segment: 'beneficiario-programa',
           title: 'Beneficiario/Programa',
@@ -177,8 +114,8 @@ const NAVIGATION = [
         },
       
       ],
->>>>>>> 5dab1b3b9d67a8323bf26069badd304ea925ea9f:src/componentes/dashboardAdmin.js
   },
+    
 ];
 
 const demoTheme = createTheme({

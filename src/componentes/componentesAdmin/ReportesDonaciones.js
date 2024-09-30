@@ -1,34 +1,49 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
-import { FaDollarSign, FaHandHoldingUsd, FaChartPie, FaMoneyBillWave} from 'react-icons/fa';
+import { FaDollarSign, FaMoneyBillWave, FaChartPie } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { MoneyOff } from '@mui/icons-material';
-
-const dataDonaciones = [
-  { name: 'Enero', donaciones: 400 },
-  { name: 'Febrero', donaciones: 500 },
-  { name: 'Marzo', donaciones: 700 },
-  { name: 'Abril', donaciones: 850 },
-  { name: 'Mayo', donaciones: 950 },
-  { name: 'Junio', donaciones: 1200 },
-];
-
-const dataTiposDonaciones = [
-  { name: 'Monetarias', value: 65 },
-  { name: 'En especie', value: 35 },
-];
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const ReportesDonaciones = () => {
-  // Simulación de datos para las tarjetas
-  const [totalDonaciones, setTotalDonaciones] = useState(5000);
-  const [totalGastos, setNuevasDonaciones] = useState(500); // Ntotal de gastos
-  const [promedioPorUsuario, setPromedioPorUsuario] = useState(150); // Promedio de donaciones por usuario
+  const [totalDonaciones, setTotalDonaciones] = useState(0);
+  const [totalGastos, setTotalGastos] = useState(0); 
+  const [promedioPorUsuario, setPromedioPorUsuario] = useState(0);
+  const [donacionesPorDonante, setDonacionesPorDonante] = useState([]);
+  const [evolucionDonaciones, setEvolucionDonaciones] = useState([]); // Nueva variable para la evolución de donaciones
 
   useEffect(() => {
-    // Aquí podrías hacer un fetch para obtener los datos reales de tu backend
+    const fetchData = async () => {
+      try {
+        // Obtener total de donaciones
+        const totalDonacionesRes = await axios.get('http://localhost:5000/donationsReports/totalDonaciones');
+        setTotalDonaciones(totalDonacionesRes.data);
+  
+        // Obtener total de gastos
+        const totalGastosRes = await axios.get('http://localhost:5000/donationsReports/totalGastos');
+        setTotalGastos(totalGastosRes.data);
+  
+        // Obtener distribución de donaciones por donante
+        const donacionesPorDonanteRes = await axios.get('http://localhost:5000/donationsReports/distribucionDonaciones');
+        setDonacionesPorDonante(donacionesPorDonanteRes.data);
+  
+        // Calcular promedio de donaciones por usuario
+        const totalUsuarios = donacionesPorDonanteRes.data.length;
+        const totalDonaciones = donacionesPorDonanteRes.data.reduce((acc, donor) => acc + donor.total_donations, 0);
+        setPromedioPorUsuario(totalDonaciones / totalUsuarios);
+
+        // Obtener evolución de donaciones
+        const evolucionRes = await axios.get('http://localhost:5000/donationsReports/evolucionDonaciones');
+        setEvolucionDonaciones(evolucionRes.data); // Aquí se setean los datos de evolución
+
+      } catch (error) {
+        console.error('Error fetching donation data:', error);
+      }
+    };
+  
+    fetchData();
   }, []);
 
   return (
@@ -56,7 +71,7 @@ const ReportesDonaciones = () => {
                 <FaMoneyBillWave className="text-blue-500 mr-2" size={40} />
                 <div>
                   <Typography variant="h4">${totalGastos}</Typography>
-                  <Typography variant="subtitle1">Total de gastos</Typography>
+                  <Typography variant="subtitle1">Total de Gastos</Typography>
                 </div>
               </div>
             </CardContent>
@@ -69,7 +84,7 @@ const ReportesDonaciones = () => {
               <div className="flex items-center">
                 <FaChartPie className="text-purple-500 mr-2" size={40} />
                 <div>
-                  <Typography variant="h4">${promedioPorUsuario}</Typography>
+                  <Typography variant="h4">${promedioPorUsuario.toFixed(2)}</Typography>
                   <Typography variant="subtitle1">Promedio de Donaciones por Usuario</Typography>
                 </div>
               </div>
@@ -95,9 +110,9 @@ const ReportesDonaciones = () => {
             </Typography>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={dataDonaciones}>
+            <LineChart data={evolucionDonaciones}> 
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="name" stroke="#FFFFFF" />
+              <XAxis dataKey="month" stroke="#FFFFFF" /> 
               <YAxis stroke="#FFFFFF" />
               <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
               <Legend />
@@ -113,7 +128,7 @@ const ReportesDonaciones = () => {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Gráfica de pastel - Distribución por tipo de donación */}
+        {/* Gráfica de pastel - Distribución de Donaciones por Donante */}
         <motion.div
           className="bg-gray-800 p-6 rounded-lg shadow-lg"
           initial={{ opacity: 0, y: -20 }}
@@ -124,22 +139,24 @@ const ReportesDonaciones = () => {
           <div className="flex items-center mb-4">
             <FaChartPie className="text-green-500 mr-2" size={24} />
             <Typography variant="h6" color="white" gutterBottom>
-              Distribución de Donaciones por Tipo
+              Distribución de Donaciones por Donante
             </Typography>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={dataTiposDonaciones}
+                data={donacionesPorDonante}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ donor_name, total_donations }) =>
+                  `${donor_name}: ${((total_donations / totalDonaciones) * 100).toFixed(2)}%`
+                }
                 outerRadius={120}
                 fill="#8884d8"
-                dataKey="value"
+                dataKey="total_donations"
               >
-                {dataTiposDonaciones.map((entry, index) => (
+                {donacionesPorDonante.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
