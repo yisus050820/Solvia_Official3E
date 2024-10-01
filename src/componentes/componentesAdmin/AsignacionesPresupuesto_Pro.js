@@ -10,50 +10,76 @@ const AsignacionesPresupuesto_Pro = () => {
   const [dineroDisponible, setDineroDisponible] = useState(0);
   const [programaSeleccionado, setProgramaSeleccionado] = useState('');
   const [cantidad, setCantidad] = useState('');
-  const [editModalOpen, setEditModalOpen] = useState(false);  // Para el modal de edición
-  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); // Almacena la asignación actual para editar
-  const [editCantidad, setEditCantidad] = useState('');  // Almacena la cantidad editada
+  const [errorCantidad, setErrorCantidad] = useState('');
+  const [errorPrograma, setErrorPrograma] = useState('');
+  const [editModalOpen, setEditModalOpen] = useState(false); // Modal para editar
+  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); // Asignación a editar
+  const [editCantidad, setEditCantidad] = useState(''); // Cantidad a editar
 
   useEffect(() => {
-    // Obtener asignaciones
     axios.get('http://localhost:5000/asigPresProg/asignaciones')
       .then(res => setAsignaciones(res.data))
       .catch(err => console.error('Error fetching assignments:', err));
 
-    // Obtener programas activos
     axios.get('http://localhost:5000/asigPresProg/programas')
       .then(res => setProgramas(res.data))
       .catch(err => console.error('Error fetching programs:', err));
 
-    // Obtener dinero disponible
     axios.get('http://localhost:5000/asigPresProg/disponible')
       .then(res => setDineroDisponible(res.data.dineroDisponible))
       .catch(err => console.error('Error fetching available funds:', err));
   }, []);
 
   const handleAsignar = () => {
-    if (!programaSeleccionado || !cantidad) {
-      alert("Todos los campos son requeridos.");
-      return;
+    let isValid = true;
+    setErrorCantidad('');
+    setErrorPrograma('');
+
+    // Validaciones
+    if (!programaSeleccionado) {
+      setErrorPrograma('Debes seleccionar un programa.');
+      isValid = false;
     }
+
+    if (!cantidad || cantidad <= 0) {
+      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      isValid = false;
+    } else if (cantidad > dineroDisponible) {
+      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      isValid = false;
+    }
+
+    if (!isValid) return;
 
     const nuevaAsignacion = {
       program_id: programaSeleccionado,
-      amount: cantidad
+      amount: cantidad,
+      date: new Date().toISOString().split('T')[0] // Añadir fecha actual
     };
 
     axios.post('http://localhost:5000/asigPresProg/asignacion', nuevaAsignacion)
-      .then(res => {
-        const newAssignment = {
-          ...nuevaAsignacion,
-          id: res.data.data,
-          programa: programas.find(p => p.id === programaSeleccionado)?.name
-        };
-        setAsignaciones([...asignaciones, newAssignment]);
+      .then(() => {
+        // Actualizar datos después de asignar
+        axios.all([
+          axios.get('http://localhost:5000/asigPresProg/asignaciones'),
+          axios.get('http://localhost:5000/asigPresProg/disponible')
+        ])
+        .then(axios.spread((asignacionesRes, disponibleRes) => {
+          setAsignaciones(asignacionesRes.data);
+          setDineroDisponible(disponibleRes.data.dineroDisponible);
+        }))
+        .catch(err => console.error('Error fetching updated info:', err));
+
         setProgramaSeleccionado('');
         setCantidad('');
       })
-      .catch(err => console.error('Error assigning budget:', err));
+      .catch(err => {
+        if (err.response && err.response.status === 400) {
+          setErrorPrograma(err.response.data.message);
+        } else {
+          console.error('Error assigning budget:', err);
+        }
+      });
   };
 
   const handleEliminar = (id) => {
@@ -65,26 +91,26 @@ const AsignacionesPresupuesto_Pro = () => {
   };
 
   const handleEditar = (asignacion) => {
-    setCurrentEditAsignacion(asignacion);  // Guarda la asignación seleccionada
-    setEditCantidad(asignacion.presupuesto);  // Configura la cantidad a editar
-    setEditModalOpen(true);  // Abre el modal de edición
+    setCurrentEditAsignacion(asignacion); // Asignación seleccionada para editar
+    setEditCantidad(asignacion.presupuesto); // Cantidad inicial a editar
+    setEditModalOpen(true); // Abre el modal de edición
   };
 
   const handleGuardarEdicion = () => {
     const updatedAsignacion = {
       ...currentEditAsignacion,
-      amount: editCantidad
+      amount: editCantidad // Actualiza la cantidad editada
     };
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
       .then(() => {
-        // Actualiza la lista de asignaciones en el estado local sin necesidad de refrescar
+        // Actualiza las asignaciones localmente sin refrescar la página
         setAsignaciones(asignaciones.map(asignacion =>
           asignacion.id === currentEditAsignacion.id
-            ? { ...asignacion, presupuesto: editCantidad }  // Actualizamos solo la cantidad
+            ? { ...asignacion, presupuesto: editCantidad } // Actualiza solo la cantidad
             : asignacion
         ));
-        setEditModalOpen(false);  // Cierra el modal de edición
+        setEditModalOpen(false); // Cierra el modal de edición
       })
       .catch(err => console.error('Error editing assignment:', err));
   };
@@ -102,19 +128,20 @@ const AsignacionesPresupuesto_Pro = () => {
             Asignar Presupuesto a Programas
           </Typography>
           <Typography variant="h6" color="white">
-            Dinero Disponible: ${dineroDisponible.toLocaleString()}
+            Dinero Disponible: ${dineroDisponible ? dineroDisponible.toLocaleString() : 'Cargando...'}
           </Typography>
 
           {/* Formulario para asignar presupuesto */}
           <Grid container spacing={4} sx={{ marginTop: '20px' }}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
+                <InputLabel id="programa-label" sx={{ color: 'gray' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
+                  sx={{ backgroundColor: 'black', borderRadius: '5px' }}
                 >
                   {programas.map(programa => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -123,6 +150,7 @@ const AsignacionesPresupuesto_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -132,14 +160,15 @@ const AsignacionesPresupuesto_Pro = () => {
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.value)}
                 fullWidth
-                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                sx={{ backgroundColor: 'black', borderRadius: '5px' }}
               />
+              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </Grid>
           </Grid>
 
           <div className="mt-6 flex justify-end">
             <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleAsignar}>
-              <FaPlus /> Asignar Presupuesto
+              <FaPlus /> 
             </motion.button>
           </div>
 
@@ -157,7 +186,7 @@ const AsignacionesPresupuesto_Pro = () => {
                 {asignaciones.map(asignacion => (
                   <TableRow key={asignacion.id} style={{ borderBottom: '1px solid #4a5568' }}>
                     <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
-                    <TableCell sx={{ color: '#fff' }}>${asignacion.presupuesto}</TableCell> {/* Usamos `presupuesto` para el campo amount */}
+                    <TableCell sx={{ color: '#fff' }}>${asignacion.presupuesto}</TableCell>
                     <TableCell sx={{ color: '#fff' }}>
                       <motion.button className="bg-blue-500 text-white px-2 py-1 rounded-full" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleEditar(asignacion)}>
                         <FaEdit />

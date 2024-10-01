@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material'; // Importa Dialog
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -18,9 +18,15 @@ const CrudProgramas = () => {
   const [editProgram, setEditProgram] = useState(null);
   const [errors, setErrors] = useState({});
   const [coordinadores, setCoordinadores] = useState([]);
+  const [today] = useState(new Date());
 
   // Obtener programas cuando se carga la página
   useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  // Obtener programas desde el servidor
+  const fetchPrograms = () => {
     axios.get('http://localhost:5000/programas')
       .then(response => {
         setData(response.data);
@@ -28,18 +34,20 @@ const CrudProgramas = () => {
       .catch(error => {
         console.error('Error fetching programs:', error);
       });
-  }, []);
+  };
 
   // Obtener coordinadores cuando se abre el modal
   useEffect(() => {
-    axios.get('http://localhost:5000/usuarios/coordinadores')
-      .then(response => {
-        setCoordinadores(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching coordinators:', error);
-      });
-  }, [isModalOpen, isEditModalOpen]); 
+    if (isModalOpen || isEditModalOpen) {
+      axios.get('http://localhost:5000/usuarios/coordinadores')
+        .then(response => {
+          setCoordinadores(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching coordinators:', error);
+        });
+    }
+  }, [isModalOpen, isEditModalOpen]);
 
   const truncateDescription = (description) => {
     if (!description) return '';
@@ -63,36 +71,38 @@ const CrudProgramas = () => {
 
   const validateProgram = (program) => {
     const validationErrors = {};
-  
+    const todayDate = new Date(today.setHours(0, 0, 0, 0));
+
     if (!program.nombre || !program.nombre.trim()) {
       validationErrors.nombre = 'El nombre no puede estar vacío.';
     }
-  
+
     if (!program.descripcion || program.descripcion.trim().length < 10) {
       validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
     }
-  
+
     if (!program.fechaInicio) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
+    } else if (program.fechaInicio < todayDate) {
+      validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
-  
+
     if (!program.fechaFin) {
       validationErrors.fechaFin = 'La fecha de fin es obligatoria.';
     } else if (program.fechaInicio && program.fechaFin < program.fechaInicio) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }
-  
+
     if (!program.objetivos || !program.objetivos.trim()) {
       validationErrors.objetivos = 'Los objetivos no pueden estar vacíos.';
     }
-  
-    // Verifica que coordinador no sea null o undefined y sea un número válido
+
     if (!program.coordinador || isNaN(program.coordinador)) {
       validationErrors.coordinador = 'El coordinador es obligatorio y debe ser un valor válido.';
     }
-  
+
     return validationErrors;
-  };  
+  };
 
   // Añadir programa nuevo
   const handleAddProgram = () => {
@@ -101,7 +111,7 @@ const CrudProgramas = () => {
       setErrors(validationErrors);
       return;
     }
-  
+
     const programData = {
       name: newProgram.nombre,
       description: newProgram.descripcion,
@@ -112,23 +122,16 @@ const CrudProgramas = () => {
       program_image: newProgram.program_image || defaultProgramPicture,
       status: newProgram.status || 'active',
     };
-  
+
     axios.post('http://localhost:5000/programas', programData)
       .then(() => {
-        // Después de añadir el programa, recargar la lista completa desde el servidor
-        axios.get('http://localhost:5000/programas')
-          .then(response => {
-            setData(response.data); // Actualiza el estado con los programas actualizados
-            handleCloseModal(); // Cierra el modal
-          })
-          .catch(error => {
-            console.error('Error al obtener programas:', error);
-          });
+        fetchPrograms(); // Recargar los datos después de añadir un nuevo programa
+        handleCloseModal(); // Cerrar el modal
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
       });
-  };  
+  };
 
   // Editar programa existente
   const handleEditProgram = () => {
@@ -137,7 +140,7 @@ const CrudProgramas = () => {
       setErrors(validationErrors);
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('name', editProgram.nombre);
     formData.append('description', editProgram.descripcion);
@@ -146,33 +149,30 @@ const CrudProgramas = () => {
     formData.append('objectives', editProgram.objetivos);
     formData.append('coordinator_charge', editProgram.coordinador);
     formData.append('status', editProgram.status || 'active');
-    
+
     if (editProgram.program_image instanceof File) {
       formData.append('program_image', editProgram.program_image);
     } else {
       formData.append('program_image', editProgram.program_image);
     }
-  
+
     axios.put(`http://localhost:5000/programas/${editProgram.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
     })
-    .then(response => {
-      const updatedData = data.map(program => 
-        program.id === editProgram.id ? { ...program, ...editProgram } : program
-      );
-      setData(updatedData);
-      handleCloseEditModal();
-    })
-    .catch(error => {
-      console.error('Error al actualizar programa:', error);
-    });
-  };  
-  
+      .then(() => {
+        fetchPrograms(); // Recargar los datos después de editar el programa
+        handleCloseEditModal();
+      })
+      .catch(error => {
+        console.error('Error al actualizar programa:', error);
+      });
+  };
+
   const handleOpenEditModal = (program) => {
     setEditProgram({
-      id: program.id, 
+      id: program.id,
       nombre: program.name,
       descripcion: program.description,
       fechaInicio: new Date(program.start_date),
@@ -185,7 +185,7 @@ const CrudProgramas = () => {
     setIsEditModalOpen(true);
     setErrors({});
   };
-  
+
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setErrors({});
@@ -211,11 +211,11 @@ const CrudProgramas = () => {
   const handleImageUpload = (e, type) => {
     const file = e.target.files[0];
     if (file) {
-        if (type === 'new') {
-            setNewProgram({ ...newProgram, program_image: file });
-        } else if (type === 'edit') {
-            setEditProgram({ ...editProgram, program_image: file });
-        }
+      if (type === 'new') {
+        setNewProgram({ ...newProgram, program_image: file });
+      } else if (type === 'edit') {
+        setEditProgram({ ...editProgram, program_image: file });
+      }
     }
   };
 
@@ -244,7 +244,7 @@ const CrudProgramas = () => {
               <th className="p-4">Fecha Fin</th>
               <th className="p-4">Objetivos</th>
               <th className="p-4">Coordinador</th>
-              <th className="p-4">Estado</th>  
+              <th className="p-4">Estado</th>
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
@@ -254,8 +254,8 @@ const CrudProgramas = () => {
                 <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date}</td>
-                <td className="p-4">{item.end_date}</td>
+                <td className="p-4">{item.start_date.split('T')[0]}</td> {/* Mostrar solo la fecha */}
+                <td className="p-4">{item.end_date.split('T')[0]}</td>   {/* Mostrar solo la fecha */}
                 <td className="p-4">{item.objectives}</td>
                 <td className="p-4">{item.coordinator_name}</td>
                 <td className="p-4">
@@ -426,7 +426,7 @@ const CrudProgramas = () => {
                   type="text"
                   className={`w-full p-2 border ${errors.nombre ? 'border-red-500' : 'border-gray-300'} rounded`}
                   placeholder="Nombre"
-                  value={editProgram.nombre || ''} 
+                  value={editProgram.nombre || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, nombre: e.target.value })}
                 />
                 {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}

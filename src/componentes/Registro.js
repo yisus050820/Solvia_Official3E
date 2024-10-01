@@ -48,7 +48,7 @@ const Registro = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validación de formato de correo electrónico
     if (!isValidEmail(email)) {
       setMessage('Por favor, introduce un correo electrónico válido.');
@@ -56,7 +56,15 @@ const Registro = () => {
       setOpenSnackbar(true);
       return;
     }
-
+  
+    // Validación de longitud mínima de contraseña
+    if (password.length < 8) {
+      setMessage('La contraseña debe tener al menos 8 caracteres.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+  
     // Validación de coincidencia de contraseñas
     if (password !== confirmPassword) {
       setMessage('Las contraseñas no coinciden.');
@@ -64,7 +72,8 @@ const Registro = () => {
       setOpenSnackbar(true);
       return;
     }
-
+  
+    // Validación de campos obligatorios
     if (!name || !email || !password || !role || !description || !profilePicture || !termsAccepted) {
       let missingFields = [];
       if (!name) missingFields.push('Nombre');
@@ -74,13 +83,13 @@ const Registro = () => {
       if (!description) missingFields.push('Descripción');
       if (!profilePicture) missingFields.push('Foto de Perfil');
       if (!termsAccepted) missingFields.push('Aceptar Términos y Condiciones');
-
+  
       setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('name', name);
     formData.append('email', email);
@@ -88,7 +97,7 @@ const Registro = () => {
     formData.append('role', role);
     formData.append('description', description);
     formData.append('profile_picture', profilePicture);
-
+  
     try {
       const response = await axios.post('http://localhost:5000/register', formData, {
         headers: {
@@ -101,7 +110,7 @@ const Registro = () => {
       setName('');
       setEmail('');
       setPassword('');
-      setConfirmPassword(''); 
+      setConfirmPassword('');
       setRole('volunteer');
       setDescription('');
       setProfilePicture(null);
@@ -115,7 +124,7 @@ const Registro = () => {
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
     }
-  };
+  };  
 
   return (
     <Box

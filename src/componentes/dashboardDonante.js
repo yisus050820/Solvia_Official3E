@@ -10,10 +10,9 @@ import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
-import DonarTable from './DonarTable'; // Asegúrate de tener este componente de tabla en un archivo separado
 
 const dashboardDonante = () => {
-  const [selectedSegment, setSelectedSegment] = useState('/dashboard'); // Controla la navegación
+  const [selectedSegment, setSelectedSegment] = (''); // Controla la navegación
 
   const handleNavigationChange = (segment) => {
     setSelectedSegment(segment);
@@ -122,7 +121,6 @@ const dashboardDonante = () => {
       <DashboardLayout>
         {/* Renderizado condicional basado en la navegación */}
         {selectedSegment === '/dashboard' && <p>Contenido del Dashboard</p>}
-        {selectedSegment === '/donaciones/donar' && <DonarTable />} {/* Muestra la tabla solo si "Donar" está seleccionado */}
         {/* Puedes añadir más secciones de contenido según las rutas */}
       </DashboardLayout>
     </AppProvider>

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, Avatar, TextField, Grid, Button } from '@mui/material';
+import { Card, CardContent, Typography, Avatar, TextField, Grid, Button, IconButton, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
-import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen } from 'react-icons/fa';
-import { Box } from '@mui/material';
+import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 
 const PerfilUsuario = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState({});
-  const [editInfo, setEditInfo] = useState(userInfo);
+  const [userInfo, setUserInfo] = useState(null);
+  const [editInfo, setEditInfo] = useState({});
   const [newProfilePicture, setNewProfilePicture] = useState(null);
+  const [password, setPassword] = useState(''); // Estado para la nueva contraseña
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(true);
 
   // Obtener la información del usuario al cargar el componente
   useEffect(() => {
@@ -18,20 +21,24 @@ const PerfilUsuario = () => {
         const response = await axios.get('/perfil', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
+
         setUserInfo(response.data);
-        setEditInfo(response.data); // Para iniciar con los valores actuales en el formulario de edición
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching profile:', error);
+        setLoading(false);
       }
     };
     fetchProfile();
   }, []);
 
+  // Controlar los cambios en los campos de edición
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditInfo({ ...editInfo, [name]: value });
   };
 
+  // Guardar los cambios en el perfil
   const handleSave = async () => {
     const formData = new FormData();
     formData.append('name', editInfo.name);
@@ -39,6 +46,11 @@ const PerfilUsuario = () => {
     formData.append('description', editInfo.description);
     if (newProfilePicture) {
       formData.append('profile_picture', newProfilePicture);
+    }
+
+    // Si se ha ingresado una nueva contraseña
+    if (password) {
+      formData.append('password', password);
     }
 
     try {
@@ -51,8 +63,17 @@ const PerfilUsuario = () => {
 
       setUserInfo(response.data);
       setIsEditing(false);
+      setPassword('');  // Limpiar la contraseña después de guardar
+      setErrors({ email: '', password: '' }); // Limpiar los errores si se guardó con éxito
     } catch (error) {
-      console.error('Error saving profile:', error);
+      if (error.response && error.response.data) {
+        const { message } = error.response.data;
+        if (message.includes('correo')) {
+          setErrors({ ...errors, email: message });
+        } else if (message.includes('contraseña')) {
+          setErrors({ ...errors, password: message });
+        }
+      }
     }
   };
 
@@ -68,27 +89,29 @@ const PerfilUsuario = () => {
     window.location.href = '/login';
   };
 
-  const buttonVariants = {
-    hover: { scale: 1.1, transition: { duration: 0.3 } },
-    tap: { scale: 0.9, transition: { duration: 0.2 } },
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+    // Al hacer clic en editar, copia los datos actuales del perfil al estado de edición
+    setEditInfo(userInfo);
   };
 
+  // Si aún está cargando, mostramos un mensaje de carga
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  // Si no hay información del usuario, mostrar un mensaje de error o vacío
+  if (!userInfo) {
+    return <div>No se pudo cargar la información del usuario.</div>;
+  }
+
   return (
-    <motion.div
-      className="w-full mx-auto mt-5 px-4"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div className="w-full mx-auto mt-5 px-4" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
-              <motion.div
-                className="flex justify-center"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
+              <motion.div className="flex justify-center" whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
                 <Avatar
                   src={userInfo.profile_picture}
                   alt={userInfo.name}
@@ -97,19 +120,9 @@ const PerfilUsuario = () => {
               </motion.div>
               {isEditing && (
                 <div className="mt-4 flex justify-center">
-                  <Button
-                    variant="contained"
-                    component="label"
-                    color="primary"
-                    sx={{ backgroundColor: '#60b4c7', color: 'black' }}
-                  >
+                  <Button variant="contained" component="label" color="primary" sx={{ backgroundColor: '#60b4c7', color: 'black' }}>
                     Cambiar Foto
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePictureChange}
-                      hidden
-                    />
+                    <input type="file" accept="image/*" onChange={handleProfilePictureChange} hidden />
                   </Button>
                 </div>
               )}
@@ -134,29 +147,48 @@ const PerfilUsuario = () => {
                 <>
                   <TextField
                     name="name"
-                    value={editInfo.name}
+                    value={editInfo.name || ''}  // Asegurarse de que no sea undefined
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
                     placeholder="Escribe tu nombre"
-                    sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
-                    InputProps={{
-                      style: { color: 'black' },
-                    }}
+                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
                   />
                   <TextField
                     name="email"
-                    value={editInfo.email}
+                    value={editInfo.email || ''}  // Asegurarse de que no sea undefined
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
                     placeholder="Escribe tu correo"
-                    sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
+                  />
+                  {/* Campo de contraseña */}
+                  <TextField
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}  // Alternar entre mostrar y ocultar contraseña
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    fullWidth
+                    variant="outlined"
+                    margin="dense"
+                    placeholder="Nueva contraseña (opcional)"
                     InputProps={{
-                      style: { color: 'black' },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)}>
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
+                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
+                    error={!!errors.password}
+                    helperText={errors.password}
                   />
                 </>
               )}
@@ -170,7 +202,7 @@ const PerfilUsuario = () => {
             ) : (
               <TextField
                 name="description"
-                value={editInfo.description}
+                value={editInfo.description || ''}  // Asegurarse de que no sea undefined
                 onChange={handleChange}
                 multiline
                 rows={3}
@@ -178,52 +210,25 @@ const PerfilUsuario = () => {
                 variant="outlined"
                 margin="dense"
                 placeholder="Agrega una descripción"
-                sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 4 }}
-                InputProps={{
-                  style: { color: 'black' },
-                }}
+                sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 4 }}
               />
             )}
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
                 <>
-                  <motion.button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-full"
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
-                    onClick={() => setIsEditing(true)}
-                  >
+                  <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" onClick={toggleEdit}>
                     <FaEdit />
                   </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white px-4 py-2 rounded-full"
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
-                    onClick={handleLogout}
-                  >
+                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={handleLogout}>
                     <FaDoorOpen />
                   </motion.button>
                 </>
               ) : (
                 <div className="flex space-x-4">
-                  <motion.button
-                    className="bg-green-500 text-white px-4 py-2 rounded-full"
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
-                    onClick={handleSave}
-                  >
+                  <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" onClick={handleSave}>
                     Guardar
                   </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white px-4 py-2 rounded-full"
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
-                    onClick={() => setIsEditing(false)}
-                  >
+                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={() => setIsEditing(false)}>
                     Cancelar
                   </motion.button>
                 </div>

@@ -35,7 +35,7 @@ router.get('/disponible', (req, res) => {
   });
 });
 
-// Asignar presupuesto a un programa
+/// Asignar presupuesto a un programa
 router.post('/asignacion', (req, res) => {
   const { program_id, amount, date } = req.body;
 
