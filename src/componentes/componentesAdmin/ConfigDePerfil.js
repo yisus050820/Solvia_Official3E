@@ -1,44 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, Avatar, TextField, Grid, Button } from '@mui/material';
 import { motion } from 'framer-motion';
-import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle } from 'react-icons/fa';
+import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen } from 'react-icons/fa';
 import { Box } from '@mui/material';
+import axios from 'axios';
 
 const PerfilUsuario = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    name: 'John',
-    email: 'Correo: john.doe@example.com',
-    role: 'Coordinador',
-    description: 'Descripción: Responsable de varios programas de ayuda social en la comunidad',
-    profile_picture: 'https://via.placeholder.com/300', // Imagen de perfil predeterminada
-  });
-
+  const [userInfo, setUserInfo] = useState({});
   const [editInfo, setEditInfo] = useState(userInfo);
   const [newProfilePicture, setNewProfilePicture] = useState(null);
 
-  // Maneja los cambios en los campos de edición
+  // Obtener la información del usuario al cargar el componente
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get('/perfil', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        setUserInfo(response.data);
+        setEditInfo(response.data); // Para iniciar con los valores actuales en el formulario de edición
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditInfo({ ...editInfo, [name]: value });
   };
 
-  // Guarda los cambios de edición
-  const handleSave = () => {
+  const handleSave = async () => {
+    const formData = new FormData();
+    formData.append('name', editInfo.name);
+    formData.append('email', editInfo.email);
+    formData.append('description', editInfo.description);
     if (newProfilePicture) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserInfo({ ...editInfo, profile_picture: reader.result });
-        setIsEditing(false);
-      };
-      reader.readAsDataURL(newProfilePicture);
-    } else {
-      setUserInfo(editInfo);
+      formData.append('profile_picture', newProfilePicture);
+    }
+
+    try {
+      const response = await axios.put('/perfil', formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setUserInfo(response.data);
       setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
     }
   };
 
-  // Maneja el cambio de la imagen de perfil
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,7 +63,11 @@ const PerfilUsuario = () => {
     }
   };
 
-  // Animaciones suaves para botones
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
   const buttonVariants = {
     hover: { scale: 1.1, transition: { duration: 0.3 } },
     tap: { scale: 0.9, transition: { duration: 0.2 } },
@@ -63,7 +84,6 @@ const PerfilUsuario = () => {
         <CardContent>
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
-              {/* Imagen de perfil más grande */}
               <motion.div
                 className="flex justify-center"
                 whileHover={{ scale: 1.05 }}
@@ -97,7 +117,6 @@ const PerfilUsuario = () => {
             <Grid item xs={12} md={8}>
               {!isEditing ? (
                 <div>
-                  {/* Información del usuario */}
                   <Typography variant="h4" color="white" sx={{ fontSize: '2rem' }}>
                     <FaUserCircle className="inline-block text-blue-500 mr-2" />
                     {userInfo.name}
@@ -113,7 +132,6 @@ const PerfilUsuario = () => {
                 </div>
               ) : (
                 <>
-                  {/* Formulario de edición */}
                   <TextField
                     name="name"
                     value={editInfo.name}
@@ -121,14 +139,10 @@ const PerfilUsuario = () => {
                     fullWidth
                     variant="outlined"
                     margin="dense"
-                    placeholder="Escribe tu nombre" // Placeholder para el campo de nombre
+                    placeholder="Escribe tu nombre"
                     sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
                     InputProps={{
                       style: { color: 'black' },
-                    }}
-                    InputLabelProps={{
-                      shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
-                      style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
                     }}
                   />
                   <TextField
@@ -138,21 +152,16 @@ const PerfilUsuario = () => {
                     fullWidth
                     variant="outlined"
                     margin="dense"
-                    placeholder="Escribe tu correo" // Placeholder para el campo de correo
+                    placeholder="Escribe tu correo"
                     sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 2 }}
                     InputProps={{
                       style: { color: 'black' },
-                    }}
-                    InputLabelProps={{
-                      shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
-                      style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
                     }}
                   />
                 </>
               )}
             </Grid>
           </Grid>
-          {/* Descripción y botones */}
           <div className="mt-6">
             {!isEditing ? (
               <Typography variant="body2" color="gray" gutterBottom sx={{ fontSize: '1.1rem' }}>
@@ -168,28 +177,35 @@ const PerfilUsuario = () => {
                 fullWidth
                 variant="outlined"
                 margin="dense"
-                placeholder="Agrega una descripción" // Placeholder para el campo de descripción
+                placeholder="Agrega una descripción"
                 sx={{ backgroundColor: '#fff', borderRadius: '5px', mb: 4 }}
                 InputProps={{
                   style: { color: 'black' },
-                }}
-                InputLabelProps={{
-                  shrink: true, // Esto fuerza que la etiqueta esté siempre arriba
-                  style: { color: 'black', fontSize: '18px', fontWeight: 'bold' },
                 }}
               />
             )}
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
-                <motion.button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-full"
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  onClick={() => setIsEditing(true)}
-                >
-                  <FaEdit />
-                </motion.button>
+                <>
+                  <motion.button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-full"
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <FaEdit />
+                  </motion.button>
+                  <motion.button
+                    className="bg-red-500 text-white px-4 py-2 rounded-full"
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    onClick={handleLogout}
+                  >
+                    <FaDoorOpen />
+                  </motion.button>
+                </>
               ) : (
                 <div className="flex space-x-4">
                   <motion.button

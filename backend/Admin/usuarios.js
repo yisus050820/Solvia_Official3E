@@ -1,7 +1,22 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const jwt = require('jsonwebtoken'); // Importar jsonwebtoken para verificar el token
+
+// Definir la función authenticateToken
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401); // Si no hay token, retornar 401 (Unauthorized)
+
+  jwt.verify(token, 'yourSecretKey', (err, user) => {
+    if (err) return res.sendStatus(403); // Si el token no es válido, retornar 403 (Forbidden)
+    req.user = user; // Adjuntar el usuario decodificado al request
+    next(); // Continuar al siguiente middleware o ruta
+  });
+}
 
 // Obtener todos los usuarios
 router.get('/', (req, res) => {
@@ -20,7 +35,6 @@ router.get('/', (req, res) => {
     res.json(results);
   });
 });
-
 
 // Obtener todos los coordinadores
 router.get('/coordinadores', (req, res) => {
@@ -81,7 +95,7 @@ router.put('/:id', (req, res) => {
         console.error('Error fetching updated user:', err);
         return res.status(500).json({ message: 'Error al obtener los detalles actualizados del usuario.' });
       }
-      res.status(200).json(updatedResults[0]);  // Devuelve el usuario actualizado, incluyendo la fecha de creación
+      res.status(200).json(updatedResults[0]);  
     });
   });
 });
@@ -90,12 +104,50 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const userId = req.params.id;
 
-  db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
+  // Verificar si el usuario está referenciado en la tabla de voluntarios
+  db.query('SELECT * FROM volunteers WHERE coordinator_id = ?', [userId], (err, rows) => {
     if (err) {
-      console.error('Error deleting user:', err);
-      return res.status(500).json({ message: 'Error al eliminar el usuario.' });
+      console.error('Error checking volunteers:', err);
+      return res.status(500).json({ message: 'Error al verificar voluntarios.' });
     }
-    res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+
+    if (rows.length > 0) {
+      return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como coordinador.' });
+    }
+
+    // Proceder con la eliminación si no hay voluntarios relacionados
+    db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
+      if (err) {
+        console.error('Error deleting user:', err);
+        return res.status(500).json({ message: 'Error al eliminar el usuario.' });
+      }
+      res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+    });
+  });
+});
+
+// Ruta protegida para editar el perfil del usuario actual
+router.put('/user', authenticateToken, async (req, res) => {
+  const { name, email, role, profile_picture, description } = req.body;
+  const userId = req.user.id; // Obtener el ID del usuario del token
+
+  let query = 'UPDATE users SET name = ?, email = ?, role = ?, profile_picture = ?, description = ? WHERE id = ?';
+  let params = [name, email, role, profile_picture, description, userId];
+
+  db.query(query, params, (err, result) => {
+    if (err) {
+      console.error('Error updating user profile:', err);
+      return res.status(500).json({ message: 'Error al actualizar la información del usuario.' });
+    }
+
+    // Obtener los datos actualizados del usuario
+    db.query('SELECT id, name, email, role, profile_picture, description FROM users WHERE id = ?', [userId], (err, updatedUser) => {
+      if (err) {
+        console.error('Error fetching updated user:', err);
+        return res.status(500).json({ message: 'Error al obtener los detalles actualizados del usuario.' });
+      }
+      res.status(200).json({ message: 'Información del usuario actualizada', user: updatedUser[0] });
+    });
   });
 });
 

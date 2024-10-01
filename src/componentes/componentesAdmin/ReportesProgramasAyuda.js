@@ -14,6 +14,7 @@ const ReportesProgramasAyuda = () => {
   const [crecimientoProgramas, setCrecimientoProgramas] = useState([]);
   const [totalDonaciones, setTotalDonaciones] = useState([]);
   const [beneficiariosPorPrograma, setBeneficiariosPorPrograma] = useState([]);
+  
 
   // Obtener datos desde el backend
   useEffect(() => {

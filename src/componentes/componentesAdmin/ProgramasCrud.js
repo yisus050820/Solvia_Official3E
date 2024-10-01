@@ -110,13 +110,20 @@ const CrudProgramas = () => {
       objectives: newProgram.objetivos,
       coordinator_charge: newProgram.coordinador,
       program_image: newProgram.program_image || defaultProgramPicture,
-      status: newProgram.status || 'active',  // Envía el valor de 'status'
+      status: newProgram.status || 'active',
     };
   
     axios.post('http://localhost:5000/programas', programData)
-      .then(response => {
-        setData([...data, response.data]);
-        handleCloseModal();
+      .then(() => {
+        // Después de añadir el programa, recargar la lista completa desde el servidor
+        axios.get('http://localhost:5000/programas')
+          .then(response => {
+            setData(response.data); // Actualiza el estado con los programas actualizados
+            handleCloseModal(); // Cierra el modal
+          })
+          .catch(error => {
+            console.error('Error al obtener programas:', error);
+          });
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
@@ -131,31 +138,36 @@ const CrudProgramas = () => {
       return;
     }
   
-    const updatedProgram = {
-      name: editProgram.nombre,
-      description: editProgram.descripcion,
-      start_date: formatDateForMySQL(editProgram.fechaInicio),
-      end_date: formatDateForMySQL(editProgram.fechaFin),
-      objectives: editProgram.objetivos,
-      coordinator_charge: editProgram.coordinador,
-      program_image: editProgram.program_image || defaultProgramPicture,
-      status: editProgram.status || 'active',  
-    };
+    const formData = new FormData();
+    formData.append('name', editProgram.nombre);
+    formData.append('description', editProgram.descripcion);
+    formData.append('start_date', formatDateForMySQL(editProgram.fechaInicio));
+    formData.append('end_date', formatDateForMySQL(editProgram.fechaFin));
+    formData.append('objectives', editProgram.objetivos);
+    formData.append('coordinator_charge', editProgram.coordinador);
+    formData.append('status', editProgram.status || 'active');
+    
+    if (editProgram.program_image instanceof File) {
+      formData.append('program_image', editProgram.program_image);
+    } else {
+      formData.append('program_image', editProgram.program_image);
+    }
   
-    axios.put(`http://localhost:5000/programas/${editProgram.id}`, updatedProgram)
-      .then(response => {
-        axios.get('http://localhost:5000/programas')
-          .then(response => {
-            setData(response.data); 
-            handleCloseEditModal();
-          })
-          .catch(error => {
-            console.error('Error al obtener programas:', error);
-          });
-      })
-      .catch(error => {
-        console.error('Error al actualizar programa:', error);
-      });
+    axios.put(`http://localhost:5000/programas/${editProgram.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    })
+    .then(response => {
+      const updatedData = data.map(program => 
+        program.id === editProgram.id ? { ...program, ...editProgram } : program
+      );
+      setData(updatedData);
+      handleCloseEditModal();
+    })
+    .catch(error => {
+      console.error('Error al actualizar programa:', error);
+    });
   };  
   
   const handleOpenEditModal = (program) => {
@@ -167,6 +179,7 @@ const CrudProgramas = () => {
       fechaFin: new Date(program.end_date),
       objetivos: program.objectives,
       coordinador: program.coordinator_charge,
+      status: program.status || 'active',
       program_image: program.program_image || defaultProgramPicture,
     });
     setIsEditModalOpen(true);
@@ -198,15 +211,11 @@ const CrudProgramas = () => {
   const handleImageUpload = (e, type) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
         if (type === 'new') {
-          setNewProgram({ ...newProgram, program_image: reader.result });
+            setNewProgram({ ...newProgram, program_image: file });
         } else if (type === 'edit') {
-          setEditProgram({ ...editProgram, program_image: reader.result });
+            setEditProgram({ ...editProgram, program_image: file });
         }
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -250,8 +259,18 @@ const CrudProgramas = () => {
                 <td className="p-4">{item.objectives}</td>
                 <td className="p-4">{item.coordinator_name}</td>
                 <td className="p-4">
-                  <span className={`inline-block w-3 h-3 rounded-full ${item.status === 'active' ? 'bg-green-500' : item.status === 'pause' ? 'bg-orange-500' : 'bg-red-500'}`}></span>
-                </td> 
+                  <span
+                    className={`text-lg font-bold ${
+                      item.status === 'active'
+                        ? 'text-green-500'
+                        : item.status === 'pause'
+                        ? 'text-yellow-500'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
+                  </span>
+                </td>
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"

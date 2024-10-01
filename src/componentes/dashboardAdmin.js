@@ -26,7 +26,6 @@ import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import UsuariosCrud from './componentesAdmin/UsuariosCrud';
 import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
-import AsignacionesCoord_Pro from './componentesAdmin/AsignacionesCoord_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 
@@ -103,11 +102,6 @@ const NAVIGATION = [
           icon: <EmojiPeople />,
         },
         {
-          segment: 'coordinador-programa',
-          title: 'Coordinador/Programa',
-          icon: <SupervisorAccountIcon />,
-        },
-        {
           segment: 'presupuesto-programa',
           title: 'Presupuesto/Programa',
           icon: <AttachMoney />,
@@ -156,7 +150,6 @@ function DemoPageContent({ pathname }) {
       {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
       {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
       {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
-      {pathname === '/asignaciones/coordinador-programa' && <AsignacionesCoord_Pro />}
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
     </Box>

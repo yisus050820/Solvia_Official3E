@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Importar useNavigate
 import { TextField, Button, Typography, Box, Paper, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -12,6 +12,28 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const navigate = useNavigate(); // Definir useNavigate para las redirecciones
+
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost:5000/login', { // Asegúrate de que la URL esté correcta
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Si la respuesta es válida
+        console.log('Login successful:', data);
+        // Aquí puedes redirigir según el rol o guardar el token
+      } else {
+        console.error('Error during login:', data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -32,15 +54,35 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/login', {
-        email,
-        password,
-      });
+      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const { token, role } = response.data; // Obtener el token y el rol
+      localStorage.setItem('token', token); // Almacenar el token
       setMessage('Inicio de sesión exitoso');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
       setEmail('');
       setPassword('');
+
+      // Redirigir según el rol
+      switch (role) {
+        case 'admin':
+          navigate('/Admin');
+          break;
+        case 'donor':
+          navigate('/donor-dashboard'); // Asegúrate de tener esta ruta configurada
+          break;
+        case 'volunteer':
+          navigate('/volunteer-dashboard'); // Asegúrate de tener esta ruta configurada
+          break;
+        case 'beneficiary':
+          navigate('/beneficiary-dashboard'); // Asegúrate de tener esta ruta configurada
+          break;
+        case 'coordinator':
+          navigate('/coordinator-dashboard'); // Asegúrate de tener esta ruta configurada
+          break;
+        default:
+          navigate('/'); // Redirigir a una ruta por defecto
+      }
     } catch (error) {
       if (error.response) {
         if (error.response.data.message === 'Correo no encontrado') {
@@ -65,7 +107,7 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: `url('URL_DE TU_IMAGEN_DE_FONDO')`,
+        backgroundImage: `url('URL_DE_TU_IMAGEN_DE_FONDO')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         p: 2,

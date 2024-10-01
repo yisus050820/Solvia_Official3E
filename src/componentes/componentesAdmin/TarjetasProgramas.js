@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-const ProgramCard = ({ title, description, participants, donations, status }) => {
+const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
@@ -38,7 +38,7 @@ const ProgramCard = ({ title, description, participants, donations, status }) =>
         {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
-          src="https://via.placeholder.com/150"
+          src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
         {/* Contenido principal de la tarjeta */}
@@ -123,6 +123,7 @@ const TarjetasProgramas = () => {
               ...program,
               participants: participantsRes.data.count,
               donations: donationsRes.data.total,
+              imageUrl: program.program_image, // Añadido para manejar la imagen del programa
             };
           })
         );        
@@ -145,6 +146,7 @@ const TarjetasProgramas = () => {
           participants={program.participants}
           donations={program.donations}
           status={program.status} 
+          imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
         />
       ))}
     </div>
