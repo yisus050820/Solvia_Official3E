@@ -16,8 +16,11 @@ import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 
-import UsuariosCrud from './componentesAdmin/UsuariosCrud';
-import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
+import UsuariosCrud from './componentesVoluntario/UsuariosCrud';
+import TarjetasProgramas from './componentesVoluntario/TarjetasProgramas';
+import PerfilUsuario from './componentesVoluntario/ConfigDePerfil';
+
+
 
 
 const NAVIGATION = [
@@ -26,8 +29,8 @@ const NAVIGATION = [
     title: 'Opciones',
   },
   {
-    segment: 'dashboard',
-    title: 'Dashboard',
+    segment: 'perfil',
+    title: 'Perfil',
     icon: <DashboardIcon />,
   },
     
@@ -90,7 +93,8 @@ function DemoPageContent({ pathname }) {
       }}
     >
       {pathname === '/voluntarios/otros-voluntarios' && <UsuariosCrud />}
-      {pathname === '/programas-inscritos' && <AsignacionesVol_Pro />}
+      {pathname === '/programas-inscritos' && <TarjetasProgramas />}
+      {pathname === '/perfil' && <PerfilUsuario />}
     </Box>
   );
 }
