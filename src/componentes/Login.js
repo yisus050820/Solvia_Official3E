@@ -69,16 +69,16 @@ const Login = () => {
           navigate('/Admin');
           break;
         case 'donor':
-          navigate('/donor-dashboard'); // Asegúrate de tener esta ruta configurada
+          navigate('/DonadorCrud'); // Asegúrate de tener esta ruta configurada
           break;
         case 'volunteer':
-          navigate('/volunteer-dashboard'); // Asegúrate de tener esta ruta configurada
+          navigate('/'); // Asegúrate de tener esta ruta configurada
           break;
         case 'beneficiary':
-          navigate('/beneficiary-dashboard'); // Asegúrate de tener esta ruta configurada
+          navigate('/BeneficiarioCrud'); // Asegúrate de tener esta ruta configurada
           break;
         case 'coordinator':
-          navigate('/coordinator-dashboard'); // Asegúrate de tener esta ruta configurada
+          navigate('/CoordiCrud'); // Asegúrate de tener esta ruta configurada
           break;
         default:
           navigate('/'); // Redirigir a una ruta por defecto

@@ -10,13 +10,20 @@ import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
+import PropTypes from 'prop-types';
+import Box from '@mui/material/Box';
+import { createTheme } from '@mui/material/styles';
 
-const dashboardDonante = () => {
-  const [selectedSegment, setSelectedSegment] = (''); // Controla la navegación
 
-  const handleNavigationChange = (segment) => {
-    setSelectedSegment(segment);
-  };
+import Donar from './componentesDonador/Donar';
+import HistorialDonaciones from './componentesDonador/HistorialDonaciones';
+import InformesDelImpacto from './componentesDonador/InformesDeImpacto';
+import VerPersonas from './componentesDonador/VerPersonas';
+import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
+import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
+import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
+
+
 
   const NAVIGATION = [
     {
@@ -24,8 +31,8 @@ const dashboardDonante = () => {
       title: 'Opciones',
     },
     {
-      segment: 'dashboard',
-      title: 'Dashboard',
+      segment: 'configuracion-perfil',
+      title: 'Mi perfil',
       icon: <DashboardIcon />,
     },
     {
@@ -43,11 +50,6 @@ const dashboardDonante = () => {
           title: 'Seguimiento de Donaciones',
           icon: <PaidIcon />,
           children: [
-            {
-              segment: 'estado-actual',
-              title: 'Estado de Donaciones Actuales',
-              icon: <PaidIcon />,
-            },
             {
               segment: 'historial',
               title: 'Historial de Donaciones',
@@ -110,21 +112,95 @@ const dashboardDonante = () => {
     },
   ];
 
-  const router = {
-    pathname: selectedSegment,
-    searchParams: new URLSearchParams(),
-    navigate: (path) => handleNavigationChange(path),
+  const demoTheme = createTheme({
+    cssVariables: {
+      colorSchemeSelector: 'data-toolpad-color-scheme',
+    },
+    colorSchemes: { light: true, dark: true },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 600,
+        lg: 1200,
+        xl: 1536,
+      },
+    },
+  });
+  
+  function DemoPageContent({ pathname }) {
+    return (
+      <Box
+        sx={{
+          py: 4,
+          px: 6,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          textAlign: 'left',
+          width: '100%',
+        }}
+      >
+        {pathname === '/donaciones/donar' && <Donar />}
+        {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
+        {pathname === '/informes/informes-generales' && <ReportesDonaciones />}
+        {pathname === '/informes/informes-impacto' && <InformesDelImpacto />}
+        {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
+        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
+        {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
+      </Box>
+    );
+  }
+  
+  
+  
+  
+  
+  
+  DemoPageContent.propTypes = {
+    pathname: PropTypes.string.isRequired,
+  };
+  
+  function DashboardDonante(props) {
+    const { window } = props;
+  
+    const [pathname, setPathname] = React.useState('configuracion-perfil');
+
+  
+    const router = React.useMemo(() => {
+      return {
+        pathname,
+        searchParams: new URLSearchParams(),
+        navigate: (path) => setPathname(String(path)),
+      };
+    }, [pathname]);
+  
+    // Remove this const when copying and pasting into your project.
+    const demoWindow = window !== undefined ? window() : undefined;
+  
+    return (
+      // preview-start
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      // preview-end
+    );
+  }
+  
+  DashboardDonante.propTypes = {
+    /**
+     * Injected by the documentation to work in an iframe.
+     * Remove this when copying and pasting into your project.
+     */
+    window: PropTypes.func,
   };
 
-  return (
-    <AppProvider navigation={NAVIGATION} router={router}>
-      <DashboardLayout>
-        {/* Renderizado condicional basado en la navegación */}
-        {selectedSegment === '/dashboard' && <p>Contenido del Dashboard</p>}
-        {/* Puedes añadir más secciones de contenido según las rutas */}
-      </DashboardLayout>
-    </AppProvider>
-  );
-};
-
-export default dashboardDonante;
+export default DashboardDonante;

@@ -5,6 +5,12 @@ import Registro from './componentes/Registro';
 import Login from './componentes/Login';
 import DashboardAdmin from './componentes/dashboardAdmin';
 import DashboardDonante from './componentes/dashboardDonante';
+import DashboardCoordi from './componentes/dashboardCoordi';
+import DashboardBeneficiario from './componentes/dashboardBeneficiario';
+import LandingPage from './componentes/index';
+
+
+
 
 function App() {
   const location = useLocation();
@@ -32,10 +38,18 @@ function App() {
           case 'admin':
             navigate('/Admin');
             break;
-          case 'donante':
-            navigate('/DonorDashboard');
+          case 'donor':
+            navigate('/DonadorCrud');
             break;
-          // Puedes agregar más roles según lo necesites
+          case 'volunteer':
+            navigate('/');
+            break;
+          case 'coordinator':
+            navigate('/CoordiCrud');
+            break;
+          case 'beneficiary':
+            navigate('/BeneficiarioCrud');
+            break;   
           default:
             navigate('/');
         }
@@ -48,10 +62,13 @@ function App() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Login onLogin={handleLogin} />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Registro />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/Admin" element={<DashboardAdmin />} />
-        <Route path="/DonorDashboard" element={<DashboardDonante />} />
+        <Route path="/CoordiCrud" element={<DashboardCoordi />} />
+        <Route path="/DonadorCrud" element={<DashboardDonante />} />
+        <Route path="/BeneficiarioCrud" element={<DashboardBeneficiario />} />
       </Routes>
     </AnimatePresence>
   );
