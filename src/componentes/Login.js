@@ -12,11 +12,10 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
-  const navigate = useNavigate(); // Definir useNavigate para las redirecciones
-
+  const navigate = useNavigate();
   const handleLogin = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/login', { // Asegúrate de que la URL esté correcta
+      const response = await fetch('http://localhost:5000/login', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -24,9 +23,7 @@ const Login = () => {
       const data = await response.json();
   
       if (response.ok) {
-        // Si la respuesta es válida
         console.log('Login successful:', data);
-        // Aquí puedes redirigir según el rol o guardar el token
       } else {
         console.error('Error during login:', data);
       }
@@ -43,6 +40,11 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -52,11 +54,19 @@ const Login = () => {
       setOpenSnackbar(true);
       return;
     }
+    
+    if (!isValidEmail(email)) {
+      setMessage('Por favor, introduce un correo electrónico válido.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
 
     try {
+      console.log(email, password);
       const response = await axios.post('http://localhost:5000/login', { email, password });
-      const { token, role } = response.data; // Obtener el token y el rol
-      localStorage.setItem('token', token); // Almacenar el token
+      const { token, role } = response.data;
+      localStorage.setItem('token', token);
       setMessage('Inicio de sesión exitoso');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
@@ -85,9 +95,9 @@ const Login = () => {
       }
     } catch (error) {
       if (error.response) {
-        if (error.response.data.message === 'Correo no encontrado') {
+        if (error.response.data.message === 'Usuario no encontrado.') {
           setMessage('El correo electrónico no está registrado.');
-        } else if (error.response.data.message === 'Contraseña incorrecta') {
+        } else if (error.response.data.message === 'Contraseña incorrecta.') {
           setMessage('La contraseña ingresada es incorrecta.');
         } else {
           setMessage('Error al intentar iniciar sesión. Por favor, inténtalo de nuevo.');

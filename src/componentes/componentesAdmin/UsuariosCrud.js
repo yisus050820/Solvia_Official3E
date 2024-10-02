@@ -76,10 +76,10 @@ const CrudUsuarios = () => {
 
   // Añadir usuario nuevo
   const handleAddUser = () => {
-    const validationErrors = validateUser(newUser, {}, false); // No estás en edición, por eso false
+    const validationErrors = validateUser(newUser, {}, false); 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log("Errores de validación:", validationErrors); // Para depurar
+      console.log("Errores de validación:", validationErrors);
       return;
     }
 

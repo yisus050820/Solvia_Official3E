@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const db = require('../db');
+const bcrypt = require('bcryptjs');
 
 // Middleware para autenticar el token JWT
 function authenticateToken(req, res, next) {
@@ -94,8 +95,9 @@ router.put('/', authenticateToken, upload.single('profile_picture'), (req, res) 
     }
 
     if (password) {
+      const hashedPassword = bcrypt.hashSync(password, 8);
       query += ', password = ?';
-      params.push(password); // Asegúrate de que la contraseña se está encriptando antes de guardarla
+      params.push(hashedPassword);
     }
 
     query += ' WHERE id = ?';

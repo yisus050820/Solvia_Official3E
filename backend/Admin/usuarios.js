@@ -63,10 +63,17 @@ router.post('/', (req, res) => {
         console.error('Error inserting user:', err);
         return res.status(500).json({ message: 'Error al añadir usuario. Inténtelo de nuevo.' });
       }
-      const newUser = { id: result.insertId, name, email, role, description, profile_picture: profilePicture };
-      res.status(201).json(newUser);
-    }
-  );
+
+      const newUserId = result.insertId;
+      db.query('SELECT id, name, email, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users WHERE id = ?', [newUserId], (err, newUser) => {
+        if (err) {
+          console.error('Error fetching newly created user:', err);
+          return res.status(500).json({ message: 'Error al recuperar el usuario recién creado.' });
+        }
+
+        res.status(201).json(newUser[0]);
+    });
+  });
 });
 
 // Actualizar usuario

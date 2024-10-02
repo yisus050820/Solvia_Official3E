@@ -6,26 +6,28 @@ const router = express.Router();
 
 router.post('/', (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
 
   // Verificar si el usuario existe en la base de datos
   const query = 'SELECT id, name, email, password, role FROM users WHERE email = ?';
   
   db.query(query, [email], (err, results) => {
-    if (err) {
-      console.error('Error during login:', err);
-      return res.status(500).json({ message: 'Error en el servidor.' });
-    }
 
     if (results.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
     const user = results[0];
+    console.log(user.password);
 
-    // Comparar la contraseña ingresada con la almacenada en la base de datos
     const isMatch = bcrypt.compareSync(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Contraseña incorrecta.' });
+    }
+
+    if (err) {
+      console.error('Error during login:', err);
+      return res.status(500).json({ message: 'Error en el servidor.' });
     }
 
     // Generar el token con el id y rol del usuario

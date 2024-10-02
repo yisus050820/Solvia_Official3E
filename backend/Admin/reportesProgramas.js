@@ -4,7 +4,7 @@ const db = require('../db');
 
 // Obtener la cantidad total de programas
 router.get('/totalProgramas', (req, res) => {
-  const query = 'SELECT COUNT(*) as total FROM programs';
+  const query = "SELECT COUNT(*) as total FROM programs WHERE status = 'active'";
   
   db.query(query, (err, results) => {
     if (err) {

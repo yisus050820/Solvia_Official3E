@@ -54,12 +54,11 @@ const AsignacionesPresupuesto_Pro = () => {
     const nuevaAsignacion = {
       program_id: programaSeleccionado,
       amount: cantidad,
-      date: new Date().toISOString().split('T')[0] // Añadir fecha actual
+      date: new Date().toISOString().split('T')[0]
     };
 
     axios.post('http://localhost:5000/asigPresProg/asignacion', nuevaAsignacion)
       .then(() => {
-        // Actualizar datos después de asignar
         axios.all([
           axios.get('http://localhost:5000/asigPresProg/asignaciones'),
           axios.get('http://localhost:5000/asigPresProg/disponible')
@@ -93,13 +92,27 @@ const AsignacionesPresupuesto_Pro = () => {
   const handleEditar = (asignacion) => {
     setCurrentEditAsignacion(asignacion); // Asignación seleccionada para editar
     setEditCantidad(asignacion.presupuesto); // Cantidad inicial a editar
-    setEditModalOpen(true); // Abre el modal de edición
-  };
+    setErrorCantidad('');  // Limpiar cualquier error anterior
+    setEditModalOpen(true); // Abrir el modal de edición
+  };  
 
   const handleGuardarEdicion = () => {
+    let isValid = true;
+    setErrorCantidad('');
+
+    if (!editCantidad || editCantidad <= 0) {
+      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      isValid = false;
+    } else if (editCantidad > dineroDisponible) {
+      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
     const updatedAsignacion = {
       ...currentEditAsignacion,
-      amount: editCantidad // Actualiza la cantidad editada
+      amount: editCantidad  
     };
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
@@ -110,7 +123,7 @@ const AsignacionesPresupuesto_Pro = () => {
             ? { ...asignacion, presupuesto: editCantidad } // Actualiza solo la cantidad
             : asignacion
         ));
-        setEditModalOpen(false); // Cierra el modal de edición
+        setEditModalOpen(false);
       })
       .catch(err => console.error('Error editing assignment:', err));
   };
@@ -154,14 +167,13 @@ const AsignacionesPresupuesto_Pro = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextField
-                label="Cantidad"
-                type="number"
-                value={cantidad}
-                onChange={(e) => setCantidad(e.target.value)}
-                fullWidth
-                sx={{ backgroundColor: 'black', borderRadius: '5px' }}
-              />
+            <TextField
+              label="Cantidad"
+              type="number"
+              value={editCantidad}
+              onChange={(e) => setEditCantidad(Number(e.target.value))}
+              fullWidth
+            />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </Grid>
           </Grid>
@@ -219,7 +231,8 @@ const AsignacionesPresupuesto_Pro = () => {
                 onChange={(e) => setEditCantidad(e.target.value)}
                 fullWidth
               />
-            </DialogContent>
+              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
+              </DialogContent>
             <DialogActions>
               <Button onClick={() => setEditModalOpen(false)} color="primary">
                 Cancelar
