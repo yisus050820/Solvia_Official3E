@@ -5,21 +5,21 @@ import { motion, useAnimation } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 
 const carouselImages = [
-  "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2",
-  "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2",
-  "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
+  "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+  "https://images.pexels.com/photos/4672720/pexels-photo-4672720.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+  "https://images.pexels.com/photos/4672717/pexels-photo-4672717.jpeg?auto=compress&cs=tinysrgb&w=600"
 ]
 
 const infoCards = [
-  { title: "Programas Educativos", description: "Brindamos apoyo a estudiantes de todo el mundo con programas diseñados para garantizar el acceso a la educación.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" },
-  { title: "Lucha contra la Desigualdad", description: "Nuestras iniciativas se centran en reducir la desigualdad en comunidades vulnerables a través de la educación y el empoderamiento.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" },
-  { title: "Apoyo Integral", description: "Ofrecemos ayudas integrales a personas y familias en situación de riesgo social para mejorar su calidad de vida.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" }
+  { title: "Programas Educativos", description: "Brindamos apoyo a estudiantes de todo el mundo con programas diseñados para garantizar el acceso a la educación.", image: "https://images.pexels.com/photos/7983552/pexels-photo-7983552.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  { title: "Lucha contra la Desigualdad", description: "Nuestras iniciativas se centran en reducir la desigualdad en comunidades vulnerables a través de la educación y el empoderamiento.", image: "https://images.pexels.com/photos/5935752/pexels-photo-5935752.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  { title: "Apoyo Integral", description: "Ofrecemos ayudas integrales a personas y familias en situación de riesgo social para mejorar su calidad de vida.", image: "https://images.pexels.com/photos/3280130/pexels-photo-3280130.jpeg?auto=compress&cs=tinysrgb&w=600" }
 ]
 
 const testimonials = [
-  { name: "Juan Pérez", comment: "Gracias a Solvia, pude continuar con mis estudios y mejorar mi futuro.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" },
-  { name: "Ana López", comment: "El programa de igualdad de Solvia transformó mi comunidad. Hoy tenemos más oportunidades que antes.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" },
-  { name: "Carlos Martínez", comment: "El apoyo que recibí de Solvia me permitió cumplir mi sueño de terminar la universidad.", image: "https://th.bing.com/th?id=OIP.TuC7alPpv5z5v8sw1Db_4QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" }
+  { name: "Juan Pérez", comment: "Gracias a Solvia, pude continuar con mis estudios y mejorar mi futuro.", image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  { name: "Ana López", comment: "El programa de igualdad de Solvia transformó mi comunidad. Hoy tenemos más oportunidades que antes.", image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  { name: "Carlos Martínez", comment: "El apoyo que recibí de Solvia me permitió cumplir mi sueño de terminar la universidad.", image: "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=600" }
 ]
 
 export default function LandingPage() {
@@ -27,7 +27,6 @@ export default function LandingPage() {
   const controls = useAnimation()
   const containerRef = useRef(null)
 
-  // Evitamos la ejecución doble en modo estricto con una bandera
   useEffect(() => {
     let isMounted = true
 
@@ -43,7 +42,6 @@ export default function LandingPage() {
     }
   }, [])
 
-  // Animación del carrusel con Framer Motion
   useEffect(() => {
     let isMounted = true
 
@@ -56,7 +54,7 @@ export default function LandingPage() {
     }
 
     if (isMounted) {
-      animateCarousel()  // Solo se anima si está montado
+      animateCarousel()
     }
 
     return () => {
@@ -66,7 +64,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
       <header className="bg-gray-800 p-4">
         <nav className="container mx-auto flex justify-between items-center">
           <motion.h1 
@@ -75,7 +72,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Logo
+            SOLVIA
           </motion.h1>
           <ul className="flex space-x-4">
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -91,7 +88,6 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Carousel */}
       <section className="relative h-96 overflow-hidden">
         <motion.img
           key={currentImage}
@@ -117,7 +113,6 @@ export default function LandingPage() {
         </button>
       </section>
 
-      {/* Info Cards */}
       <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-4">
           <motion.h2 
@@ -149,7 +144,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Carousel */}
       <section className="py-16 bg-gray-900 overflow-hidden">
         <div className="container mx-auto px-4">
           <motion.h2 
@@ -177,7 +171,7 @@ export default function LandingPage() {
                     transition={{ duration: 1 }}
                   >
                     <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center h-full">
-                      <img src={testimonial.image} alt={testimonial.name} className="w-20 h-20 rounded-full mb-4" />
+                      <img src={testimonial.image} alt={testimonial.name} className="w-20 h-20 object-cover rounded-full mb-4" />
                       <p className="text-center mb-2 flex-grow">{testimonial.comment}</p>
                       <p className="font-semibold">{testimonial.name}</p>
                       <div className="flex mt-2">
@@ -194,7 +188,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* About */}
       <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-4">
           <motion.h2 
@@ -216,7 +209,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-900 py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -226,7 +218,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              © 2023 Solvia. Todos los derechos reservados.
+              © 2024 Solvia. Todos los derechos reservados.
             </motion.p>
             <motion.div 
               className="flex space-x-4 mt-4 md:mt-0"

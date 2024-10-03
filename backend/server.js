@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');  // Falta agregar esta línea para que funcione path
+const path = require('path');  // Ya está agregada
 
 const app = express();
 
@@ -17,19 +17,21 @@ const userRoutes = require('./Admin/usuarios');
 const programRoutes = require('./Admin/programas');
 const registerRoute = require('./auth/register');
 const loginRoute = require('./auth/login');
+const resetPasswordRoute = require('./auth/resetPassword'); // Importar la nueva ruta de restablecimiento de contraseña
 const programReportsRoutes = require('./Admin/reportesProgramas');
 const donationsReportsRoutes = require('./Admin/reportesDonaciones');
 const usersReporsRoutes = require('./Admin/reportesUsuarios');
 const asigBenProgRoutes = require('./Admin/asignacionesBen_Prog');
 const asigPresProgRoutes = require('./Admin/aignacionesPresupuesto_Prog');
 const asigVolProgRoutes = require('./Admin/asignacionesVol_Prog');
-const perfilRoutes = require('./Admin/perfil')
+const perfilRoutes = require('./Admin/perfil');
 
 // Usar las rutas
 app.use('/usuarios', userRoutes);
 app.use('/programas', programRoutes);
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
+app.use('/auth', resetPasswordRoute); // Usar la nueva ruta para reset-password
 app.use('/programReports', programReportsRoutes);
 app.use('/donationsReports', donationsReportsRoutes);
 app.use('/userReports', usersReporsRoutes);

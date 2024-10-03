@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Box, Paper, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -12,25 +12,9 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [resetEmail, setResetEmail] = useState(''); // Estado para el correo de recuperación
+  const [showResetForm, setShowResetForm] = useState(false); // Estado para mostrar el modal de restablecimiento
   const navigate = useNavigate();
-  const handleLogin = async (email, password) => {
-    try {
-      const response = await fetch('http://localhost:5000/login', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-  
-      if (response.ok) {
-        console.log('Login successful:', data);
-      } else {
-        console.error('Error during login:', data);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -45,6 +29,7 @@ const Login = () => {
     return emailRegex.test(email);
   };
 
+  // Manejador para el login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,7 +39,7 @@ const Login = () => {
       setOpenSnackbar(true);
       return;
     }
-    
+
     if (!isValidEmail(email)) {
       setMessage('Por favor, introduce un correo electrónico válido.');
       setSnackbarSeverity('error');
@@ -79,16 +64,16 @@ const Login = () => {
           navigate('/Admin');
           break;
         case 'donor':
-          navigate('/DonadorCrud'); // Asegúrate de tener esta ruta configurada
+          navigate('/DonadorCrud'); 
           break;
         case 'volunteer':
-          navigate('/'); // Asegúrate de tener esta ruta configurada
+          navigate('/VoluntarioCrud'); 
           break;
         case 'beneficiary':
-          navigate('/BeneficiarioCrud'); // Asegúrate de tener esta ruta configurada
+          navigate('/BeneficiarioCrud'); 
           break;
         case 'coordinator':
-          navigate('/CoordiCrud'); // Asegúrate de tener esta ruta configurada
+          navigate('/CoordiCrud'); 
           break;
         default:
           navigate('/'); // Redirigir a una ruta por defecto
@@ -105,6 +90,33 @@ const Login = () => {
       } else {
         setMessage('Error al intentar iniciar sesión. Por favor, inténtalo de nuevo.');
       }
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Manejador para enviar el formulario de restablecimiento de contraseña
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    console.log('Enviando correo de restablecimiento a:', resetEmail); // Log para verificar el correo
+
+    if (!isValidEmail(resetEmail)) {
+      setMessage('Por favor, introduce un correo electrónico válido.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      // Enviar la solicitud al backend para generar el token y enviar el correo de restablecimiento
+      const response = await axios.post('http://localhost:5000/auth/reset-password', { email: resetEmail });
+
+      setMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.');
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+      setShowResetForm(false); // Cerrar el formulario
+    } catch (error) {
+      setMessage('Error al enviar el correo de restablecimiento.');
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
     }
@@ -212,6 +224,11 @@ const Login = () => {
           </Box>
           <Box mt={2} textAlign="center">
             <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
+              <Button onClick={() => setShowResetForm(true)} sx={{ color: '#1a73e8' }}>
+                ¿Olvidaste tu contraseña?
+              </Button>
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
               ¿No tienes una cuenta?{' '}
               <Link to="/register" style={{ color: '#1a73e8', textDecoration: 'none' }}>
                 Regístrate aquí
@@ -219,6 +236,44 @@ const Login = () => {
             </Typography>
           </Box>
         </Paper>
+
+        {/* Modal para el formulario de restablecimiento de contraseña */}
+        {showResetForm && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              bgcolor: 'background.paper',
+              p: 4,
+              boxShadow: 24,
+              zIndex: 1000,
+              borderRadius: '10px',
+            }}
+          >
+            <Typography variant="h6" align="center">
+              Restablecer Contraseña
+            </Typography>
+            <form onSubmit={handleResetPassword}>
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Correo Electrónico"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                required
+              />
+              <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+                Enviar correo de restablecimiento
+              </Button>
+              <Button onClick={() => setShowResetForm(false)} sx={{ mt: 2 }}>
+                Cerrar
+              </Button>
+            </form>
+          </Box>
+        )}
 
         <Snackbar
           open={openSnackbar}

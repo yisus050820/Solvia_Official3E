@@ -86,7 +86,7 @@ const PerfilUsuario = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    window.location.href = '/index';
   };
 
   const toggleEdit = () => {

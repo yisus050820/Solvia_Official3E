@@ -8,6 +8,8 @@ import DashboardDonante from './componentes/dashboardDonante';
 import DashboardCoordi from './componentes/dashboardCoordi';
 import DashboardBeneficiario from './componentes/dashboardBeneficiario';
 import LandingPage from './componentes/index';
+import ResetPassword from './componentes/ResetPassword';
+import DashboardVoluntario from './componentes/dashboardVoluntario';
 
 
 
@@ -42,7 +44,7 @@ function App() {
             navigate('/DonadorCrud');
             break;
           case 'volunteer':
-            navigate('/');
+            navigate('/VoluntarioCrud');
             break;
           case 'coordinator':
             navigate('/CoordiCrud');
@@ -69,6 +71,9 @@ function App() {
         <Route path="/CoordiCrud" element={<DashboardCoordi />} />
         <Route path="/DonadorCrud" element={<DashboardDonante />} />
         <Route path="/BeneficiarioCrud" element={<DashboardBeneficiario />} />
+        <Route path="/VoluntarioCrud" element={<DashboardVoluntario />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* Ruta para el restablecimiento */}
+        <Route path="/index" element={<LandingPage />} />
       </Routes>
     </AnimatePresence>
   );
