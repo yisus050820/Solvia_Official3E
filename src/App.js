@@ -15,7 +15,7 @@ function App() {
   return (
     <AnimatePresence mode="wait"> 
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<DashboardLayoutBasic />} />
         <Route path="/register" element={<Registro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/login" element={<DashboardLayoutBasic />} />
