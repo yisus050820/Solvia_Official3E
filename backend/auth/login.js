@@ -5,6 +5,7 @@ const db = require('../db');
 const router = express.Router();
 
 router.post('/', (req, res) => {
+  console.log('La info llego al back');
   const { email, password } = req.body;
   console.log(req.body);
 
