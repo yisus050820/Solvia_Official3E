@@ -21,9 +21,10 @@ router.get('/asignaciones', (req, res) => {
 
 // Obtener presupuesto disponible
 router.get('/disponible', (req, res) => {
+  console.log('Llego al back.');
   const query = `
     SELECT 
-      (SELECT SUM(amount) FROM donations) - (SELECT SUM(amount) FROM expenses) AS dineroDisponible
+      (SELECT SUM(amount) FROM donations) - COALESCE((SELECT SUM(amount) FROM expenses), 0) AS dineroDisponible
   `;
 
   db.query(query, (err, results) => {
@@ -31,6 +32,12 @@ router.get('/disponible', (req, res) => {
       console.error('Error fetching available funds:', err);
       return res.status(500).json({ message: 'Error al obtener el dinero disponible.' });
     }
+    
+    console.log('Results:', results); // Para depuración
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron resultados.' });
+    }
+    
     res.json({ dineroDisponible: results[0].dineroDisponible });
   });
 });

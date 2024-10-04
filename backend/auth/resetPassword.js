@@ -43,11 +43,11 @@ router.post('/', (req, res) => {
         service: 'gmail',
         auth: {
           user: 'acabrales@ucol.mx',
-          pass: 'OPYaoi10528', // Aquí deberías usar la contraseña de aplicación
+          pass: 'mpacclnkcfnsbzqu', // Aquí deberías usar la contraseña de aplicación
         },
       });
 
-      const resetUrl = `http://localhost:5000/reset-password/${token}`;
+      const resetUrl = `http://localhost:5000/resetPassword/${token}`;
 
       const mailOptions = {
         from: 'acabrales@ucol.mx',
@@ -70,13 +70,9 @@ router.post('/', (req, res) => {
   });
 });
 
-// Endpoint para restablecer la contraseña
-router.post('/reset-password/:token', (req, res) => {
+// Endpoint GET para manejar la redirección cuando el usuario hace clic en el enlace
+router.get('/:token', (req, res) => {
   const { token } = req.params;
-  const { password } = req.body;
-
-  console.log('Token recibido:', token);
-  console.log('Nueva contraseña recibida:', password);
 
   // Verificar si el token es válido y no ha expirado
   const query = 'SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?';
@@ -87,7 +83,30 @@ router.post('/reset-password/:token', (req, res) => {
     }
 
     if (results.length === 0) {
-      console.log('Token inválido o expirado. Token:', token, 'Fecha actual:', Date.now());
+      console.log('Token inválido o expirado. Token:', token);
+      return res.status(400).json({ message: 'Token inválido o expirado.' });
+    }
+
+    // Redirigir al frontend para que el usuario ingrese su nueva contraseña
+    res.redirect(`http://localhost:3000/resetPassword/${token}`); // Cambia esto a la URL de tu frontend (puerto 3000)
+  });
+});
+
+// Endpoint POST para restablecer la contraseña
+router.post('/reset/:token', (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  // Verificar si el token es válido y no ha expirado
+  const query = 'SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?';
+  db.query(query, [token, Date.now()], (err, results) => {
+    if (err) {
+      console.error('Error en la base de datos:', err);
+      return res.status(500).json({ message: 'Error en el servidor.' });
+    }
+
+    if (results.length === 0) {
+      console.log('Token inválido o expirado. Token:', token);
       return res.status(400).json({ message: 'Token inválido o expirado.' });
     }
 

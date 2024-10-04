@@ -111,7 +111,7 @@ const Registro = () => {
       // Redirigir al usuario a la página de login
       setTimeout(() => {
         navigate('/login'); // Redirección tras éxito
-      }, 2000); // Esperar 2 segundos antes de redirigir
+      }, 1000); // Esperar 2 segundos antes de redirigir
 
       // Limpiar los campos del formulario
       setName('');

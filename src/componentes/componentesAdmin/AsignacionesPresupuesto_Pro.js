@@ -30,6 +30,8 @@ const AsignacionesPresupuesto_Pro = () => {
       .catch(err => console.error('Error fetching available funds:', err));
   }, []);
 
+  console.log(dineroDisponible);
+
   const handleAsignar = () => {
     let isValid = true;
     setErrorCantidad('');
