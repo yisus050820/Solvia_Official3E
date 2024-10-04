@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { motion } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 
@@ -12,9 +12,9 @@ const AsignacionesPresupuesto_Pro = () => {
   const [cantidad, setCantidad] = useState('');
   const [errorCantidad, setErrorCantidad] = useState('');
   const [errorPrograma, setErrorPrograma] = useState('');
-  const [editModalOpen, setEditModalOpen] = useState(false); // Modal para editar
-  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); // Asignación a editar
-  const [editCantidad, setEditCantidad] = useState(''); // Cantidad a editar
+  const [editModalOpen, setEditModalOpen] = useState(false); 
+  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); 
+  const [editCantidad, setEditCantidad] = useState(''); 
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigPresProg/asignaciones')
@@ -37,7 +37,6 @@ const AsignacionesPresupuesto_Pro = () => {
     setErrorCantidad('');
     setErrorPrograma('');
 
-    // Validaciones
     if (!programaSeleccionado) {
       setErrorPrograma('Debes seleccionar un programa.');
       isValid = false;
@@ -92,10 +91,10 @@ const AsignacionesPresupuesto_Pro = () => {
   };
 
   const handleEditar = (asignacion) => {
-    setCurrentEditAsignacion(asignacion); // Asignación seleccionada para editar
-    setEditCantidad(asignacion.presupuesto); // Cantidad inicial a editar
-    setErrorCantidad('');  // Limpiar cualquier error anterior
-    setEditModalOpen(true); // Abrir el modal de edición
+    setCurrentEditAsignacion(asignacion); 
+    setEditCantidad(asignacion.presupuesto); 
+    setErrorCantidad('');  
+    setEditModalOpen(true); 
   };  
 
   const handleGuardarEdicion = () => {
@@ -119,10 +118,9 @@ const AsignacionesPresupuesto_Pro = () => {
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
       .then(() => {
-        // Actualiza las asignaciones localmente sin refrescar la página
         setAsignaciones(asignaciones.map(asignacion =>
           asignacion.id === currentEditAsignacion.id
-            ? { ...asignacion, presupuesto: editCantidad } // Actualiza solo la cantidad
+            ? { ...asignacion, presupuesto: editCantidad } 
             : asignacion
         ));
         setEditModalOpen(false);
@@ -150,13 +148,25 @@ const AsignacionesPresupuesto_Pro = () => {
           <Grid container spacing={4} sx={{ marginTop: '20px' }}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label" sx={{ color: 'gray' }}>Selecciona un Programa</InputLabel>
+                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
-                  sx={{ backgroundColor: 'black', borderRadius: '5px' }}
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
+                  }}
                 >
                   {programas.map(programa => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -169,13 +179,18 @@ const AsignacionesPresupuesto_Pro = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-            <TextField
-              label="Cantidad"
-              type="number"
-              value={cantidad}
-              onChange={(e) => setCantidad(Number(e.target.value))}
-              fullWidth
-            />
+              <TextField
+                label="Cantidad"
+                type="number"
+                value={cantidad}
+                onChange={(e) => setCantidad(Number(e.target.value))}
+                fullWidth
+                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                InputLabelProps={{
+                  // Mismo color que el label de Selecciona un Programa
+                  
+                }}
+              />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </Grid>
           </Grid>
@@ -223,7 +238,7 @@ const AsignacionesPresupuesto_Pro = () => {
                 label="Programa"
                 value={currentEditAsignacion?.programa || ''}
                 fullWidth
-                sx={{ marginBottom: '16px' }}
+                sx={{ marginBottom: '16px', backgroundColor: '#fff', borderRadius: '5px' }}
                 disabled
               />
               <TextField
@@ -232,16 +247,20 @@ const AsignacionesPresupuesto_Pro = () => {
                 value={editCantidad}
                 onChange={(e) => setEditCantidad(Number(e.target.value))}
                 fullWidth
+                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                InputLabelProps={{
+                  style: { color: 'black' }, // Mismo color que el label de Selecciona un Programa
+                }}
               />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
-              </DialogContent>
+            </DialogContent>
             <DialogActions>
-              <Button onClick={() => setEditModalOpen(false)} color="primary">
+              <motion.button className="bg-gray-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={() => setEditModalOpen(false)}>
                 Cancelar
-              </Button>
-              <Button onClick={handleGuardarEdicion} color="primary">
+              </motion.button>
+              <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={handleGuardarEdicion}>
                 Guardar
-              </Button>
+              </motion.button>
             </DialogActions>
           </Dialog>
         </CardContent>

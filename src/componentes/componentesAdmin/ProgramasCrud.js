@@ -20,12 +20,10 @@ const CrudProgramas = () => {
   const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
 
-  // Obtener programas cuando se carga la página
   useEffect(() => {
     fetchPrograms();
   }, []);
 
-  // Obtener programas desde el servidor
   const fetchPrograms = () => {
     axios.get('http://localhost:5000/programas')
       .then(response => {
@@ -36,7 +34,6 @@ const CrudProgramas = () => {
       });
   };
 
-  // Obtener coordinadores cuando se abre el modal
   useEffect(() => {
     if (isModalOpen || isEditModalOpen) {
       axios.get('http://localhost:5000/usuarios/coordinadores')
@@ -104,7 +101,6 @@ const CrudProgramas = () => {
     return validationErrors;
   };
 
-  // Añadir programa nuevo
   const handleAddProgram = () => {
     const validationErrors = validateProgram(newProgram);
     if (Object.keys(validationErrors).length > 0) {
@@ -125,15 +121,14 @@ const CrudProgramas = () => {
 
     axios.post('http://localhost:5000/programas', programData)
       .then(() => {
-        fetchPrograms(); // Recargar los datos después de añadir un nuevo programa
-        handleCloseModal(); // Cerrar el modal
+        fetchPrograms(); 
+        handleCloseModal(); 
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
       });
   };
 
-  // Editar programa existente
   const handleEditProgram = () => {
     const validationErrors = validateProgram(editProgram);
     if (Object.keys(validationErrors).length > 0) {
@@ -162,7 +157,7 @@ const CrudProgramas = () => {
       }
     })
       .then(() => {
-        fetchPrograms(); // Recargar los datos después de editar el programa
+        fetchPrograms(); 
         handleCloseEditModal();
       })
       .catch(error => {
@@ -233,8 +228,7 @@ const CrudProgramas = () => {
           </motion.button>
         </div>
 
-        {/* Tabla de programas */}
-        <table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
               <th className="p-4">ID</th>
@@ -248,14 +242,14 @@ const CrudProgramas = () => {
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-gray-900">
+          <motion.tbody layout className="bg-gray-900">
             {data.map((item) => (
-              <tr key={item.id} className="border-b border-gray-700">
+              <motion.tr key={item.id} className="border-b border-gray-700">
                 <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date.split('T')[0]}</td> {/* Mostrar solo la fecha */}
-                <td className="p-4">{item.end_date.split('T')[0]}</td>   {/* Mostrar solo la fecha */}
+                <td className="p-4">{item.start_date.split('T')[0]}</td> 
+                <td className="p-4">{item.end_date.split('T')[0]}</td>   
                 <td className="p-4">{item.objectives}</td>
                 <td className="p-4">{item.coordinator_name}</td>
                 <td className="p-4">
@@ -287,10 +281,10 @@ const CrudProgramas = () => {
                     <FaTrashAlt />
                   </motion.button>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
-          </tbody>
-        </table>
+          </motion.tbody>
+        </motion.table>
       </div>
 
       {/* Ventana emergente para agregar un nuevo registro */}
@@ -303,16 +297,16 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
+              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.nombre ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={newProgram.nombre}
                   onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
@@ -321,7 +315,7 @@ const CrudProgramas = () => {
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.descripcion ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={newProgram.descripcion}
                   onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
@@ -332,7 +326,7 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaInicio}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
                 />
                 {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
@@ -341,14 +335,14 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaFin}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
                 {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.objetivos ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Objetivos"
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
@@ -356,7 +350,7 @@ const CrudProgramas = () => {
                 {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
-                  className={`w-full p-2 border ${errors.coordinador ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.coordinador}
                   onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
                 >
@@ -369,7 +363,7 @@ const CrudProgramas = () => {
                 </select>
                 {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.status || 'active'}
                   onChange={(e) => setNewProgram({ ...newProgram, status: e.target.value })}
                 >
@@ -379,7 +373,7 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'new')}
                 />
@@ -415,16 +409,16 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Programa</h2>
+              <h2 className="text-white text-2xl font-bold mb-4">Editar Programa</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.nombre ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={editProgram.nombre || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, nombre: e.target.value })}
@@ -433,7 +427,7 @@ const CrudProgramas = () => {
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.descripcion ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={editProgram.descripcion || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, descripcion: e.target.value })}
@@ -444,7 +438,7 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
                 />
                 {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
@@ -453,14 +447,14 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaFin}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
                 {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.objetivos ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Objetivos"
                   value={editProgram.objetivos || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
@@ -468,7 +462,7 @@ const CrudProgramas = () => {
                 {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
-                  className={`w-full p-2 border ${errors.coordinador ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.coordinador || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, coordinador: e.target.value })}
                 >
@@ -481,7 +475,7 @@ const CrudProgramas = () => {
                 </select>
                 {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.status || 'active'}
                   onChange={(e) => setEditProgram({ ...editProgram, status: e.target.value })}
                 >
@@ -491,7 +485,7 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'edit')}
                 />
@@ -517,7 +511,6 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
 
-      {/* Confirmación de eliminar */}
       <Dialog
         open={isDeleteConfirmOpen}
         onClose={() => setIsDeleteConfirmOpen(false)}

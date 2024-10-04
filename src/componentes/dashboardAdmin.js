@@ -16,6 +16,9 @@ import AttachMoney from '@mui/icons-material/AttachMoney';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import MessageIcon from '@mui/icons-material/Message';
+import { Feedback } from '@mui/icons-material';
 
 // Importaciones de los formularios hijos
 import ProgramasCrud from './componentesAdmin/ProgramasCrud';
@@ -28,6 +31,8 @@ import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
+import Comunicacion from './componentesAdmin/Comunicacion';
+import VerFeedback from './componentesAdmin/VerFeedback';
 
 
 const NAVIGATION = [
@@ -109,6 +114,24 @@ const NAVIGATION = [
       
       ],
   },
+  {
+    segment: 'comunicacion',
+    title: 'Comunicacion',
+    icon: <ChatBubbleIcon />,
+    children: [
+
+      {
+        segment: 'contacto',
+        title: 'Contactar con un usuario',
+        icon: <MessageIcon />,
+      },
+      {
+        segment: 'ver-feedback',
+        title: 'Ver feedback de programas',
+        icon: <Feedback />,
+      },
+    ],
+  },
     
 ];
 
@@ -152,6 +175,8 @@ function DemoPageContent({ pathname }) {
       {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
+      {pathname === '/comunicacion/contacto' && <Comunicacion />}
+      {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
     </Box>
   );
 }

@@ -85,8 +85,8 @@ const AsignacionesBen_Pro = () => {
             ? {
                 ...asignacion,
                 ...datosEditados,
-                beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name, // Actualiza nombre beneficiario
-                programa: programas.find(p => p.id === programaSeleccionado)?.name // Actualiza nombre programa
+                beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name,
+                programa: programas.find(p => p.id === programaSeleccionado)?.name
               }
             : asignacion
         );
@@ -144,14 +144,6 @@ const AsignacionesBen_Pro = () => {
                       color: beneficiarioSeleccionado ? 'black' : 'inherit',
                     }
                   }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 48 * 5 + 8,
-                        width: 250,
-                      }
-                    }
-                  }}
                 >
                   {beneficiarios.map((beneficiario) => (
                     <MenuItem key={beneficiario.id} value={beneficiario.id}>
@@ -174,14 +166,6 @@ const AsignacionesBen_Pro = () => {
                       color: programaSeleccionado ? 'black' : 'inherit',
                     }
                   }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 48 * 5 + 8,
-                        width: 250,
-                      }
-                    }
-                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -193,12 +177,12 @@ const AsignacionesBen_Pro = () => {
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
-          <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
+            <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
           </div>
 
-          {/* Tabla de Asignaciones con estilo y animaciones */}
+          {/* Tabla de Asignaciones */}
           <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
           <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
@@ -233,10 +217,10 @@ const AsignacionesBen_Pro = () => {
       <AnimatePresence>
         {isEditModalOpen && editAsignacion && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Asignación</h2>
+            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
+              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
               <div className="space-y-4">
-                <select className="w-full p-2 border border-gray-300 rounded" value={beneficiarioSeleccionado} onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={beneficiarioSeleccionado} onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}>
                   <option value="">Selecciona un beneficiario</option>
                   {beneficiarios.map((beneficiario) => (
                     <option key={beneficiario.id} value={beneficiario.id}>
@@ -245,7 +229,7 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
                   <option value="">Selecciona un programa</option>
                   {programas.map((programa) => (
                     <option key={programa.id} value={programa.id}>
@@ -287,4 +271,3 @@ const AsignacionesBen_Pro = () => {
 };
 
 export default AsignacionesBen_Pro;
-

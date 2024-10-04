@@ -12,7 +12,9 @@ import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import MessageIcon from '@mui/icons-material/Message';
 import { createTheme } from '@mui/material/styles';
+import { Feedback } from '@mui/icons-material';
 
 
 import Donar from './componentesDonador/Donar';
@@ -22,7 +24,9 @@ import VerPersonas from './componentesDonador/VerPersonas';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
-
+import Calificar from './componentesBeneficiario/Feedback';
+import Comunicacion from './componentesDonador/Comunicacion';
+import VerFeedback from './componentesDonador/VerFeedback';
 
 
   const NAVIGATION = [
@@ -100,13 +104,18 @@ import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
       children: [
         {
           segment: 'contacto',
-          title: 'Contactar con un coordinador',
-          icon: <ChatBubbleIcon />,
+          title: 'Contactar con un administrador',
+          icon: <MessageIcon />,
         },
         {
           segment: 'feedback', // Nuevo hijo "Feedback"
           title: 'Feedback',
-          icon: <ChatBubbleIcon />, // Puedes cambiar el ícono si lo deseas
+          icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
+        },
+        {
+          segment: 'ver-feedback',
+          title: 'Ver feedback de programas',
+          icon: <Feedback />,
         },
       ],
     },
@@ -149,6 +158,9 @@ import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
+        {pathname === '/comunicacion/feedback' && <Calificar />}
+        {pathname === '/comunicacion/contacto' && <Comunicacion />}
+        {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
       </Box>
     );
   }

@@ -19,7 +19,6 @@ const CrudUsuarios = () => {
   const [filtroRol, setFiltroRol] = useState('');
   const [errors, setErrors] = useState({});
 
-  // Obtener usuarios al cargar la página
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
@@ -74,7 +73,6 @@ const CrudUsuarios = () => {
     return validationErrors;
   };
 
-  // Añadir usuario nuevo
   const handleAddUser = () => {
     const validationErrors = validateUser(newUser, {}, false); 
     if (Object.keys(validationErrors).length > 0) {
@@ -107,7 +105,6 @@ const CrudUsuarios = () => {
       });
   };
 
-  // Editar usuario existente
   const handleEditUser = () => {
     const validationErrors = validateUser(editUser, originalUser, true);
     if (Object.keys(validationErrors).length > 0) {
@@ -138,7 +135,7 @@ const CrudUsuarios = () => {
       console.error('Error al actualizar usuario:', error);
     });
   };
-  
+
   const handleOpenEditModal = (user) => {
     setEditUser({
       ...user,
@@ -148,14 +145,12 @@ const CrudUsuarios = () => {
     setIsEditModalOpen(true);
     setErrors({});
   };
-  
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setErrors({});
   };
 
-  // Eliminar usuario 
   const handleDelete = (id) => {
     axios.delete(`http://localhost:5000/usuarios/${id}`)
       .then(() => {
@@ -183,7 +178,6 @@ const CrudUsuarios = () => {
   };
 
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
-
 
   return (
     <>
@@ -224,7 +218,7 @@ const CrudUsuarios = () => {
             <FaPlus />
           </motion.button>
         </div>
-        {/* Tabla de usuarios */}
+
         <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
@@ -233,7 +227,7 @@ const CrudUsuarios = () => {
               <th className="p-4">Correo</th>
               <th className="p-4">Rol</th>
               <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Creación</th> {/* Nueva columna para la fecha de creación */}
+              <th className="p-4">Fecha Creación</th> 
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
@@ -245,7 +239,7 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
                 <td className="p-4">{item.description}</td>
-                <td className="p-4">{item.created_at}</td> {/* Mostramos la fecha de creación */}
+                <td className="p-4">{item.created_at}</td> 
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
@@ -255,7 +249,7 @@ const CrudUsuarios = () => {
                   </motion.button>
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
-                    onClick={() => handleDeleteClick(item.id)}  // Abre el diálogo de confirmación
+                    onClick={() => handleDeleteClick(item.id)}  
                   >
                     <FaTrashAlt />
                   </motion.button>
@@ -270,12 +264,12 @@ const CrudUsuarios = () => {
       <AnimatePresence>
         {isModalOpen && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full">
-              <h2 className="text-black text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
+            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={newUser.name}
                   onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
@@ -283,14 +277,14 @@ const CrudUsuarios = () => {
                 {errors.name && <p className="text-red-500">{errors.name}</p>}
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Correo"
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                 />
                 {errors.email && <p className="text-red-500">{errors.email}</p>}
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newUser.role}
                   onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                 >
@@ -302,7 +296,7 @@ const CrudUsuarios = () => {
                 </select>
                 {errors.role && <p className="text-red-500">{errors.role}</p>}
                 <textarea
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={newUser.description}
                   onChange={(e) => setNewUser({ ...newUser, description: e.target.value })}
@@ -311,7 +305,7 @@ const CrudUsuarios = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                     placeholder="Contraseña"
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
@@ -335,29 +329,29 @@ const CrudUsuarios = () => {
         )}
       </AnimatePresence>
 
-      {/* Modal para editar usuario*/}
+      {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full">
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Usuario</h2>
+            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+              <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={editUser.name}
                   onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
                 />
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Correo"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editUser.role}
                   onChange={(e) => setEditUser({ ...editUser, role: e.target.value })}
                 >
@@ -370,7 +364,7 @@ const CrudUsuarios = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                     placeholder="Nueva Contraseña (opcional)"
                     value={editUser.password || ''}
                     onChange={(e) => setEditUser({ ...editUser, password: e.target.value })}
@@ -384,7 +378,7 @@ const CrudUsuarios = () => {
                 </div>
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={editUser.description}
                   onChange={(e) => setEditUser({ ...editUser, description: e.target.value })}
@@ -438,7 +432,7 @@ const CrudUsuarios = () => {
                 className="bg-red-500 text-white px-4 py-2 rounded-full"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={confirmDelete}  // Llama a la función confirmDelete
+                onClick={confirmDelete}  
               >
                 Eliminar
               </motion.button>

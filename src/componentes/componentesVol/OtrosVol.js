@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import { FaIconName } from 'react-icons/fa';
-
-
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -75,9 +72,7 @@ const OtrosVoluntarios = () => {
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-10">
-        <div className="flex justify-between mb-4 space-x-4">
-
-        </div>
+        <div className="flex justify-between mb-4 space-x-4"></div>
 
         <motion.table
           className="w-full bg-gray-800 text-white rounded-lg shadow-md"
@@ -144,29 +139,29 @@ const OtrosVoluntarios = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: '-100vh' }}
               animate={{ y: '0' }}
               exit={{ y: '-100vh' }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
+              <h2 className="text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={newUser.name}
                   onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                 />
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Correo"
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                 />
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   value={newUser.role}
                   onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                 >
@@ -179,7 +174,7 @@ const OtrosVoluntarios = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                     placeholder="Contraseña"
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
@@ -193,7 +188,7 @@ const OtrosVoluntarios = () => {
                 </div>
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={newUser.description}
                   onChange={(e) => setNewUser({ ...newUser, description: e.target.value })}
@@ -229,29 +224,29 @@ const OtrosVoluntarios = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: '-100vh' }}
               animate={{ y: '0' }}
               exit={{ y: '-100vh' }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Usuario</h2>
+              <h2 className="text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={editUser.name}
                   onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
                 />
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Correo"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   value={editUser.role}
                   onChange={(e) => setEditUser({ ...editUser, role: e.target.value })}
                 >
@@ -264,7 +259,7 @@ const OtrosVoluntarios = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                     placeholder="Contraseña"
                     value={editUser.password}
                     onChange={(e) => setEditUser({ ...editUser, password: e.target.value })}
@@ -278,7 +273,7 @@ const OtrosVoluntarios = () => {
                 </div>
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={editUser.description}
                   onChange={(e) => setEditUser({ ...editUser, description: e.target.value })}
