@@ -153,7 +153,7 @@ const PerfilUsuario = () => {
                     variant="outlined"
                     margin="dense"
                     placeholder="Escribe tu nombre"
-                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
+                    sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Aseguramos que el texto sea negro
                   />
                   <TextField
                     name="email"
@@ -165,10 +165,10 @@ const PerfilUsuario = () => {
                     placeholder="Escribe tu correo"
                     error={!!errors.email}
                     helperText={errors.email}
-                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
+                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' }, color:'black' }} // Texto negro
                   />
                   {/* Campo de contraseña */}
-                  <TextField
+                  <TextField  
                     name="password"
                     type={showPassword ? 'text' : 'password'}  // Alternar entre mostrar y ocultar contraseña
                     value={password}
@@ -186,7 +186,7 @@ const PerfilUsuario = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 2 }}
+                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Texto negro
                     error={!!errors.password}
                     helperText={errors.password}
                   />
@@ -201,16 +201,14 @@ const PerfilUsuario = () => {
               </Typography>
             ) : (
               <TextField
-                name="description"
-                value={editInfo.description || ''}  // Asegurarse de que no sea undefined
-                onChange={handleChange}
-                multiline
-                rows={3}
-                fullWidth
-                variant="outlined"
-                margin="dense"
-                placeholder="Agrega una descripción"
-                sx={{ backgroundColor: 'black', borderRadius: '5px', mb: 4 }}
+              name="description"
+              value={editInfo.description || ''}  // Asegurarse de que no sea undefined
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              margin="dense"
+              placeholder="Agrega una descripción"
+              sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Aseguramos que el texto sea negro
               />
             )}
             <div className="flex justify-end space-x-4">

@@ -237,10 +237,10 @@ const AsignacionesVol_Pro = () => {
       <AnimatePresence>
         {isEditModalOpen && editAsignacion && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Asignación</h2>
+            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
+              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
               <div className="space-y-4">
-                <select className="w-full p-2 border border-gray-300 rounded" value={voluntarioSeleccionado} onChange={(e) => setVoluntarioSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={voluntarioSeleccionado} onChange={(e) => setVoluntarioSeleccionado(e.target.value)}>
                   <option value="">Selecciona un voluntario</option>
                   {voluntarios.map((voluntario) => (
                     <option key={voluntario.id} value={voluntario.id}>
@@ -249,7 +249,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
                   <option value="">Selecciona un programa</option>
                   {programas.map((programa) => (
                     <option key={programa.id} value={programa.id}>
@@ -258,7 +258,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={taskStatusSeleccionado} onChange={(e) => setTaskStatusSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={taskStatusSeleccionado} onChange={(e) => setTaskStatusSeleccionado(e.target.value)}>
                   <option value="active">Activo</option>
                   <option value="pause">Pausado</option>
                   <option value="unactive">Inactivo</option>

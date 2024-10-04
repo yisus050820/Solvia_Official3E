@@ -4,153 +4,137 @@ import axios from 'axios';
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState('');
+
+  // Feedback genérico para mostrar en la ventana modal, ahora con calificación de 1 a 10
+  const genericFeedback = [
+    { username: 'Juan Pérez', message: 'Este programa fue muy útil, lo recomiendo mucho.', rating: 9 },
+    { username: 'Ana Rodríguez', message: 'Me encantó participar, aprendí mucho.', rating: 8 },
+    { username: 'Carlos Sánchez', message: 'Excelente programa, los recursos son muy buenos.', rating: 10 }
+  ];
+
+  // Feedback genérico del usuario
+  const userFeedback = {
+    username: 'Tú',
+    message: 'Este programa me ayudó a mejorar mis habilidades.',
+    rating: 8
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
-  };
-
-  const resetForm = () => {
-    setRating(0);
-    setFeedback('');
+    // Aquí NO se realiza ninguna llamada al backend para el feedback
   };
 
   const handleCloseModal = () => {
-    resetForm();
     setIsModalOpen(false);
   };
 
-  const handleRatingChange = (event) => {
-    setRating(event.target.value);
-  };
-
-  const handleFeedbackChange = (event) => {
-    setFeedback(event.target.value);
-  };
-
-  const handleSubmitFeedback = () => {
-    console.log(`Feedback enviado para ${title}:`);
-    console.log(`Calificación: ${rating}`);
-    console.log(`Comentario: ${feedback}`);
-    
-    resetForm();
-    setIsModalOpen(false);
-  };
-
+  // Función para determinar el color del estado
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
-        return 'bg-green-500';
+        return 'bg-green-500';  // Verde para activo
       case 'pause':
-        return 'bg-yellow-500';
+        return 'bg-yellow-500'; // Amarillo para pausado
       case 'unactive':
-        return 'bg-red-500';
+        return 'bg-red-500';    // Rojo para inactivo
       default:
-        return 'bg-gray-500';
+        return 'bg-gray-500';   // Gris por defecto
     }
   };
 
   return (
     <>
+      {/* Tarjeta del programa */}
       <motion.div 
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
         whileHover={{ scale: 1.05 }} 
         whileTap={{ scale: 0.95 }}   
       >
+        {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
           src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
+        {/* Contenido principal de la tarjeta */}
         <div className="p-4">
           <h2 className="text-white text-xl font-bold">{title}</h2>
+          {/* Estado del programa con un círculo de color */}
           <div className="flex items-center mt-2">
             <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
             <span className="ml-2 text-gray-400 capitalize">{status}</span>
           </div>
+          {/* Limitar la descripción a un máximo de 100 caracteres */}
           <p className="text-gray-400 mt-2">
-            {description.length > 100 ? `${description.substring(0, 100)}...` : description}
+            {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
+          {/* Participantes */}
           <div className="mt-4">
             <span className="text-green-400">Participantes: {participants}</span>
           </div>
+          {/* Donaciones */}
           <div className="mt-2">
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
+            {/* Botón para abrir la ventana emergente */}
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
               whileHover={{ backgroundColor: '#636363' }}
               onClick={handleOpenModal}
             >
-              Dar Feedback
+              Ver Feedback
             </motion.button>
           </div>
         </div>
       </motion.div>
 
+      {/* Ventana emergente */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"  
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
           >
+            {/* Contenido de la ventana emergente */}
             <motion.div 
-              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }} 
-              animate={{ y: "0" }} 
+              animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-2xl font-bold mb-4">Feedback para {title}</h2>
-              <p className="text-gray-400">{description}</p>
-              <div className="mb-4">
-                <label className="block text-gray-300 font-bold mb-2">
-                  Calificación (1 a 10):
-                </label>
-                <input 
-                  type="number" 
-                  value={rating} 
-                  onChange={handleRatingChange} 
-                  min="1" 
-                  max="10" 
-                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
-                  placeholder="Calificación"
-                />
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-gray-300 font-bold mb-2">
-                  Comentarios:
-                </label>
-                <textarea 
-                  value={feedback} 
-                  onChange={handleFeedbackChange} 
-                  className="w-full p-2 border border-gray-500 rounded bg-white text-black" 
-                  rows="4" 
-                  placeholder="Escribe tu comentario aquí..."
-                />
-              </div>
-              
-              <div className="flex justify-between mt-4">
-                <motion.button 
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
-                  onClick={handleCloseModal}
-                >
-                  Cancelar
-                </motion.button>
-                
-                <motion.button 
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
-                  onClick={handleSubmitFeedback}
-                >
-                  Enviar Feedback
-                </motion.button>
-              </div>
+              <h2 className="text-black text-2xl font-bold mb-4">Feedback de {title}</h2>
+
+              {/* Feedback del usuario como el resto */}
+              <ul className="text-gray-600">
+                <li className="mb-4">
+                  <strong>{userFeedback.username}</strong>: {userFeedback.message} <br />
+                  <span className="text-yellow-500">Calificación: {userFeedback.rating}/10</span>
+                </li>
+
+                {/* Feedback genérico */}
+                {genericFeedback.length > 0 ? (
+                  genericFeedback.map((fb, index) => (
+                    <li key={index} className="mb-4">
+                      <strong>{fb.username}</strong>: {fb.message} <br />
+                      <span className="text-yellow-500">Calificación: {fb.rating}/10</span>
+                    </li>
+                  ))
+                ) : (
+                  <p>No hay feedback disponible.</p>
+                )}
+              </ul>
+
+              {/* Botón para cerrar la ventana */}
+              <motion.button 
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                whileHover={{ backgroundColor: '#4A90E2' }}
+                onClick={handleCloseModal}
+              >
+                Cerrar
+              </motion.button>
             </motion.div>
           </motion.div>
         )}
@@ -159,7 +143,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   );
 };
 
-const Calificar = () => {
+const MiFeedback = () => {
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
@@ -174,7 +158,7 @@ const Calificar = () => {
               ...program,
               participants: participantsRes.data.count,
               donations: donationsRes.data.total,
-              imageUrl: program.program_image, // Imagen del programa desde el backend
+              imageUrl: program.program_image, // Añadido para manejar la imagen del programa
             };
           })
         );        
@@ -196,12 +180,12 @@ const Calificar = () => {
           description={program.description}
           participants={program.participants}
           donations={program.donations}
-          status={program.status}
-          imageUrl={program.imageUrl}
+          status={program.status} 
+          imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
         />
       ))}
     </div>
   );
 };
 
-export default Calificar;
+export default MiFeedback;
