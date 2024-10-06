@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Typography, Box, Paper, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
+import { TextField, Button, Box, Paper, Typography, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const ResetPassword = () => {
@@ -9,6 +9,7 @@ const ResetPassword = () => {
   const { token } = useParams(); // Obtenemos el token desde los parámetros de la URL
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
@@ -17,7 +18,7 @@ const ResetPassword = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
-  
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };

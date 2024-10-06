@@ -39,24 +39,24 @@ function isValidEmail(email) {
 
 // Ruta para obtener la información del perfil del usuario autenticado
 router.get('/', authenticateToken, (req, res) => {
-    const userId = req.user.id;
-  
-    console.log(`Obteniendo información del perfil del usuario con ID: ${userId}`);
-  
-    const query = 'SELECT id, name, email, role, description, profile_picture FROM users WHERE id = ?';
-    db.query(query, [userId], (err, result) => {
-      if (err) {
-        console.error('Error fetching user profile:', err);
-        return res.status(500).json({ message: 'Error al obtener el perfil del usuario.' });
-      }
-      if (result.length === 0) {
-        console.log('Usuario no encontrado.');
-        return res.status(404).json({ message: 'Usuario no encontrado.' });
-      }
-      console.log('Perfil del usuario obtenido correctamente:', result[0]);
-      res.json(result[0]);
-    });
+  const userId = req.user.id;
+
+  console.log(`Obteniendo información del perfil del usuario con ID: ${userId}`);
+
+  const query = 'SELECT id, name, email, role, description, profile_picture FROM users WHERE id = ?';
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error('Error fetching user profile:', err);
+      return res.status(500).json({ message: 'Error al obtener el perfil del usuario.' });
+    }
+    if (result.length === 0) {
+      console.log('Usuario no encontrado.');
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+    console.log('Perfil del usuario obtenido correctamente:', result[0]);
+    res.json(result[0]);
   });
+});
 
 // Ruta para actualizar el perfil del usuario autenticado
 router.put('/', authenticateToken, upload.single('profile_picture'), (req, res) => {

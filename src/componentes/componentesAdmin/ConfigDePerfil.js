@@ -16,10 +16,22 @@ const PerfilUsuario = () => {
 
   // Obtener la información del usuario al cargar el componente
   useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    // Verificar si el token existe y no está vacío
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
+    // Revisar el tamaño del token (si es necesario)
+    console.log('Tamaño del token:', token.length);
+
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('/perfil', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        const response = await axios.get('http://localhost:5000/perfil', {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         setUserInfo(response.data);
@@ -85,8 +97,9 @@ const PerfilUsuario = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/index';
+    localStorage.removeItem('token');  // Limpiar el token al cerrar sesión
+    delete axios.defaults.headers.common['Authorization'];  // Limpiar encabezados globales
+    window.location.href = '/index';  // Redirigir a la página de inicio o login
   };
 
   const toggleEdit = () => {
