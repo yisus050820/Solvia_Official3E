@@ -5,7 +5,6 @@ import { TextField, Button, Box, Paper, Typography, Snackbar, Alert, InputAdornm
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const ResetPassword = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const { token } = useParams(); // Obtenemos el token desde los parámetros de la URL
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
