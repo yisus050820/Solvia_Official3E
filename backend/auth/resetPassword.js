@@ -6,7 +6,7 @@ const db = require('../db'); // Tu conexión a la base de datos
 const router = express.Router();
 
 // Endpoint para solicitar el restablecimiento de contraseña
-router.post('/reset-password', (req, res) => {
+router.post('/', (req, res) => {
   const { email } = req.body;
 
   console.log('Solicitud de restablecimiento recibida para:', email);
@@ -42,15 +42,15 @@ router.post('/reset-password', (req, res) => {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'enriquezjesus122@gmail.com',
-          pass: 'gqdjhvkkwibtrelj', // Aquí deberías usar la contraseña de aplicación
+          user: 'acabrales@ucol.mx',
+          pass: 'aucyvrcdbrnnkyjv', // Aquí deberías usar la contraseña de aplicación
         },
       });
 
-      const resetUrl = `http://localhost:3000/reset-password/${token}`;
+      const resetUrl = `http://localhost:3000/resetPassword/${token}`;
 
       const mailOptions = {
-        from: 'enriquezjesus122@gmail.com',
+        from: 'acabrales@ucol.mx',
         to: email,
         subject: 'Restablecer Contraseña',
         text: `Recibiste este correo porque solicitaste restablecer tu contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña: \n\n ${resetUrl} \n\nEste enlace es válido por 1 hora. Si no solicitaste este cambio, puedes ignorar este correo.`,
@@ -71,23 +71,18 @@ router.post('/reset-password', (req, res) => {
 });
 
 // Endpoint para restablecer la contraseña
-router.post('/reset-password/:token', (req, res) => {
+router.post('/reset/:token', (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
-
-  console.log('Token recibido:', token);
-  console.log('Nueva contraseña recibida:', password);
 
   // Verificar si el token es válido y no ha expirado
   const query = 'SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?';
   db.query(query, [token, Date.now()], (err, results) => {
     if (err) {
-      console.error('Error en la base de datos:', err);
       return res.status(500).json({ message: 'Error en el servidor.' });
     }
 
     if (results.length === 0) {
-      console.log('Token inválido o expirado. Token:', token, 'Fecha actual:', Date.now());
       return res.status(400).json({ message: 'Token inválido o expirado.' });
     }
 
@@ -100,13 +95,33 @@ router.post('/reset-password/:token', (req, res) => {
     const updateQuery = 'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE id = ?';
     db.query(updateQuery, [hashedPassword, userId], (err) => {
       if (err) {
-        console.error('Error al actualizar la contraseña:', err);
         return res.status(500).json({ message: 'Error al actualizar la contraseña.' });
       }
 
-      console.log('Contraseña restablecida con éxito para el usuario ID:', userId);
       res.status(200).json({ message: 'Contraseña restablecida con éxito.' });
     });
+  });
+});
+
+// Endpoint GET para manejar la redirección cuando el usuario hace clic en el enlace
+router.get('/reset/:token', (req, res) => {
+  const { token } = req.params;
+
+  // Verificar si el token es válido y no ha expirado
+  const query = 'SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?';
+  db.query(query, [token, Date.now()], (err, results) => {
+    if (err) {
+      console.error('Error en la base de datos:', err);
+      return res.status(500).json({ message: 'Error en el servidor.' });
+    }
+
+    if (results.length === 0) {
+      console.log('Token inválido o expirado. Token:', token);
+      return res.status(400).json({ message: 'Token inválido o expirado.' });
+    }
+
+    // Redirigir al frontend para que el usuario ingrese su nueva contraseña
+    res.redirect(`http://localhost:3000/resetPassword/${token}`); // Cambia esto a la URL de tu frontend (puerto 3000)
   });
 });
 

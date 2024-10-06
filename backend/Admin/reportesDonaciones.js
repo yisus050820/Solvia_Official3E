@@ -31,9 +31,9 @@ router.get('/distribucionDonaciones', (req, res) => {
   const query = `
     SELECT u.name AS donor_name, COALESCE(SUM(d.amount), 0) AS total_donations
     FROM users u
-    LEFT JOIN donations d ON u.id = d.donor_id
+    INNER JOIN donations d ON u.id = d.donor_id
     WHERE u.role = 'donor'
-    GROUP BY u.name
+    GROUP BY u.name;
   `;
   db.query(query, (err, results) => {
     if (err) {

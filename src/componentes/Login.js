@@ -98,7 +98,7 @@ const Login = () => {
   // Manejador para enviar el formulario de restablecimiento de contraseña
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    console.log('Enviando correo de restablecimiento a:', resetEmail); // Log para verificar el correo
+    console.log('Info correctamente proporcionada'); // Log para verificar el correo
 
     if (!isValidEmail(resetEmail)) {
       setMessage('Por favor, introduce un correo electrónico válido.');
@@ -109,7 +109,8 @@ const Login = () => {
 
     try {
       // Enviar la solicitud al backend para generar el token y enviar el correo de restablecimiento
-      const response = await axios.post('http://localhost:5000/auth/reset-password', { email: resetEmail });
+      const response = await axios.post('http://localhost:5000/resetPassword', { email: resetEmail });
+      console.log('Info enviada desde el front al back');
 
       setMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.');
       setSnackbarSeverity('success');

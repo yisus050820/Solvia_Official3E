@@ -31,7 +31,7 @@ app.use('/usuarios', userRoutes);
 app.use('/programas', programRoutes);
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
-app.use('/auth', resetPasswordRoute); // Usar la nueva ruta para reset-password
+app.use('/resetPassword', resetPasswordRoute); // Usar la nueva ruta para reset-password
 app.use('/programReports', programReportsRoutes);
 app.use('/donationsReports', donationsReportsRoutes);
 app.use('/userReports', usersReporsRoutes);

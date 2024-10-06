@@ -170,8 +170,8 @@ const AsignacionesPresupuesto_Pro = () => {
             <TextField
               label="Cantidad"
               type="number"
-              value={editCantidad}
-              onChange={(e) => setEditCantidad(Number(e.target.value))}
+              value={cantidad}
+              onChange={(e) => setCantidad(Number(e.target.value))}
               fullWidth
             />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
@@ -228,7 +228,7 @@ const AsignacionesPresupuesto_Pro = () => {
                 label="Cantidad"
                 type="number"
                 value={editCantidad}
-                onChange={(e) => setEditCantidad(e.target.value)}
+                onChange={(e) => setEditCantidad(Number(e.target.value))}
                 fullWidth
               />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
