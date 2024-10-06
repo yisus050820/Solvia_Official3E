@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Paper, Typography, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Box, Paper, Typography, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const ResetPassword = () => {
   const { token } = useParams(); // Obtenemos el token desde los parámetros de la URL
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
@@ -14,6 +16,10 @@ const ResetPassword = () => {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleResetPassword = async (e) => {
@@ -28,7 +34,7 @@ const ResetPassword = () => {
 
     try {
       // Enviamos la nueva contraseña y el token al backend
-      const response = await axios.post(`http://localhost:5000/reset-password/${token}`, { password });
+      const response = await axios.post(`http://localhost:5000/resetPassword/reset/${token}`, { password });
       setMessage('Contraseña restablecida con éxito');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
@@ -62,24 +68,8 @@ const ResetPassword = () => {
           Restablecer Contraseña
         </Typography>
         <Box component="form" onSubmit={handleResetPassword} noValidate>
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Nueva Contraseña"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Confirmar Contraseña"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+          <TextField margin="normal" fullWidth label="Contraseña" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#black' }, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: '#b0b0b0' }}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment>), sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
+          <TextField margin="normal" fullWidth label="Confirmar Contraseña" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#black' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
           <Button
             type="submit"
             fullWidth

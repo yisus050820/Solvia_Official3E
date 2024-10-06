@@ -72,7 +72,7 @@ function App() {
         <Route path="/DonadorCrud" element={<DashboardDonante />} />
         <Route path="/BeneficiarioCrud" element={<DashboardBeneficiario />} />
         <Route path="/VoluntarioCrud" element={<DashboardVoluntario />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* Ruta para el restablecimiento */}
+        <Route path="/resetPassword/:token" element={<ResetPassword />} /> {/* Ruta para el restablecimiento */}
         <Route path="/index" element={<LandingPage />} />
       </Routes>
     </AnimatePresence>
