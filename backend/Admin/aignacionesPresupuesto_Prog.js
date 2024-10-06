@@ -23,7 +23,7 @@ router.get('/asignaciones', (req, res) => {
 router.get('/disponible', (req, res) => {
   const query = `
     SELECT 
-      (SELECT SUM(amount) FROM donations) - (SELECT SUM(amount) FROM expenses) AS dineroDisponible
+    (SELECT SUM(amount) FROM donations) - COALESCE((SELECT SUM(amount) FROM expenses), 0) AS dineroDisponible;
   `;
 
   db.query(query, (err, results) => {
