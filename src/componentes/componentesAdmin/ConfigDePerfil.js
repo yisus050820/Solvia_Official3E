@@ -66,9 +66,9 @@ const PerfilUsuario = () => {
     }
 
     try {
-      const response = await axios.put('/perfil', formData, {
+      const response = await axios.put('http://localhost:5000/perfil', formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
