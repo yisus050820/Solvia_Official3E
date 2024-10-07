@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { Typography } from '@mui/material';
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,15 +35,15 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
         return 'bg-gray-500';   // Gris por defecto
     }
   };
-
+  
   return (
-    <>
+    <>    
       {/* Tarjeta del programa */}
       <motion.div 
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
         whileHover={{ scale: 1.05 }} 
         whileTap={{ scale: 0.95 }}   
-      >
+      >      
         {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
@@ -156,18 +157,26 @@ const VerFeedback = () => {
   }, []);
 
   return (
-    <div className="flex justify-center flex-wrap">
-      {programs.map((program) => (
-        <ProgramCard
-          key={program.id}
-          title={program.name}
-          description={program.description}
-          participants={program.participants}
-          donations={program.donations}
-          status={program.status} 
-          imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
-        />
-      ))}
+    <div>
+      {/* Título encima del contenido */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Ver Feedback
+      </Typography>
+      
+      {/* Contenedor de los programas */}
+      <div className="flex justify-center flex-wrap">
+        {programs.map((program) => (
+          <ProgramCard
+            key={program.id}
+            title={program.name}
+            description={program.description}
+            participants={program.participants}
+            donations={program.donations}
+            status={program.status}
+            imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
+          />
+        ))}
+      </div>
     </div>
   );
 };

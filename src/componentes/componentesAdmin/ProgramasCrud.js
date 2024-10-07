@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+
 
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -216,7 +217,11 @@ const CrudProgramas = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-10">
+      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+        {/* Título encima del contenido */}
+        <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
+          Gestionar Programas
+        </Typography>
         <div className="flex justify-end mb-4 space-x-4">
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"

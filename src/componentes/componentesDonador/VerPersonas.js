@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-
+import { Typography } from '@mui/material';
 
 const VerPersonas = () => {
   const [data, setData] = useState([
@@ -11,7 +11,10 @@ const VerPersonas = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-10">
+      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Otros Donadores
+      </Typography>
         <motion.table
           className="w-full bg-gray-800 text-white rounded-lg shadow-md"
           initial={{ opacity: 0 }}

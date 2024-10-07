@@ -130,11 +130,17 @@ const AsignacionesPresupuesto_Pro = () => {
 
   return (
     <motion.div
-      className="max-w-6xl mx-auto mt-10"
+      className="max-w-6xl mx-auto mt-0"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+
+    {/* Título "Asignación" */}
+    <Typography variant="h3" align="center" color="primary" gutterBottom>
+      Asignación
+    </Typography>
+
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Typography variant="h4" color="white" gutterBottom>
@@ -188,7 +194,10 @@ const AsignacionesPresupuesto_Pro = () => {
                 sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
                 InputLabelProps={{
                   // Mismo color que el label de Selecciona un Programa
-                  
+                  style: { color: 'black' },
+                }}
+                inputProps={{
+                  style: { color: 'black' }, // Establece el color del texto ingresado a negro
                 }}
               />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
@@ -239,7 +248,9 @@ const AsignacionesPresupuesto_Pro = () => {
                 value={currentEditAsignacion?.programa || ''}
                 fullWidth
                 sx={{ marginBottom: '16px', backgroundColor: '#fff', borderRadius: '5px' }}
-                disabled
+                InputProps={{
+                  style: { color: 'black' }, // Establece el color del texto a negro
+                }}
               />
               <TextField
                 label="Cantidad"
@@ -249,13 +260,17 @@ const AsignacionesPresupuesto_Pro = () => {
                 fullWidth
                 sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
                 InputLabelProps={{
-                  style: { color: 'black' }, // Mismo color que el label de Selecciona un Programa
+                  // Mismo color que el label de Selecciona un Programa
+                  style: { color: 'black' },
+                }}
+                inputProps={{
+                  style: { color: 'black' }, // Establece el color del texto ingresado a negro
                 }}
               />
               {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </DialogContent>
             <DialogActions>
-              <motion.button className="bg-gray-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={() => setEditModalOpen(false)}>
+              <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={() => setEditModalOpen(false)}>
                 Cancelar
               </motion.button>
               <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={handleGuardarEdicion}>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { Typography } from '@mui/material';
+
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -172,18 +174,25 @@ const MiFeedback = () => {
   }, []);
 
   return (
-    <div className="flex justify-center flex-wrap">
-      {programs.map((program) => (
-        <ProgramCard
-          key={program.id}
-          title={program.name}
-          description={program.description}
-          participants={program.participants}
-          donations={program.donations}
-          status={program.status} 
-          imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
-        />
-      ))}
+    <div className="mt-4">
+    {/* Título usando Typography */}
+    <Typography variant="h3" align="center" color="primary" gutterBottom>
+      Ver Feedback
+    </Typography>
+
+      <div className="flex justify-center flex-wrap">
+        {programs.map((program) => (
+          <ProgramCard
+            key={program.id}
+            title={program.name}
+            description={program.description}
+            participants={program.participants}
+            donations={program.donations}
+            status={program.status} 
+            imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
+          />
+        ))}
+      </div>
     </div>
   );
 };

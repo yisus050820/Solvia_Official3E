@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { Typography } from '@mui/material'; // Importa Typography de Material-UI
 
 const HistorialDonaciones = () => {
   const [donaciones, setDonaciones] = useState([
@@ -10,15 +11,16 @@ const HistorialDonaciones = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-4 mx-auto mt-10">
-        <motion.h1
-          className="text-3xl font-bold text-white mb-6"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+      <div className="w-full px-6 py-4 mx-auto mt-2">
+        {/* Título usando Typography */}
+        <Typography 
+          variant="h3" 
+          align="center" 
+          color="primary" 
+          gutterBottom
         >
           Historial de Donaciones
-        </motion.h1>
+        </Typography>
 
         <motion.table
           className="w-full bg-gray-800 text-white rounded-lg shadow-md"

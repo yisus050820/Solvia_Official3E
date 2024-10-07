@@ -52,7 +52,11 @@ const ReportesUsuarios = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-10">
+    <div className="max-w-6xl mx-auto mt-2">
+      {/* Título encima del contenido */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Reporte Usuarios
+      </Typography>
       {/* Resumen rápido - Total de usuarios, nuevos usuarios, usuarios por rol */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>

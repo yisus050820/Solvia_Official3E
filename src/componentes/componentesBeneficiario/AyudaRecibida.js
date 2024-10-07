@@ -30,7 +30,10 @@ const AyudaRecibida = () => {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto mt-10">
+    <div className="max-w-6xl mx-auto mt-2">
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Ayuda Recibida
+      </Typography>
       {/* Resumen rápido - Total de donaciones, nuevas donaciones, promedio por usuario */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>

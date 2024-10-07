@@ -47,11 +47,14 @@ const Comunicacion = () => {
 
   return (
     <motion.div
-      className="max-w-6xl mx-auto mt-10"
+      className="max-w-6xl mx-auto mt-2"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+    <Typography variant="h3" align="center" color="primary" gutterBottom>
+      Comunicación
+    </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Typography variant="h4" color="white" gutterBottom>

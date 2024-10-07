@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { Typography } from '@mui/material';
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -188,6 +189,11 @@ const Calificar = () => {
   }, []);
 
   return (
+    <div className="mt-2"> {/* Ajusta el margen superior */}
+      {/* Título de la sección */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Feedback
+      </Typography>
     <div className="flex justify-center flex-wrap">
       {programs.map((program) => (
         <ProgramCard
@@ -198,8 +204,9 @@ const Calificar = () => {
           donations={program.donations}
           status={program.status}
           imageUrl={program.imageUrl}
-        />
-      ))}
+          />
+        ))}
+      </div>
     </div>
   );
 };

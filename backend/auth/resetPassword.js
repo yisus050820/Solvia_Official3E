@@ -42,15 +42,15 @@ router.post('/', (req, res) => {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'acabrales@ucol.mx',
-          pass: 'aucyvrcdbrnnkyjv', // Aquí deberías usar la contraseña de aplicación
+          user: 'solviacorp@gmail.com',
+          pass: 'qtqucfzmxnzjpkaj', // Aquí deberías usar la contraseña de aplicación
         },
       });
 
       const resetUrl = `http://localhost:3000/resetPassword/${token}`;
 
       const mailOptions = {
-        from: 'acabrales@ucol.mx',
+        from: 'solviacorp@gmail.com',
         to: email,
         subject: 'Restablecer Contraseña',
         text: `Recibiste este correo porque solicitaste restablecer tu contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña: \n\n ${resetUrl} \n\nEste enlace es válido por 1 hora. Si no solicitaste este cambio, puedes ignorar este correo.`,

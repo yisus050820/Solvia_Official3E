@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { Typography } from '@mui/material';
 
 const CrudUsuariosCoordi = () => {
   const [data, setData] = useState([]);
@@ -21,7 +22,10 @@ const CrudUsuariosCoordi = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-10">
+      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Usuarios
+      </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
