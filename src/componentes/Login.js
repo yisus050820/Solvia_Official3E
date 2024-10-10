@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Box, Paper, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -12,6 +12,9 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [resetEmail, setResetEmail] = useState(''); // Estado para el correo de recuperación
+  const [showResetForm, setShowResetForm] = useState(false); // Estado para mostrar el modal de restablecimiento
+  const navigate = useNavigate();
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -21,6 +24,12 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Manejador para el login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -31,27 +40,92 @@ const Login = () => {
       return;
     }
 
+    if (!isValidEmail(email)) {
+      setMessage('Por favor, introduce un correo electrónico válido.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:5000/login', {
-        email,
-        password,
-      });
+      console.log(email, password);
+      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const { token, role } = response.data;
+      localStorage.setItem('token', token);
       setMessage('Inicio de sesión exitoso');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
       setEmail('');
       setPassword('');
+
+      // Redirigir según el rol
+      switch (role) {
+        case 'admin':
+          navigate('/Admin');
+          break;
+        case 'donor':
+          navigate('/DonadorCrud'); 
+          break;
+        case 'volunteer':
+          navigate('/VoluntarioCrud'); 
+          break;
+        case 'beneficiary':
+          navigate('/BeneficiarioCrud'); 
+          break;
+        case 'coordinator':
+          navigate('/CoordiCrud'); 
+          break;
+        default:
+          navigate('/'); // Redirigir a una ruta por defecto
+      }
     } catch (error) {
       if (error.response) {
-        if (error.response.data.message === 'Correo no encontrado') {
+        if (error.response.data.message === 'Usuario no encontrado.') {
           setMessage('El correo electrónico no está registrado.');
-        } else if (error.response.data.message === 'Contraseña incorrecta') {
+        } else if (error.response.data.message === 'Contraseña incorrecta.') {
           setMessage('La contraseña ingresada es incorrecta.');
         } else {
           setMessage('Error al intentar iniciar sesión. Por favor, inténtalo de nuevo.');
         }
       } else {
         setMessage('Error al intentar iniciar sesión. Por favor, inténtalo de nuevo.');
+      }
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Manejador para enviar el formulario de restablecimiento de contraseña
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    console.log('Info correctamente proporcionada'); // Log para verificar el correo
+
+    if (!isValidEmail(resetEmail)) {
+      setMessage('Por favor, introduce un correo electrónico válido.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      // Enviar la solicitud al backend para generar el token y enviar el correo de restablecimiento
+      const response = await axios.post('http://localhost:5000/resetPassword', { email: resetEmail });
+      console.log('Info enviada desde el front al back');
+      setMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.');
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+      setShowResetForm(false); // Cerrar el formulario
+    } catch (error) {
+      if (error.response) {
+        if (error.response.data.message === 'Error en el servidor.') {
+          setMessage('Error en el servidor.');
+        } else if (error.response.data.message === 'Usuario no encontrado.') {
+          setMessage('Usuario no encontrado.');
+        } else {
+          setMessage('Error');
+        }
+      } else {
+        setMessage('Error al enviar el correo de restablecimiento.');
       }
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
@@ -65,7 +139,7 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: `url('URL_DE TU_IMAGEN_DE_FONDO')`,
+        backgroundImage: `url('URL_DE_TU_IMAGEN_DE_FONDO')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         p: 2,
@@ -160,6 +234,11 @@ const Login = () => {
           </Box>
           <Box mt={2} textAlign="center">
             <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
+              <Button onClick={() => setShowResetForm(true)} sx={{ color: '#1a73e8' }}>
+                ¿Olvidaste tu contraseña?
+              </Button>
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
               ¿No tienes una cuenta?{' '}
               <Link to="/register" style={{ color: '#1a73e8', textDecoration: 'none' }}>
                 Regístrate aquí
@@ -167,6 +246,44 @@ const Login = () => {
             </Typography>
           </Box>
         </Paper>
+
+        {/* Modal para el formulario de restablecimiento de contraseña */}
+        {showResetForm && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              bgcolor: 'background.paper',
+              p: 4,
+              boxShadow: 24,
+              zIndex: 1000,
+              borderRadius: '10px',
+            }}
+          >
+            <Typography variant="h6" align="center">
+              Restablecer Contraseña
+            </Typography>
+            <form onSubmit={handleResetPassword}>
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Correo Electrónico"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                required
+              />
+              <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+                Enviar correo de restablecimiento
+              </Button>
+              <Button onClick={() => setShowResetForm(false)} sx={{ mt: 2 }}>
+                Cerrar
+              </Button>
+            </form>
+          </Box>
+        )}
 
         <Snackbar
           open={openSnackbar}

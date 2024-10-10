@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import { Typography } from '@mui/material';
 
-const ProgramCard = ({ title, description, participants, donations }) => {
+const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
@@ -16,7 +18,7 @@ const ProgramCard = ({ title, description, participants, donations }) => {
   };
 
   const handleCloseModal = () => {
-    resetForm(); // Restablecer el formulario cuando se cierra el modal
+    resetForm();
     setIsModalOpen(false);
   };
 
@@ -29,34 +31,45 @@ const ProgramCard = ({ title, description, participants, donations }) => {
   };
 
   const handleSubmitFeedback = () => {
-    // Aquí iría la llamada al backend para enviar el feedback
-    // Ejemplo: fetch('/api/feedback', { method: 'POST', body: JSON.stringify({ title, rating, feedback }) })
     console.log(`Feedback enviado para ${title}:`);
     console.log(`Calificación: ${rating}`);
     console.log(`Comentario: ${feedback}`);
     
-    // Cerrar el modal y reiniciar el formulario
     resetForm();
     setIsModalOpen(false);
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-500';
+      case 'pause':
+        return 'bg-yellow-500';
+      case 'unactive':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   return (
     <>
-      {/* Tarjeta del programa */}
       <motion.div 
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
         whileHover={{ scale: 1.05 }} 
         whileTap={{ scale: 0.95 }}   
       >
-        {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
-          src="https://via.placeholder.com/150"
+          src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
-        {/* Contenido principal de la tarjeta */}
         <div className="p-4">
           <h2 className="text-white text-xl font-bold">{title}</h2>
+          <div className="flex items-center mt-2">
+            <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
+            <span className="ml-2 text-gray-400 capitalize">{status}</span>
+          </div>
           <p className="text-gray-400 mt-2">
             {description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
@@ -67,7 +80,6 @@ const ProgramCard = ({ title, description, participants, donations }) => {
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
-            {/* Botón para abrir la ventana emergente */}
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
               whileHover={{ backgroundColor: '#636363' }}
@@ -79,27 +91,24 @@ const ProgramCard = ({ title, description, participants, donations }) => {
         </div>
       </motion.div>
 
-      {/* Ventana emergente */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"  // z-50 asegura que esté sobre las demás tarjetas
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
           >
-            {/* Contenido de la ventana emergente */}
             <motion.div 
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }} 
               animate={{ y: "0" }} 
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Feedback para {title}</h2>
-              <p className="text-gray-600">{description}</p> {/* Descripción completa */}
-              {/* Formulario de feedback */}
+              <h2 className="text-2xl font-bold mb-4">Feedback para {title}</h2>
+              <p className="text-gray-400">{description}</p>
               <div className="mb-4">
-                <label className="block text-gray-700 font-bold mb-2">
+                <label className="block text-gray-300 font-bold mb-2">
                   Calificación (1 a 10):
                 </label>
                 <input 
@@ -108,25 +117,25 @@ const ProgramCard = ({ title, description, participants, donations }) => {
                   onChange={handleRatingChange} 
                   min="1" 
                   max="10" 
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black"
+                  placeholder="Calificación"
                 />
               </div>
               
               <div className="mb-4">
-                <label className="block text-gray-700 font-bold mb-2">
+                <label className="block text-gray-300 font-bold mb-2">
                   Comentarios:
                 </label>
                 <textarea 
                   value={feedback} 
                   onChange={handleFeedbackChange} 
-                  className="w-full p-2 border rounded-lg" 
+                  className="w-full p-2 border border-gray-500 rounded bg-white text-black" 
                   rows="4" 
                   placeholder="Escribe tu comentario aquí..."
                 />
               </div>
               
-              <div className="flex justify-end space-x-4">
-                {/* Botón para cerrar la ventana */}
+              <div className="flex justify-between mt-4">
                 <motion.button 
                   className="bg-gray-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#636363' }}
@@ -135,7 +144,6 @@ const ProgramCard = ({ title, description, participants, donations }) => {
                   Cancelar
                 </motion.button>
                 
-                {/* Botón para enviar el feedback */}
                 <motion.button 
                   className="bg-blue-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#4A90E2' }}
@@ -152,41 +160,53 @@ const ProgramCard = ({ title, description, participants, donations }) => {
   );
 };
 
-// Componente principal que genera las tarjetas
 const Calificar = () => {
-  const programs = [
-    {
-      title: 'Community Food Drive',
-      description: 'This program is dedicated to providing essential food supplies to families and individuals in need in our local communities. Volunteers are actively involved in distributing food packages every weekend and during special holiday drives. We collaborate with local businesses and donors to make sure no one goes hungry.',
-      participants: 25,
-      donations: 1500,
-    },
-    {
-      title: 'Medical Aid Program',
-      description: 'The Medical Aid Program focuses on providing essential healthcare services, including general check-ups, vaccinations, and emergency treatments, to communities with limited access to medical facilities. We work with local and international medical professionals to ensure the health and wellbeing of these populations.',
-      participants: 40,
-      donations: 2300,
-    },
-    {
-      title: 'Education Support Initiative',
-      description: 'Our Education Support Initiative provides free tutoring, school supplies, and financial assistance for students from low-income families. We believe every child deserves a fair chance at education, and our goal is to bridge the educational gap in underserved areas.',
-      participants: 18,
-      donations: 800,
-    },
-  ];
+  const [programs, setPrograms] = useState([]);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/programas');
+        const programData = await Promise.all(
+          response.data.map(async (program) => {
+            const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`);
+            const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`);
+            return {
+              ...program,
+              participants: participantsRes.data.count,
+              donations: donationsRes.data.total,
+              imageUrl: program.program_image, // Imagen del programa desde el backend
+            };
+          })
+        );        
+        setPrograms(programData);
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
 
   return (
-    // Flex para centrar y distribuir las tarjetas
+    <div className="mt-2"> {/* Ajusta el margen superior */}
+      {/* Título de la sección */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Feedback
+      </Typography>
     <div className="flex justify-center flex-wrap">
-      {programs.map((program, index) => (
+      {programs.map((program) => (
         <ProgramCard
-          key={index}
-          title={program.title}
+          key={program.id}
+          title={program.name}
           description={program.description}
           participants={program.participants}
           donations={program.donations}
-        />
-      ))}
+          status={program.status}
+          imageUrl={program.imageUrl}
+          />
+        ))}
+      </div>
     </div>
   );
 };
