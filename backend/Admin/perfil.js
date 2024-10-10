@@ -6,6 +6,9 @@ const path = require('path');
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 
+
+router.use('/uploads', express.static(path.join(__dirname, './uploads')));
+
 // Middleware para autenticar el token JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -55,6 +58,7 @@ router.get('/', authenticateToken, (req, res) => {
     }
     console.log('Perfil del usuario obtenido correctamente:', result[0]);
     res.json(result[0]);
+    colsole.log(profile_picture);
   });
 });
 
@@ -62,7 +66,7 @@ router.get('/', authenticateToken, (req, res) => {
 router.put('/', authenticateToken, upload.single('profile_picture'), (req, res) => {
   const userId = req.user.id;
   const { name, email, password, description } = req.body;
-  const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
+  const profilePicture = req.file ? `/uploads/${req.file.filename}` : null; // Ajuste aquí
 
   // Validación de email
   if (!isValidEmail(email)) {
@@ -115,6 +119,7 @@ router.put('/', authenticateToken, upload.single('profile_picture'), (req, res) 
           return res.status(500).json({ message: 'Error al obtener el perfil actualizado.' });
         }
         res.json(updatedResult[0]);
+        console.log('Información del perfil actualizado:', updatedResult[0]);
       });
     });
   });
