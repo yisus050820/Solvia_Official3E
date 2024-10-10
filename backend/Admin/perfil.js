@@ -58,7 +58,6 @@ router.get('/', authenticateToken, (req, res) => {
     }
     console.log('Perfil del usuario obtenido correctamente:', result[0]);
     res.json(result[0]);
-    colsole.log(profile_picture);
   });
 });
 
