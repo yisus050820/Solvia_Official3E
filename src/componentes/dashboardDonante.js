@@ -151,12 +151,12 @@ import VerFeedback from './componentesDonador/VerFeedback';
           width: '100%',
         }}
       >
+        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/donaciones/donar' && <Donar />}
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
         {pathname === '/informes/informes-generales' && <ReportesDonaciones />}
         {pathname === '/informes/informes-impacto' && <InformesDelImpacto />}
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
-        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <Comunicacion />}
@@ -177,7 +177,7 @@ import VerFeedback from './componentesDonador/VerFeedback';
   function DashboardDonante(props) {
     const { window } = props;
   
-    const [pathname, setPathname] = React.useState('configuracion-perfil');
+    const [pathname, setPathname] = React.useState('/configuracion-perfil');
 
   
     const router = React.useMemo(() => {

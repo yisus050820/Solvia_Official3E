@@ -18,6 +18,7 @@ const CrudUsuarios = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [filtroRol, setFiltroRol] = useState('');
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
@@ -95,6 +96,7 @@ const CrudUsuarios = () => {
         const createdUser = response.data;
         setData([...data, createdUser]); 
         handleCloseModal();
+        setSuccessMessage('Usuario agregado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
         if (error.response && error.response.status === 409) {
@@ -130,6 +132,7 @@ const CrudUsuarios = () => {
           console.error('Error fetching users:', error);
         });
       handleCloseEditModal();
+      setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
     })
     .catch(error => {
       console.error('Error al actualizar usuario:', error);
@@ -157,6 +160,7 @@ const CrudUsuarios = () => {
         setData(data.filter(user => user.id !== id));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
+        setSuccessMessage('Usuario eliminado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
         console.error('Error deleting user:', error);
@@ -182,9 +186,9 @@ const CrudUsuarios = () => {
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
-        Usuarios
-      </Typography>
+        <Typography variant="h3" align="center" color="primary" gutterBottom>
+          Usuarios
+        </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -230,7 +234,7 @@ const CrudUsuarios = () => {
               <th className="p-4">Correo</th>
               <th className="p-4">Rol</th>
               <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Creación</th> 
+              <th className="p-4">Fecha Creación</th>
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
@@ -242,7 +246,7 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
                 <td className="p-4">{item.description}</td>
-                <td className="p-4">{item.created_at}</td> 
+                <td className="p-4">{item.created_at}</td>
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
@@ -252,7 +256,7 @@ const CrudUsuarios = () => {
                   </motion.button>
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
-                    onClick={() => handleDeleteClick(item.id)}  
+                    onClick={() => handleDeleteClick(item.id)}
                   >
                     <FaTrashAlt />
                   </motion.button>
@@ -443,6 +447,23 @@ const CrudUsuarios = () => {
           </Dialog>
         )}
       </AnimatePresence>
+
+      {/* Modal para mensajes de éxito */}
+      {successMessage && (
+        <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className="flex justify-end">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={() => setSuccessMessage('')}
+              >
+                Cerrar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </>
   );
 };
