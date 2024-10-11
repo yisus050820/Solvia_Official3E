@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
@@ -15,6 +15,13 @@ const AsignacionesVol_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   // Cargar los voluntarios y programas al montar el componente
   useEffect(() => {
@@ -64,8 +71,18 @@ const AsignacionesVol_Pro = () => {
         setProgramaSeleccionado(''); 
         setTaskStatusSeleccionado('active');
       })
-      .catch(err => {
-        console.error('Error assigning volunteer:', err);
+      .catch(error => {
+        if (error.response) {
+          if (error.response.data.message === 'El voluntario ya está asignado a este programa.') {
+            setMessage('El voluntario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al asignar voluntario.');
+          }
+        } else {
+          setMessage('Error al asignar voluntario. Por favor, inténtalo de nuevo.');
+        }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };  
 
@@ -90,16 +107,40 @@ const AsignacionesVol_Pro = () => {
 
     axios.put(`http://localhost:5000/asigVolProg/voluntarios/${currentId}`, datosEditados)
       .then(() => {
+        // Si la edición fue exitosa, actualizar el estado
         const nuevasAsignaciones = asignaciones.map(asignacion => 
           asignacion.id === currentId ? { ...asignacion, ...datosEditados } : asignacion
         );
         setAsignaciones(nuevasAsignaciones);
         setIsEditModalOpen(false);
+
+        // Restablecer los campos y mostrar mensaje de éxito
         setVoluntarioSeleccionado(''); 
         setProgramaSeleccionado('');
         setTaskStatusSeleccionado('active');
+        setSnackbarSeverity('success');
+        setMessage('Asignación actualizada con éxito.');
+        setOpenSnackbar(true);
       })
-      .catch(err => console.error('Error updating assignment:', err));
+      .catch(error => {
+        // Manejar el error si el usuario ya está asignado a un programa
+        if (error.response) {
+          if (error.response.status === 409) {
+            // Mostrar error específico del backend
+            setMessage(error.response.data.message); // El mensaje enviado por el backend
+          } else if (error.response.status === 500) {
+            // Error del servidor
+            setMessage('Error al actualizar la asignación.');
+          }
+        } else {
+          // Error de red o similar
+          setMessage('Error al editar asignación. Por favor, inténtalo de nuevo.');
+        }
+        
+        // Mostrar el mensaje de error en el Snackbar
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
   };
 
   // Manejar la eliminación de una asignación
@@ -113,6 +154,7 @@ const AsignacionesVol_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setCurrentId(null); 
       })
       .catch(err => console.error('Error deleting assignment:', err));
   };
@@ -296,6 +338,16 @@ const AsignacionesVol_Pro = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };
