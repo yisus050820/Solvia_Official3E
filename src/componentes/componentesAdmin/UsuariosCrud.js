@@ -30,6 +30,17 @@ const CrudUsuarios = () => {
       });
   }, []);
 
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+      return () => clearTimeout(timer); // Limpiar el timer si el componente se desmonta antes
+    }
+  }, [successMessage]);
+
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
@@ -270,7 +281,12 @@ const CrudUsuarios = () => {
       {/* Modal para añadir usuario */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2, ease: "easeIn" }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
@@ -328,8 +344,19 @@ const CrudUsuarios = () => {
                 {errors.password && <p className="text-red-500">{errors.password}</p>}
               </div>
               <div className="mt-4 flex justify-end space-x-2">
-                <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cancelar</button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleAddUser}>Agregar</button>
+                <motion.button 
+                className="bg-gray-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                onClick={handleCloseModal} 
+                >
+                  Cancelar
+                </motion.button>
+                <motion.button 
+                className="bg-blue-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#4A90E2',scale: 1.1 }}
+                onClick={handleAddUser}>
+                  Agregar
+                  </motion.button>
               </div>
             </motion.div>
           </motion.div>
@@ -339,8 +366,18 @@ const CrudUsuarios = () => {
       {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <motion.div 
+            initial={{ y: -50 }}
+            animate={{ y: 0 }}
+            exit={{ y: 50 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
               <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -394,14 +431,14 @@ const CrudUsuarios = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
+                  whileHover={{ backgroundColor: '#4A90E2',scale: 1.1 }}
                   onClick={handleEditUser}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -449,9 +486,20 @@ const CrudUsuarios = () => {
       </AnimatePresence>
 
       {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
       {successMessage && (
-        <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
             <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
             <div className="flex justify-end">
               <button
@@ -464,6 +512,8 @@ const CrudUsuarios = () => {
           </motion.div>
         </motion.div>
       )}
+              </AnimatePresence>
+
     </>
   );
 };
