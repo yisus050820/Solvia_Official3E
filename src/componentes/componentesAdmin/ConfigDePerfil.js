@@ -13,6 +13,7 @@ const PerfilUsuario = () => {
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem('token');
 
   // Obtener la información del usuario al cargar el componente
   useEffect(() => {
