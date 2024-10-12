@@ -68,7 +68,7 @@ const PerfilUsuario = () => {
     try {
       const response = await axios.put('http://localhost:5000/perfil', formData, {
         headers: {
-          Authorization: 'Bearer ${token}',
+          Authorization: 'Bearer ${token}' ,
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -227,19 +227,36 @@ const PerfilUsuario = () => {
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
                 <>
-                  <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" onClick={toggleEdit}>
+                  <motion.button 
+                  className="bg-blue-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={toggleEdit}
+                  >
                     <FaEdit />
                   </motion.button>
-                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={handleLogout}>
+                  <motion.button 
+                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleLogout}>
                     <FaDoorOpen />
                   </motion.button>
                 </>
               ) : (
                 <div className="flex space-x-4">
-                  <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" onClick={handleSave}>
+                  <motion.button 
+                  className="bg-green-500 text-white px-4 py-2 rounded-full"
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleSave}>
                     Guardar
                   </motion.button>
-                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={() => setIsEditing(false)}>
+                  <motion.button 
+                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{ backgroundColor: '#C53030', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setIsEditing(false)}>
                     Cancelar
                   </motion.button>
                 </div>

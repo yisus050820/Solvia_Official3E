@@ -274,6 +274,7 @@ const CrudProgramas = () => {
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
                     whileHover={{ scale: 1.1 }}
+                    whileTap={{scale: 0.9}}
                     onClick={() => handleOpenEditModal(item)}
                   >
                     <FaEdit />
@@ -281,6 +282,7 @@ const CrudProgramas = () => {
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
                     whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleDeleteConfirm(item.id)}
                   >
                     <FaTrashAlt />
@@ -386,14 +388,17 @@ const CrudProgramas = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-green-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#38a169' }}
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleAddProgram}
                 >
                   Agregar
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+
                   onClick={handleCloseModal}
                 >
                   Cerrar
@@ -498,14 +503,16 @@ const CrudProgramas = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale:1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleEditProgram}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363',scale:1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -532,6 +539,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-gray-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9}}
             onClick={() => setIsDeleteConfirmOpen(false)}
           >
             Cancelar
@@ -539,6 +547,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9}}
             onClick={handleDelete}
           >
             Eliminar

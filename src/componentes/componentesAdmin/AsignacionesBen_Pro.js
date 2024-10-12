@@ -181,7 +181,12 @@ const AsignacionesBen_Pro = () => {
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
-            <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
+            <motion.button 
+            className="bg-green-500 text-white px-4 py-2 rounded-full" 
+            variants={buttonVariants} 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{scale: 0.9}}
+            onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
           </div>
@@ -202,10 +207,22 @@ const AsignacionesBen_Pro = () => {
                     <TableCell sx={{ color: '#fff' }}>{asignacion.beneficiario}</TableCell>
                     <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
                     <TableCell sx={{ color: '#fff' }}>
-                      <motion.button className="bg-blue-500 text-white px-2 py-1 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={() => handleEditar(asignacion)}>
+                      <motion.button 
+                      className="bg-blue-500 text-white px-2 py-1 rounded-full" 
+                      variants={buttonVariants} 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={() => handleEditar(asignacion)}
+                      >
                         <FaEdit />
                       </motion.button>
-                      <motion.button className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={() => handleEliminar(asignacion.id)}>
+                      <motion.button 
+                      className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" 
+                      variants={buttonVariants} 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={() => handleEliminar(asignacion.id)}
+                      >
                         <FaTrashAlt />
                       </motion.button>
                     </TableCell>
@@ -242,8 +259,12 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </select>
               </div>
-              <div className="flex justify-between mt-4">
-                <motion.button className="bg-blue-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#4A90E2' }} onClick={confirmEdit}>
+              <div className="flex justify-between mt-4"> 
+                <motion.button 
+                className="bg-blue-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                whileTap={{scale: 0.9}}
+                onClick={confirmEdit}>
                   Guardar Cambios
                 </motion.button>
                 <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#636363' }} onClick={() => setIsEditModalOpen(false)}>
