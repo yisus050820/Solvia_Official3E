@@ -40,11 +40,10 @@ const CrudUsuarios = () => {
   //Alerta se cierra automaticamente despues de 5 segundos
   useEffect(() => {
     if (successMessage) {
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         setSuccessMessage('');
       }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
 
-      return () => clearTimeout(timer); // Limpiar el timer si el componente se desmonta antes
     }
   }, [successMessage]);
 
@@ -295,12 +294,17 @@ const CrudUsuarios = () => {
       <AnimatePresence>
         {isModalOpen && (
           <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.2, ease: "easeIn" }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          >
+            <motion.div 
+            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+            initial={{ y: "-100vh" }}
+            animate={{ y: "0" }}
+            exit={{ y: "-100vh" }}
+            >
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -356,15 +360,7 @@ const CrudUsuarios = () => {
                 </div>
                 {errors.password && <p className="text-red-500">{errors.password}</p>}
               </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <motion.button 
-                className="bg-gray-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleCloseModal} 
-                >
-                  Cancelar
-                </motion.button>
+              <div className="mt-4 flex justify-between">
                 <motion.button 
                 className="bg-green-500 text-white px-4 py-2 rounded" 
                 whileHover={{ backgroundColor: '#38a169',scale: 1.1 }}
@@ -372,6 +368,14 @@ const CrudUsuarios = () => {
                 onClick={handleAddUser}>
                   Agregar
                   </motion.button>
+                  <motion.button 
+                className="bg-gray-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleCloseModal} 
+                >
+                  Cancelar
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>

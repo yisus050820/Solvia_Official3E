@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaEdit, FaCheck } from 'react-icons/fa';
 
 const AsignacionesBen_Pro = () => {
   const [beneficiarioSeleccionado, setBeneficiarioSeleccionado] = useState('');
@@ -14,6 +14,15 @@ const AsignacionesBen_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [errorBeneficiario, setErrorBeneficiario] = useState('');
+  const [errorPrograma, setErrorPrograma] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
+    // Variantes de animación para la palomita
+    const checkmarkVariants = {
+      hidden: { opacity: 0, pathLength: 0 },
+      visible: { opacity: 1, pathLength: 1 },
+    };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigBenProg/beneficiarios')
@@ -35,11 +44,31 @@ const AsignacionesBen_Pro = () => {
       .catch(err => console.error('Error fetching assignments:', err));
   }, [asignaciones]);  
 
-  const handleAsignar = () => {
-    if (!beneficiarioSeleccionado || !programaSeleccionado) {
-      console.error('Error: Campos incompletos.');
-      return;
+   //Alerta se cierra automaticamente despues de 5 segundos
+   useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
     }
+  }, [successMessage]);
+
+  const handleAsignar = () => {
+    let isValid = true;
+    setErrorBeneficiario('');
+    setErrorPrograma('');
+    
+    if (!beneficiarioSeleccionado) {
+      setErrorBeneficiario('Debes seleccionar un beneficiario.');
+      isValid = false;
+    }
+    if (!programaSeleccionado) {
+      setErrorPrograma('Debes seleccionar un programa.');
+      isValid = false;
+    }
+    if (!isValid) return;
+
   
     const nuevaAsignacion = {
       user_id: beneficiarioSeleccionado,
@@ -58,6 +87,7 @@ const AsignacionesBen_Pro = () => {
         setAsignaciones([...asignaciones, newAssignment]); 
         setBeneficiarioSeleccionado('');
         setProgramaSeleccionado(''); 
+        setSuccessMessage('Asignacion realizada exitosamente.')
       })
       .catch(err => {
         console.error('Error assigning volunteer:', err);
@@ -95,6 +125,7 @@ const AsignacionesBen_Pro = () => {
         setIsEditModalOpen(false);
         setBeneficiarioSeleccionado('');
         setProgramaSeleccionado('');
+        setSuccessMessage('Asignacion actualizada exitosamente.')
       })
       .catch(err => console.error('Error updating assignment:', err));
   };  
@@ -109,13 +140,14 @@ const AsignacionesBen_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setSuccessMessage('Asignacion eliminada exitosamente.')
       })
       .catch(err => console.error('Error deleting assignment:', err));
   };
 
   const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    hover: { scale: 1.1, transition: { duration: 0.3 } },
+    tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
 
   return (
@@ -156,6 +188,8 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorBeneficiario && <span style={{ color: 'red' }}>{errorBeneficiario}</span>}
+
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
@@ -178,14 +212,15 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
             <motion.button 
             className="bg-green-500 text-white px-4 py-2 rounded-full" 
             variants={buttonVariants} 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{scale: 0.9}}
+            whileHover="hover"
+            whileTap="tap"
             onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
@@ -267,7 +302,11 @@ const AsignacionesBen_Pro = () => {
                 onClick={confirmEdit}>
                   Guardar Cambios
                 </motion.button>
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#636363' }} onClick={() => setIsEditModalOpen(false)}>
+                <motion.button 
+                className="bg-gray-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                whileTap={{scale: 0.9}} 
+                onClick={() => setIsEditModalOpen(false)}>
                   Cerrar
                 </motion.button>
               </div>
@@ -283,14 +322,66 @@ const AsignacionesBen_Pro = () => {
           <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <motion.button className="bg-gray-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} onClick={() => setIsDeleteConfirmOpen(false)}>
+          <motion.button 
+          className="bg-gray-500 text-white px-4 py-2 rounded-full" 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{scale: 0.9}}
+          onClick={() => setIsDeleteConfirmOpen(false)}>
             Cancelar
           </motion.button>
-          <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} onClick={confirmDelete}>
+          <motion.button 
+          className="bg-red-500 text-white px-4 py-2 rounded-full" 
+          whileHover={{ scale: 1.1 }} 
+          whileTap={{scale: 0.9}}
+          onClick={confirmDelete}>
             Eliminar
           </motion.button>
         </DialogActions>
       </Dialog>
+
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
     </motion.div>
   );
 };

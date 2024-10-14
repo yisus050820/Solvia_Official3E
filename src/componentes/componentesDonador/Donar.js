@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText,
   DialogTitle, TextField
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaCheck } from 'react-icons/fa';
 
 const Donar = () => {
   const [cantidad, setCantidad] = useState('');
   const [donaciones, setDonaciones] = useState([]);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
 
   const handleDonar = () => {
     if (cantidad > 0) {
@@ -22,7 +24,14 @@ const Donar = () => {
       };
       setDonaciones([...donaciones, nuevaDonacion]);
       setCantidad('');
+      setSuccessMessage('Donacion hecha exitosamente.'); // Mostrar mensaje de éxito
     }
+  };
+
+      // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
   };
 
   const handleEliminar = (id) => {
@@ -33,12 +42,23 @@ const Donar = () => {
   const confirmDelete = () => {
     setDonaciones(donaciones.filter(donacion => donacion.id !== currentId));
     setIsDeleteConfirmOpen(false);
+    setSuccessMessage('Donacion eliminada exitosamente.'); // Mostrar mensaje de éxito
   };
 
   const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    hover: { scale: 1.1, transition: { duration: 0.3 } },
+    tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
+
+    //Alerta se cierra automaticamente despues de 5 segundos
+    useEffect(() => {
+      if (successMessage) {
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+  
+      }
+    }, [successMessage]);
 
   return (
     <motion.div
@@ -163,7 +183,51 @@ const Donar = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+       {/* Modal para mensajes de éxito */}
+       <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
     </motion.div>
+    
   );
 };
 

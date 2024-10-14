@@ -45,14 +45,16 @@ const ProgramCard = ({ title, description, participants, donations }) => {
           <div className="flex mt-4 space-x-4">
             <motion.button 
               className="bg-red-500 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#DC2626' }}
+              whileHover={{ backgroundColor: '#DC2626',scale:1.1 }}
+              whileTap={{scale:0.9}}
             >
               Salir del Programa
             </motion.button>
             {/* Botón para abrir la ventana emergente */}
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
+              whileHover={{ backgroundColor: '#636363', scale:1.1 }}
+              whileTap={{scale:0.9}}
               onClick={handleOpenModal}
             >
               Más info

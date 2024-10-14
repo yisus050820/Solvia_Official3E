@@ -25,8 +25,8 @@ const Comunicacion = () => {
 
   // Variantes de animación para el botón
   const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    hover: { scale: 1.1, transition: { duration: 0.3 } },
+    tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
 
   // Espacio para manejar lógica de backend (vacío por ahora)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
@@ -20,6 +20,14 @@ const CrudProgramas = () => {
   const [errors, setErrors] = useState({});
   const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
+   // Variantes de animación para la palomita
+   const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
+
 
   useEffect(() => {
     fetchPrograms();
@@ -35,6 +43,17 @@ const CrudProgramas = () => {
       });
   };
 
+
+    //Alerta se cierra automaticamente despues de 5 segundos
+    useEffect(() => {
+      if (successMessage) {
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+  
+      }
+    }, [successMessage]);
+  
   useEffect(() => {
     if (isModalOpen || isEditModalOpen) {
       axios.get('http://localhost:5000/usuarios/coordinadores')
@@ -124,6 +143,7 @@ const CrudProgramas = () => {
       .then(() => {
         fetchPrograms(); 
         handleCloseModal(); 
+        setSuccessMessage('Programa agregado exitosamente.')
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
@@ -160,6 +180,7 @@ const CrudProgramas = () => {
       .then(() => {
         fetchPrograms(); 
         handleCloseEditModal();
+        setSuccessMessage('Programa actualizado exitosamente.')
       })
       .catch(error => {
         console.error('Error al actualizar programa:', error);
@@ -198,6 +219,7 @@ const CrudProgramas = () => {
         setData(data.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
+        setSuccessMessage('Programa eliminado exitosamente.')
       })
       .catch(error => {
         console.error('Error deleting program:', error);
@@ -398,7 +420,6 @@ const CrudProgramas = () => {
                   className="bg-gray-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-
                   onClick={handleCloseModal}
                 >
                   Cerrar
@@ -554,6 +575,50 @@ const CrudProgramas = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
+
     </>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaEdit, FaCheck } from 'react-icons/fa';
 
 const AsignacionesVol_Pro = () => {
   const [voluntarioSeleccionado, setVoluntarioSeleccionado] = useState('');
@@ -15,6 +15,15 @@ const AsignacionesVol_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [errorVoluntario, setErrorVoluntario] = useState('');
+  const [errorPrograma, setErrorPrograma] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
+    // Variantes de animación para la palomita
+    const checkmarkVariants = {
+      hidden: { opacity: 0, pathLength: 0 },
+      visible: { opacity: 1, pathLength: 1 },
+    };
 
   // Cargar los voluntarios y programas al montar el componente
   useEffect(() => {
@@ -37,13 +46,32 @@ const AsignacionesVol_Pro = () => {
       .catch(err => console.error('Error fetching assignments:', err));
   }, []);
 
+    //Alerta se cierra automaticamente despues de 5 segundos
+    useEffect(() => {
+      if (successMessage) {
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+  
+      }
+    }, [successMessage]);
+
   // Manejar la asignación de voluntarios a programas
   const handleAsignar = () => {
-    if (!voluntarioSeleccionado || !programaSeleccionado) {
-      console.error('Error: Campos incompletos.');
-      return;
-    }
+  let isValid = true;
+  setErrorVoluntario('');
+  setErrorPrograma('');
   
+  if (!voluntarioSeleccionado) {
+    setErrorVoluntario('Debes seleccionar un voluntario.');
+    isValid = false;
+  }
+  if (!programaSeleccionado) {
+    setErrorPrograma('Debes seleccionar un programa.');
+    isValid = false;
+  }
+  if (!isValid) return;
+
     const nuevaAsignacion = {
       user_id: voluntarioSeleccionado,
       program_id: programaSeleccionado,
@@ -63,6 +91,7 @@ const AsignacionesVol_Pro = () => {
         setVoluntarioSeleccionado(''); 
         setProgramaSeleccionado(''); 
         setTaskStatusSeleccionado('active');
+        setSuccessMessage('Asignacion realizada exitosamente.')
       })
       .catch(err => {
         console.error('Error assigning volunteer:', err);
@@ -98,6 +127,7 @@ const AsignacionesVol_Pro = () => {
         setVoluntarioSeleccionado(''); 
         setProgramaSeleccionado('');
         setTaskStatusSeleccionado('active');
+        setSuccessMessage('Asignacion actualizada exitosamente.')
       })
       .catch(err => console.error('Error updating assignment:', err));
   };
@@ -113,13 +143,14 @@ const AsignacionesVol_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setSuccessMessage('Asignacion eliminada exitosamente.')
       })
       .catch(err => console.error('Error deleting assignment:', err));
   };
 
   const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    hover: { scale: 1.1, transition: { duration: 0.3 } },
+    tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
 
   return (
@@ -162,6 +193,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorVoluntario && <span style={{ color: 'red' }}>{errorVoluntario}</span>}
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
@@ -192,6 +224,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
@@ -269,10 +302,10 @@ const AsignacionesVol_Pro = () => {
                 </select>
               </div>
               <div className="flex justify-between mt-4">
-                <motion.button className="bg-blue-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#4A90E2' }} onClick={confirmEdit}>
+                <motion.button className="bg-blue-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }} onClick={confirmEdit}>
                   Guardar Cambios
                 </motion.button>
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#636363' }} onClick={() => setIsEditModalOpen(false)}>
+                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#636363', scale: 0.9 }} onClick={() => setIsEditModalOpen(false)}>
                   Cerrar
                 </motion.button>
               </div>
@@ -296,6 +329,50 @@ const AsignacionesVol_Pro = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
     </motion.div>
   );
 };
