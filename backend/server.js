@@ -1,7 +1,8 @@
-const express = require('express');
+const express = require('express'); 
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');  // Ya está agregada
+const path = require('path');  
+const http = require('http');
 
 const app = express();
 
@@ -9,15 +10,19 @@ const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-app.use(cors());
-app.use(express.json()); // Esta línea ya es suficiente para manejar JSON en las solicitudes
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true
+}));
+
+app.use(express.json());
 
 // Importar las rutas
 const userRoutes = require('./Admin/usuarios');
 const programRoutes = require('./Admin/programas');
 const registerRoute = require('./auth/register');
 const loginRoute = require('./auth/login');
-const resetPasswordRoute = require('./auth/resetPassword'); // Importar la nueva ruta de restablecimiento de contraseña
+const resetPasswordRoute = require('./auth/resetPassword');
 const programReportsRoutes = require('./Admin/reportesProgramas');
 const donationsReportsRoutes = require('./Admin/reportesDonaciones');
 const usersReporsRoutes = require('./Admin/reportesUsuarios');
@@ -31,7 +36,7 @@ app.use('/usuarios', userRoutes);
 app.use('/programas', programRoutes);
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
-app.use('/resetPassword', resetPasswordRoute); // Usar la nueva ruta para reset-password
+app.use('/resetPassword', resetPasswordRoute);
 app.use('/programReports', programReportsRoutes);
 app.use('/donationsReports', donationsReportsRoutes);
 app.use('/userReports', usersReporsRoutes);
@@ -39,10 +44,14 @@ app.use('/asigBenProg', asigBenProgRoutes);
 app.use('/asigPresProg', asigPresProgRoutes);
 app.use('/asigVolProg', asigVolProgRoutes);
 app.use('/perfil', perfilRoutes);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
+
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const server = http.createServer(app);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

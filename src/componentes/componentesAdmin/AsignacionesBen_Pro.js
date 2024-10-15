@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
@@ -14,6 +14,13 @@ const AsignacionesBen_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigBenProg/beneficiarios')
@@ -21,49 +28,69 @@ const AsignacionesBen_Pro = () => {
         setBeneficiarios(res.data);
       })
       .catch(err => console.error('Error fetching beneficiaries:', err));
-  
+
     axios.get('http://localhost:5000/asigBenProg/programas')
       .then(res => {
         setProgramas(res.data);
       })
       .catch(err => console.error('Error fetching programs:', err));
-  
+
     axios.get('http://localhost:5000/asigBenProg/asignaciones')
       .then(res => {
         setAsignaciones(res.data);
       })
       .catch(err => console.error('Error fetching assignments:', err));
-  }, [asignaciones]);  
+  }, []);
 
   const handleAsignar = () => {
     if (!beneficiarioSeleccionado || !programaSeleccionado) {
-      console.error('Error: Campos incompletos.');
+      setMessage('Error: Campos incompletos.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
   
     const nuevaAsignacion = {
       user_id: beneficiarioSeleccionado,
-      program_id: programaSeleccionado,
-      coordinator_id: 1 
+      program_id: programaSeleccionado
     };
   
     axios.post('http://localhost:5000/asigBenProg/beneficiarios', nuevaAsignacion)
-      .then(res => {
+      .then((res) => {
+        // Suponiendo que el backend devuelve el id de la nueva asignación creada
         const newAssignment = {
-          ...nuevaAsignacion,
-          id: res.data.data, 
+          id: res.data.data, // El ID de la asignación retornado por el backend
           beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name,
-          programa: programas.find(p => p.id === programaSeleccionado)?.name
+          programa: programas.find(p => p.id === programaSeleccionado)?.name,
+          user_id: beneficiarioSeleccionado,
+          program_id: programaSeleccionado
         };
-        setAsignaciones([...asignaciones, newAssignment]); 
+        
+        // Actualizamos el estado con la nueva asignación
+        setAsignaciones([...asignaciones, newAssignment]);
+  
+        // Limpiar campos después de una asignación exitosa
         setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado(''); 
+        setProgramaSeleccionado('');
       })
-      .catch(err => {
-        console.error('Error assigning volunteer:', err);
+      .catch(error => {
+        if (error.response) {
+          if (error.response.status === 409) {
+            setMessage('El beneficiario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al asignar beneficiario.');
+          }
+        } else {
+          setMessage('Error de red. Inténtalo de nuevo.');
+        }
+  
+        setBeneficiarioSeleccionado('');
+        setProgramaSeleccionado('');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
-  }; 
-
+  };
+  
   const handleEditar = (asignacion) => {
     setBeneficiarioSeleccionado(asignacion.user_id);
     setProgramaSeleccionado(asignacion.program_id);
@@ -79,26 +106,46 @@ const AsignacionesBen_Pro = () => {
     };
   
     axios.put(`http://localhost:5000/asigBenProg/beneficiarios/${currentId}`, datosEditados)
-      .then(() => {
-        const nuevasAsignaciones = asignaciones.map(asignacion =>
-          asignacion.id === currentId
-            ? {
-                ...asignacion,
-                ...datosEditados,
-                beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name,
-                programa: programas.find(p => p.id === programaSeleccionado)?.name
-              }
-            : asignacion
+      .then((res) => {
+        // Suponiendo que el backend devuelve los datos actualizados como "updatedData"
+        const updatedData = res.data.updatedData;
+  
+        // Actualizamos la asignación en el estado con los datos retornados
+        const updatedAsignaciones = asignaciones.map(asignacion => 
+          asignacion.id === currentId ? { 
+            ...asignacion, 
+            beneficiario: beneficiarios.find(v => v.id === updatedData.user_id)?.name || asignacion.beneficiario,
+            programa: programas.find(p => p.id === updatedData.program_id)?.name || asignacion.programa,
+            user_id: updatedData.user_id,
+            program_id: updatedData.program_id
+          } : asignacion
         );
   
-        setAsignaciones(nuevasAsignaciones);
-        setIsEditModalOpen(false);
+        setAsignaciones(updatedAsignaciones);
+  
+        // Limpiar los campos después de una edición exitosa
         setBeneficiarioSeleccionado('');
         setProgramaSeleccionado('');
+        setIsEditModalOpen(false); // Cerramos el modal de edición
       })
-      .catch(err => console.error('Error updating assignment:', err));
-  };  
-
+      .catch(error => {
+        if (error.response) {
+          if (error.response.status === 409) {
+            setMessage('El beneficiario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al actualizar la asignación.');
+          }
+        } else {
+          setMessage('Error de red. Inténtalo de nuevo.');
+        }
+  
+        setBeneficiarioSeleccionado('');
+        setProgramaSeleccionado('');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
+  };
+  
   const handleEliminar = (id) => {
     setIsDeleteConfirmOpen(true);
     setCurrentId(id);
@@ -109,9 +156,10 @@ const AsignacionesBen_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setCurrentId(null); 
       })
       .catch(err => console.error('Error deleting assignment:', err));
-  };
+  };  
 
   const buttonVariants = {
     hover: { scale: 1.05, transition: { duration: 0.3 } },
@@ -188,7 +236,7 @@ const AsignacionesBen_Pro = () => {
 
           {/* Tabla de Asignaciones */}
           <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
-          <Table>
+            <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
                   <TableCell sx={{ color: '#fff' }}>Beneficiario</TableCell>
@@ -270,6 +318,16 @@ const AsignacionesBen_Pro = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };
