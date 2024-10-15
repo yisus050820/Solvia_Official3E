@@ -15,20 +15,22 @@ import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import MessageIcon from '@mui/icons-material/Message';
+import { Feedback } from '@mui/icons-material';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
-// Importaciones de los formularios hijos
-import ProgramasCrud from './componentesCoordi/ProgramasCrud';
-import ReportesDonaciones from './componentesCoordi/ReportesDonaciones';
-import ReportesProgramasAyuda from './componentesCoordi/ReportesProgramasAyuda';
-import ReportesUsuarios from './componentesCoordi/ReportesUsuarios';
-import TarjetasProgramas from './componentesCoordi/TarjetasProgramas';
-import UsuariosCrud from './componentesCoordi/UsuariosCrud';
-import AsignacionesBen_Pro from './componentesCoordi/AsignacionesBen_Pro';
-import AsignacionesVol_Pro from './componentesCoordi/AsignacionesVol_Pro';
-import AsignacionPresupuesto_Pro from './componentesCoordi/AsignacionesPresupuesto_Pro';
-import PerfilUsuario from './componentesCoordi/ConfigDePerfil';
-
+import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
+import CrudProgramas from './componentesAdmin/ProgramasCrud';
+import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
+import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
+import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
+import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
+import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
+import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
+import AsignacionesPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
+import CrudUsuariosCoordi from './componentesCoordi/Usuarios';
+import Comunicacion from './componentesAdmin/Comunicacion';
+import VerFeedback from './componentesAdmin/VerFeedback';
 
 const NAVIGATION = [
   {
@@ -109,6 +111,24 @@ const NAVIGATION = [
       
       ],
   },
+  {
+    segment: 'comunicacion',
+    title: 'Comunicacion',
+    icon: <ChatBubbleIcon />,
+    children: [
+
+      {
+        segment: 'contacto',
+        title: 'Contactar con un usuario',
+        icon: <MessageIcon />,
+      },
+      {
+        segment: 'ver-feedback',
+        title: 'Ver feedback de programas',
+        icon: <Feedback />,
+      },
+    ],
+  }
     
 ];
 
@@ -142,16 +162,19 @@ function DemoPageContent({ pathname }) {
         width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      {pathname === '/users' && <UsuariosCrud />}
-      {pathname === '/programas/gestionar-programas' && <ProgramasCrud />}
-      {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
-      {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
-      {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}
-      {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
-      {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
-      {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
-      {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
-      {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
+        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
+        {pathname === '/users' && <CrudUsuariosCoordi />}
+        {pathname === '/programas/gestionar-programas' && <CrudProgramas />}
+        {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
+        {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
+        {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
+        {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}
+        {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
+        {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
+        {pathname === '/asignaciones/presupuesto-programa' && <AsignacionesPresupuesto_Pro />}
+        {pathname === '/comunicacion/contacto' && <Comunicacion />}
+        {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+        
     </Box>
   );
 }
@@ -162,7 +185,7 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function DashboardLayoutBasic(props) {
+function DashboardCoordi(props) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/configuracion-perfil');
@@ -194,7 +217,7 @@ function DashboardLayoutBasic(props) {
   );
 }
 
-DashboardLayoutBasic.propTypes = {
+DashboardCoordi.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -202,4 +225,4 @@ DashboardLayoutBasic.propTypes = {
   window: PropTypes.func,
 };
 
-export default DashboardLayoutBasic;
+export default DashboardCoordi;
