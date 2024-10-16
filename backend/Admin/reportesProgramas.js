@@ -17,7 +17,7 @@ router.get('/totalProgramas', (req, res) => {
 
 // Obtener el total de beneficiarios (filtrado por rol 'beneficiary' en la tabla `users`)
 router.get('/totalBeneficiarios', (req, res) => {
-  const query = "SELECT COUNT(*) as total FROM users WHERE role = 'beneficiary'";
+  const query = "SELECT COUNT(*) as total FROM beneficiaries";
   
   db.query(query, (err, results) => {
     if (err) {
@@ -30,7 +30,7 @@ router.get('/totalBeneficiarios', (req, res) => {
 
 // Obtener el total de voluntarios (filtrado por rol 'volunteer' en la tabla `users`)
 router.get('/totalVoluntarios', (req, res) => {
-  const query = "SELECT COUNT(*) as total FROM users WHERE role = 'volunteer'";
+  const query = "SELECT COUNT(*) as total FROM volunteers";
   
   db.query(query, (err, results) => {
     if (err) {

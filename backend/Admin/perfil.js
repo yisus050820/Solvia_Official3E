@@ -44,7 +44,7 @@ function isValidEmail(email) {
 router.get('/', authenticateToken, (req, res) => {
   const userId = req.user.id;
 
-  console.log(`Obteniendo información del perfil del usuario con ID: ${userId}`);
+  //console.log(`Obteniendo información del perfil del usuario con ID: ${userId}`);
 
   const query = 'SELECT id, name, email, role, description, profile_picture FROM users WHERE id = ?';
   db.query(query, [userId], (err, result) => {
@@ -56,7 +56,7 @@ router.get('/', authenticateToken, (req, res) => {
       console.log('Usuario no encontrado.');
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
-    console.log('Perfil del usuario obtenido correctamente:', result[0]);
+    //console.log('Perfil del usuario obtenido correctamente:', result[0]);
     res.json(result[0]);
   });
 });

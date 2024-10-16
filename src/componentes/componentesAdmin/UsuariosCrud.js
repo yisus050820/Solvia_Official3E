@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from '@mui/material';
+import { ReceiptEuroIcon } from 'lucide-react';
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -17,7 +18,14 @@ const CrudUsuarios = () => {
   const [originalUser, setOriginalUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [filtroRol, setFiltroRol] = useState('');
+  const [message, setMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
@@ -47,16 +55,10 @@ const CrudUsuarios = () => {
 
   const validateUser = (user, originalUser = {}, isEditing = false) => {
     const validationErrors = {};
-
-    if (!user.name.trim() || (isEditing && user.name !== originalUser.name)) {
-      if (!user.name.trim()) {
-        validationErrors.name = 'El nombre no puede estar vacío.';
-      }
-    }
-
+    
     if (!isEditing || (isEditing && user.email && user.email !== originalUser.email)) {
       if (!isValidEmail(user.email)) {
-        validationErrors.email = 'El correo no es válido.';
+        validationErrors.email = 'El correo que ingresó no es válido, por favor ingrese un correo válido.';
       }
     }
 
@@ -67,51 +69,85 @@ const CrudUsuarios = () => {
     }
 
     if (!isEditing && user.description && user.description.length < 10) {
-      validationErrors.description = 'La descripción debe tener al menos 10 caracteres si se proporciona.';
+      validationErrors.description = 'La descripción debe tener mínimo 10 caracteres';
     }
 
     return validationErrors;
   };
 
   const handleAddUser = () => {
-    const validationErrors = validateUser(newUser, {}, false); 
+    const { name, email, password, description, role, profile_picture } = newUser;
+
+    const missingFields = [];
+    if (!name) missingFields.push('Nombre');
+    if (!email) missingFields.push('Correo Electrónico');
+    if (!password) missingFields.push('Contraseña');
+    if (!description) missingFields.push('Descripción');
+    if (!role) missingFields.push('Rol');
+    if (!profile_picture) missingFields.push('Foto de Perfil');
+
+    if (missingFields.length > 0) {
+      setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    const validationErrors = validateUser(newUser, {}, false);
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log("Errores de validación:", validationErrors);
+
+      const firstError = Object.values(validationErrors)[0];
+
+      setMessage(firstError);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
 
     const userData = {
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      description: newUser.description,
-      password: newUser.password,
-      profile_picture: newUser.profile_picture || defaultProfilePicture
+      name,
+      email,
+      role,
+      description,
+      password,
+      profile_picture: profile_picture || defaultProfilePicture,
     };
 
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
         const createdUser = response.data;
-        setData([...data, createdUser]); 
+        setData([...data, createdUser]);
         handleCloseModal();
       })
       .catch(error => {
         if (error.response && error.response.status === 409) {
-          setErrors({ email: 'Este correo ya está registrado.' });
+          setMessage('El correo utilizado ya está registrado');
+          setSnackbarSeverity('error');
+          setOpenSnackbar(true);
         } else {
-          console.error('Error al añadir usuario:', error);
+          setMessage('Error al agregar usuario, intente más tarde.');
+          setSnackbarSeverity('error');
+          setOpenSnackbar(true);
         }
       });
   };
 
   const handleEditUser = () => {
-    const validationErrors = validateUser(editUser, originalUser, true);
+    const validationErrors = validateUser(newUser, {}, false);
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+
+      const firstError = Object.values(validationErrors)[0];
+
+      setMessage(firstError);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
-  
+
     const updatedUser = {
       name: editUser.name,
       email: editUser.email,
@@ -119,21 +155,24 @@ const CrudUsuarios = () => {
       description: editUser.description,
       ...(editUser.password ? { password: editUser.password } : {})
     };
-  
+
     axios.put(`http://localhost:5000/usuarios/${editUser.id}`, updatedUser)
-    .then(response => {
-      axios.get('http://localhost:5000/usuarios')
-        .then(response => {
-          setData(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching users:', error);
-        });
-      handleCloseEditModal();
-    })
-    .catch(error => {
-      console.error('Error al actualizar usuario:', error);
-    });
+      .then(response => {
+        axios.get('http://localhost:5000/usuarios')
+          .then(response => {
+            setData(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching users:', error);
+          });
+        handleCloseEditModal();
+      })
+      .catch(error => {
+        setMessage(`Error al actualizar usuario, intente más tarde.`);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        return;
+      });
   };
 
   const handleOpenEditModal = (user) => {
@@ -155,21 +194,28 @@ const CrudUsuarios = () => {
     axios.delete(`http://localhost:5000/usuarios/${id}`)
       .then(() => {
         setData(data.filter(user => user.id !== id));
-        setIsDeleteConfirmOpen(false);
-        setCurrentId(null);
       })
       .catch(error => {
-        console.error('Error deleting user:', error);
-      });
+        let errorMessage = 'Error al eliminar usuario, intente más tarde.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setMessage(errorMessage);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        console.error('Error al eliminar usuario:', error);
+      });      
   };
 
   const handleDeleteClick = (id) => {
-    setCurrentId(id);  
-    setIsDeleteConfirmOpen(true);  
+    setCurrentId(id);
+    setIsDeleteConfirmOpen(true);
   };
 
   const confirmDelete = () => {
-    handleDelete(currentId);
+    if (currentId) {
+      handleDelete(currentId);
+    }
     setIsDeleteConfirmOpen(false);
   };
 
@@ -182,9 +228,9 @@ const CrudUsuarios = () => {
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
-        Usuarios
-      </Typography>
+        <Typography variant="h3" align="center" color="primary" gutterBottom>
+          Usuarios
+        </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -230,7 +276,7 @@ const CrudUsuarios = () => {
               <th className="p-4">Correo</th>
               <th className="p-4">Rol</th>
               <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Creación</th> 
+              <th className="p-4">Fecha Creación</th>
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
@@ -242,7 +288,7 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
                 <td className="p-4">{item.description}</td>
-                <td className="p-4">{item.created_at}</td> 
+                <td className="p-4">{item.created_at}</td>
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
@@ -252,7 +298,7 @@ const CrudUsuarios = () => {
                   </motion.button>
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
-                    onClick={() => handleDeleteClick(item.id)}  
+                    onClick={() => handleDeleteClick(item.id)}
                   >
                     <FaTrashAlt />
                   </motion.button>
@@ -277,7 +323,6 @@ const CrudUsuarios = () => {
                   value={newUser.name}
                   onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                 />
-                {errors.name && <p className="text-red-500">{errors.name}</p>}
                 <input
                   type="email"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -285,7 +330,6 @@ const CrudUsuarios = () => {
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                 />
-                {errors.email && <p className="text-red-500">{errors.email}</p>}
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newUser.role}
@@ -297,14 +341,12 @@ const CrudUsuarios = () => {
                   <option value="donor">Donante</option>
                   <option value="beneficiary">Beneficiario</option>
                 </select>
-                {errors.role && <p className="text-red-500">{errors.role}</p>}
                 <textarea
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={newUser.description}
                   onChange={(e) => setNewUser({ ...newUser, description: e.target.value })}
                 />
-                {errors.description && <p className="text-red-500">{errors.description}</p>}
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -321,7 +363,6 @@ const CrudUsuarios = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-500">{errors.password}</p>}
               </div>
               <div className="mt-4 flex justify-end space-x-2">
                 <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cancelar</button>
@@ -435,7 +476,7 @@ const CrudUsuarios = () => {
                 className="bg-red-500 text-white px-4 py-2 rounded-full"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={confirmDelete}  
+                onClick={confirmDelete}
               >
                 Eliminar
               </motion.button>
@@ -443,6 +484,16 @@ const CrudUsuarios = () => {
           </Dialog>
         )}
       </AnimatePresence>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

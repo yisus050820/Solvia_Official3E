@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
@@ -16,7 +17,6 @@ const CrudProgramas = () => {
   const [currentId, setCurrentId] = useState(null);
   const [newProgram, setNewProgram] = useState({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
   const [editProgram, setEditProgram] = useState(null);
-  const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -24,16 +24,28 @@ const CrudProgramas = () => {
   const [errors, setErrors] = useState({});
   const [originalProgram, setOriginalProgram] = useState(null);
 
+  const [usuarioActualId, setUsuarioActualId] = useState(null);
+  const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setUsuarioActualId(decodedToken.id);
+      setUsuarioActualNombre(decodedToken.nombre);
+    }
+  }, []);
 
   useEffect(() => {
     fetchPrograms();
   }, []);
 
   const fetchPrograms = () => {
-    axios.get('http://localhost:5000/programas')
+    axios.get('http://localhost:5000/programs')
       .then(response => {
         setData(response.data);
       })
@@ -41,18 +53,6 @@ const CrudProgramas = () => {
         console.error('Error fetching programs:', error);
       });
   };
-
-  useEffect(() => {
-    if (isModalOpen || isEditModalOpen) {
-      axios.get('http://localhost:5000/usuarios/coordinadores')
-        .then(response => {
-          setCoordinadores(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching coordinators:', error);
-        });
-    }
-  }, [isModalOpen, isEditModalOpen]);
 
   const truncateDescription = (description) => {
     if (!description) return '';
@@ -64,7 +64,7 @@ const CrudProgramas = () => {
   };
 
   const handleOpenModal = () => {
-    setNewProgram({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
+    setNewProgram({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: usuarioActualId, program_image: '' });
     setIsModalOpen(true);
     setErrors({});
   };
@@ -77,7 +77,7 @@ const CrudProgramas = () => {
   const validateProgram = (program, originalProgram = {}, isEditing = false) => {
     const validationErrors = {};
     const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0); 
+    todayDate.setHours(0, 0, 0, 0);
 
     if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
       if (program.descripcion.length < 10) {
@@ -102,14 +102,8 @@ const CrudProgramas = () => {
         validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
       }
     }
-
-    if (!program.coordinador || isNaN(program.coordinador)) {
-      validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
-    }
-
     return validationErrors;
-};
-
+  };
 
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
@@ -119,16 +113,21 @@ const CrudProgramas = () => {
   };
 
   const handleAddProgram = () => {
-    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
+    const token = localStorage.getItem('token');
 
-    // Verificación de campos vacíos
+    if (!token) {
+      console.error('No se encontró el token.');
+      return;
+    }
+
+    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, program_image } = newProgram;
+
     const missingFields = [];
     if (!nombre) missingFields.push('Nombre');
     if (!descripcion) missingFields.push('Descripción');
     if (!fechaInicio) missingFields.push('Fecha de inicio');
     if (!fechaFin) missingFields.push('Fecha de fin');
     if (!objetivos) missingFields.push('Objetivos');
-    if (!coordinador) missingFields.push('Coordinador');
 
     if (missingFields.length > 0) {
       setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
@@ -137,12 +136,10 @@ const CrudProgramas = () => {
       return;
     }
 
-    // Validación de los datos
     const validationErrors = validateProgram(newProgram, {}, false);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
       setMessage(firstError);
       setSnackbarSeverity('error');
@@ -150,19 +147,21 @@ const CrudProgramas = () => {
       return;
     }
 
-    // Formateo de los datos para el envío
     const programData = {
       name: nombre,
       description: descripcion,
       start_date: formatDateForMySQL(fechaInicio),
       end_date: formatDateForMySQL(fechaFin),
       objectives: objetivos,
-      coordinator_charge: coordinador,
       program_image: program_image || defaultProgramPicture,
       status: newProgram.status || 'active',
     };
 
-    axios.post('http://localhost:5000/programas', programData)
+    axios.post('http://localhost:5000/programs', programData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(() => {
         fetchPrograms();
         handleCloseModal();
@@ -198,17 +197,20 @@ const CrudProgramas = () => {
       formData.append('program_image', editProgram.program_image);
     }
 
-    axios.put(`http://localhost:5000/programas/${editProgram.id}`, formData, {
+    axios.put(`http://localhost:5000/programs/${editProgram.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      }
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
     })
       .then(() => {
         fetchPrograms();
         handleCloseEditModal();
       })
       .catch(error => {
-        console.error('Error al actualizar programa:', error);
+        setMessage('Error al actualizar el programa, intente más tarde.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -220,7 +222,6 @@ const CrudProgramas = () => {
       fechaInicio: new Date(program.start_date),
       fechaFin: new Date(program.end_date),
       objetivos: program.objectives,
-      coordinador: program.coordinator_charge,
       status: program.status || 'active',
       program_image: program.program_image || defaultProgramPicture,
     });
@@ -240,7 +241,7 @@ const CrudProgramas = () => {
   };
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:5000/programas/${currentId}`)
+    axios.delete(`http://localhost:5000/programs/${currentId}`)
       .then(() => {
         setData(data.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
@@ -394,19 +395,6 @@ const CrudProgramas = () => {
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
                 />
-
-                <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                  value={newProgram.coordinador}
-                  onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
-                >
-                  <option value="">Selecciona un coordinador</option>
-                  {coordinadores.map((coordinador) => (
-                    <option key={coordinador.id} value={coordinador.id}>
-                      {coordinador.name}
-                    </option>
-                  ))}
-                </select>
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.status || 'active'}
@@ -501,19 +489,6 @@ const CrudProgramas = () => {
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
                 />
 
-                <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                  value={editProgram.coordinador || ''}
-                  onChange={(e) => setEditProgram({ ...editProgram, coordinador: e.target.value })}
-                >
-                  <option value="">Selecciona un coordinador</option>
-                  {coordinadores.map((coordinador) => (
-                    <option key={coordinador.id} value={coordinador.id}>
-                      {coordinador.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.status || 'active'}

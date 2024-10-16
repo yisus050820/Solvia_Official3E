@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const db = require('../db');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken');
 
-const secretKey = 'yourSecretKey';
+// Middleware para autenticar el token JWT
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-function decodeToken(token) {
-  try {
-    const decoded = jwt.verify(token, secretKey);
-    console.log('ID del usuario: ', userId);
-    return userId;
-  } catch (err) {
-    console.error('Error al verificar el token:', err.message);
-    return null;
-  }
+  if (token == null) return res.sendStatus(401); // No hay token
+
+  jwt.verify(token, 'yourSecretKey', (err, user) => {
+    if (err) return res.sendStatus(403); // Token no válido
+    req.user = user;
+    next();
+  });
 }
 
 // Configuración de multer para guardar imágenes en la carpeta uploads
@@ -32,8 +33,6 @@ const upload = multer({ storage: storage });
 
 // Obtener programas
 router.get('/', (req, res) => {
-
-  console.log()
     let query = `
         SELECT p.*, u.name as coordinator_name 
         FROM programs p
@@ -49,12 +48,11 @@ router.get('/', (req, res) => {
     });
 });
 
-
-
 // Crear programa
-router.post('/', upload.single('program_image'), (req, res) => {
+router.post('/', authenticateToken, upload.single('program_image'), (req, res) => {
     const { name, description, start_date, end_date, objectives, status = 'active' } = req.body;  
-    const program_image = req.file ? `/uploads/${req.file.filename}` : null; // Guarda la ruta de la imagen
+    const coordinator_charge = req.user.id;
+    const program_image = req.file ? `/uploads/${req.file.filename}` : null;
 
     db.query(
         'INSERT INTO programs (name, description, start_date, end_date, objectives, coordinator_charge, program_image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',  
@@ -71,14 +69,15 @@ router.post('/', upload.single('program_image'), (req, res) => {
 });
 
 // Editar programa
-router.put('/:id', upload.single('program_image'), (req, res) => {
+router.put('/:id', authenticateToken, upload.single('program_image'), (req, res) => {
   // Si ocurre un error al subir la imagen
   if (req.fileValidationError) {
     return res.status(400).json({ message: req.fileValidationError });
   }
 
-  const { name, description, start_date, end_date, objectives, coordinator_charge, status } = req.body;
+  const { name, description, start_date, end_date, objectives, status } = req.body;
   const programId = req.params.id;
+  const coordinator_charge = req.user.id;
   
   // Si se sube una nueva imagen, usa la nueva ruta, si no, mantiene la imagen anterior
   const program_image = req.file ? `/uploads/${req.file.filename}` : req.body.program_image;

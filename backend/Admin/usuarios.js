@@ -107,31 +107,58 @@ router.put('/:id', (req, res) => {
   });
 });
 
-// Eliminar usuario
+//Eliminar usuario si no esta asignado a algo
 router.delete('/:id', (req, res) => {
   const userId = req.params.id;
 
-  // Verificar si el usuario está referenciado en la tabla de voluntarios
-  db.query('SELECT * FROM volunteers WHERE coordinator_id = ?', [userId], (err, rows) => {
+  // Verificar si el usuario está referenciado en las tablas programs, beneficiaries y volunteers
+  const checkProgramCoordinatorQuery = 'SELECT * FROM programs WHERE coordinator_charge = ?';
+  const checkBeneficiaryQuery = 'SELECT * FROM beneficiaries WHERE user_id = ?';
+  const checkVolunteerQuery = 'SELECT * FROM volunteers WHERE user_id = ?';
+
+  db.query(checkProgramCoordinatorQuery, [userId], (err, programRows) => {
     if (err) {
-      console.error('Error checking volunteers:', err);
-      return res.status(500).json({ message: 'Error al verificar voluntarios.' });
+      console.error('Error checking programs:', err);
+      return res.status(500).json({ message: 'Error al verificar asignación en programas.' });
     }
 
-    if (rows.length > 0) {
-      return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como coordinador.' });
+    if (programRows.length > 0) {
+      return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como coordinador en un programa.' });
     }
 
-    // Proceder con la eliminación si no hay voluntarios relacionados
-    db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
+    db.query(checkBeneficiaryQuery, [userId], (err, beneficiaryRows) => {
       if (err) {
-        console.error('Error deleting user:', err);
-        return res.status(500).json({ message: 'Error al eliminar el usuario.' });
+        console.error('Error checking beneficiaries:', err);
+        return res.status(500).json({ message: 'Error al verificar asignación como beneficiario.' });
       }
-      res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+
+      if (beneficiaryRows.length > 0) {
+        return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como beneficiario en un programa.' });
+      }
+
+      db.query(checkVolunteerQuery, [userId], (err, volunteerRows) => {
+        if (err) {
+          console.error('Error checking volunteers:', err);
+          return res.status(500).json({ message: 'Error al verificar asignación como voluntario.' });
+        }
+
+        if (volunteerRows.length > 0) {
+          return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como voluntario en un programa.' });
+        }
+
+        // Proceder con la eliminación si no hay relaciones en las tablas verificadas
+        db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
+          if (err) {
+            console.error('Error deleting user:', err);
+            return res.status(500).json({ message: 'Error al eliminar el usuario.' });
+          }
+          res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+        });
+      });
     });
   });
 });
+
 
 // Ruta protegida para editar el perfil del usuario actual
 router.put('/user', authenticateToken, async (req, res) => {
