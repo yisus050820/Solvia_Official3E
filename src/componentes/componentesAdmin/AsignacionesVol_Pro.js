@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
@@ -30,13 +30,13 @@ const AsignacionesVol_Pro = () => {
         setVoluntarios(res.data);
       })
       .catch(err => console.error('Error fetching volunteers:', err));
-  
+
     axios.get('http://localhost:5000/asigVolProg/programas')
       .then(res => {
         setProgramas(res.data);
       })
       .catch(err => console.error('Error fetching programs:', err));
-  
+
     axios.get('http://localhost:5000/asigVolProg/asignaciones')
       .then(res => {
         setAsignaciones(res.data);
@@ -50,25 +50,25 @@ const AsignacionesVol_Pro = () => {
       console.error('Error: Campos incompletos.');
       return;
     }
-  
+
     const nuevaAsignacion = {
       user_id: voluntarioSeleccionado,
       program_id: programaSeleccionado,
       task_status: taskStatusSeleccionado,
-      coordinator_id: 1 
+      coordinator_id: 1
     };
-  
+
     axios.post('http://localhost:5000/asigVolProg/voluntarios', nuevaAsignacion)
       .then(res => {
         const newAssignment = {
           ...nuevaAsignacion,
-          id: res.data.data, 
+          id: res.data.data,
           voluntario: voluntarios.find(v => v.id === voluntarioSeleccionado)?.name,
           programa: programas.find(p => p.id === programaSeleccionado)?.name
         };
-        setAsignaciones([...asignaciones, newAssignment]); 
-        setVoluntarioSeleccionado(''); 
-        setProgramaSeleccionado(''); 
+        setAsignaciones([...asignaciones, newAssignment]);
+        setVoluntarioSeleccionado('');
+        setProgramaSeleccionado('');
         setTaskStatusSeleccionado('active');
       })
       .catch(error => {
@@ -84,7 +84,7 @@ const AsignacionesVol_Pro = () => {
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
-  };  
+  };
 
   // Manejar la edición de una asignación
   const handleEditar = (asignacion) => {
@@ -101,26 +101,29 @@ const AsignacionesVol_Pro = () => {
     const datosEditados = {
       user_id: voluntarioSeleccionado,
       program_id: programaSeleccionado,
-      task_status: taskStatusSeleccionado,
-      coordinator_id: 1 
+      task_status: taskStatusSeleccionado
     };
 
     axios.put(`http://localhost:5000/asigVolProg/voluntarios/${currentId}`, datosEditados)
-      .then(() => {
-        // Si la edición fue exitosa, actualizar el estado
-        const nuevasAsignaciones = asignaciones.map(asignacion => 
-          asignacion.id === currentId ? { ...asignacion, ...datosEditados } : asignacion
-        );
-        setAsignaciones(nuevasAsignaciones);
-        setIsEditModalOpen(false);
+      .then((res) => {
+        const updatedData = res.data.updatedData;
 
-        // Restablecer los campos y mostrar mensaje de éxito
-        setVoluntarioSeleccionado(''); 
+        // Si la edición fue exitosa, actualizar el estado
+        const updatedAsignaciones = asignaciones.map(asignacion =>
+          asignacion.id === currentId ? {
+            ...asignacion,
+            voluntario: voluntarios.find(v => v.id === updatedData.user_id)?.name || asignacion.voluntario,
+            programa: programas.find(p => p.id === updatedData.program_id)?.name || asignacion.programa,
+            user_id: updatedData.user_id,
+            program_id: updatedData.program_id
+          } : asignacion
+        );
+        setAsignaciones(updatedAsignaciones);
+
+        setVoluntarioSeleccionado('');
         setProgramaSeleccionado('');
         setTaskStatusSeleccionado('active');
-        setSnackbarSeverity('success');
-        setMessage('Asignación actualizada con éxito.');
-        setOpenSnackbar(true);
+        setIsEditModalOpen(false);
       })
       .catch(error => {
         // Manejar el error si el usuario ya está asignado a un programa
@@ -133,11 +136,9 @@ const AsignacionesVol_Pro = () => {
             setMessage('Error al actualizar la asignación.');
           }
         } else {
-          // Error de red o similar
           setMessage('Error al editar asignación. Por favor, inténtalo de nuevo.');
         }
-        
-        // Mostrar el mensaje de error en el Snackbar
+
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
@@ -154,9 +155,13 @@ const AsignacionesVol_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
-        setCurrentId(null); 
+        setCurrentId(null);
       })
-      .catch(err => console.error('Error deleting assignment:', err));
+      .catch(err => {
+        console.error('Error deleting assignment:', err);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
   };
 
   const buttonVariants = {

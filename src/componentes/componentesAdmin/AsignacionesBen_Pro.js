@@ -42,6 +42,11 @@ const AsignacionesBen_Pro = () => {
       .catch(err => console.error('Error fetching assignments:', err));
   }, []);
 
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
   const handleAsignar = () => {
     if (!beneficiarioSeleccionado || !programaSeleccionado) {
       setMessage('Error: Campos incompletos.');
@@ -81,11 +86,8 @@ const AsignacionesBen_Pro = () => {
             setMessage('Error al asignar beneficiario.');
           }
         } else {
-          setMessage('Error de red. Inténtalo de nuevo.');
+          setMessage('Error del servidor. Inténtalo de nuevo.');
         }
-  
-        setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado('');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
@@ -107,7 +109,6 @@ const AsignacionesBen_Pro = () => {
   
     axios.put(`http://localhost:5000/asigBenProg/beneficiarios/${currentId}`, datosEditados)
       .then((res) => {
-        // Suponiendo que el backend devuelve los datos actualizados como "updatedData"
         const updatedData = res.data.updatedData;
   
         // Actualizamos la asignación en el estado con los datos retornados
@@ -139,8 +140,6 @@ const AsignacionesBen_Pro = () => {
           setMessage('Error de red. Inténtalo de nuevo.');
         }
   
-        setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado('');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });

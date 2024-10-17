@@ -37,6 +37,11 @@ const CrudUsuarios = () => {
       });
   }, []);
 
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
@@ -287,7 +292,7 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
-                <td className="p-4">{item.description}</td>
+                <td className="p-4">{truncateDescription(item.description)}</td>
                 <td className="p-4">{item.created_at}</td>
                 <td className="p-4 flex space-x-4">
                   <motion.button

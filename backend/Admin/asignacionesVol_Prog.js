@@ -4,9 +4,14 @@ const db = require('../db');
 const { body, param, validationResult } = require('express-validator');
 
 // Función para verificar si ya existe la asignación
-const verifyAssignmentExists = (user_id, program_id, callback) => {
-    const query = 'SELECT COUNT(*) AS count FROM volunteers WHERE user_id = ? AND program_id = ?';
-    db.query(query, [user_id, program_id], (err, result) => {
+const verifyAssignmentExists = (user_id, program_id, id, callback) => {
+    const query = `
+        SELECT COUNT(*) AS count 
+        FROM volunteers 
+        WHERE user_id = ? AND program_id = ? ${id ? 'AND id != ?' : ''}
+    `;
+    const params = id ? [user_id, program_id, id] : [user_id, program_id];
+    db.query(query, params, (err, result) => {
         if (err) return callback(err);
         callback(null, result[0].count > 0);
     });
@@ -56,13 +61,14 @@ router.post('/voluntarios', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+
     const { user_id, program_id, task_status } = req.body;
 
     if (!user_id || !program_id || !task_status) {
         return res.status(400).json({ message: 'Todos los campos son requeridos.' });
     }
 
-    verifyAssignmentExists(user_id, program_id, (err, exists) => {
+    verifyAssignmentExists(user_id, program_id, null, (err, exists) => {
         if (err) {
             console.error('Error during verification:', err);
             return res.status(500).json({ message: 'Error al verificar la asignación.' });
@@ -76,7 +82,6 @@ router.post('/voluntarios', [
             INSERT INTO volunteers (user_id, program_id, task_status)
             VALUES (?, ?, ?)
         `;
-
 
         db.query(insertQuery, [user_id, program_id, task_status], (err, result) => {
             if (err) {
@@ -106,15 +111,14 @@ router.put('/voluntarios/:id', [
         return res.status(400).json({ message: 'Todos los campos son requeridos.' });
     }
 
-    // Verificar si la asignación ya existe para el usuario y programa
-    verifyAssignmentExists(user_id, program_id, (err, exists) => {
+    // Verificar si la asignación ya existe para el usuario y programa, excluyendo la actual asignación
+    verifyAssignmentExists(user_id, program_id, id, (err, exists) => {
         if (err) {
             console.error('Error during verification:', err);
             return res.status(500).json({ message: 'Error al verificar la asignación.' });
         }
 
         if (exists) {
-            // Si ya existe la asignación, devolver un error
             return res.status(409).json({ message: 'El usuario ya está asignado a este programa.' });
         }
 
@@ -130,7 +134,27 @@ router.put('/voluntarios/:id', [
                 console.error('Error updating assignment:', err);
                 return res.status(500).json({ message: 'Error al actualizar la asignación.' });
             }
-            res.json({ message: 'Asignación actualizada con éxito.' });
+
+            // Obtener los datos actualizados
+            const selectQuery = `
+                SELECT v.id, u.name AS voluntario, p.name AS programa, v.user_id, v.program_id
+                FROM volunteers v
+                JOIN users u ON v.user_id = u.id
+                JOIN programs p ON v.program_id = p.id
+                WHERE v.id = ?
+            `;
+
+            db.query(selectQuery, [id], (err, updatedResult) => {
+                if (err) {
+                    console.error('Error fetching updated assignment:', err);
+                    return res.status(500).json({ message: 'Error al obtener los datos actualizados.' });
+                }
+
+                res.json({
+                    message: 'Asignación actualizada con éxito.',
+                    updatedData: updatedResult[0]
+                });
+            });
         });
     });
 });

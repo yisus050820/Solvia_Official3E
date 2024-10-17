@@ -18,6 +18,11 @@ const CrudUsuariosCoordi = () => {
       });
   }, []);
 
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
   return (
@@ -73,7 +78,7 @@ const CrudUsuariosCoordi = () => {
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
-                <td className="p-4">{item.description}</td>
+                <td className="p-4">{truncateDescription(item.description)}</td>
                 <td className="p-4">{item.created_at}</td> {/* Mostramos la fecha de creación */}
               </motion.tr>
             ))}

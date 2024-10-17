@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 
@@ -12,9 +12,16 @@ const AsignacionesPresupuesto_Pro = () => {
   const [cantidad, setCantidad] = useState('');
   const [errorCantidad, setErrorCantidad] = useState('');
   const [errorPrograma, setErrorPrograma] = useState('');
-  const [editModalOpen, setEditModalOpen] = useState(false); 
-  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); 
-  const [editCantidad, setEditCantidad] = useState(''); 
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null);
+  const [editCantidad, setEditCantidad] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigPresProg/asignaciones')
@@ -34,19 +41,23 @@ const AsignacionesPresupuesto_Pro = () => {
 
   const handleAsignar = () => {
     let isValid = true;
-    setErrorCantidad('');
-    setErrorPrograma('');
 
     if (!programaSeleccionado) {
-      setErrorPrograma('Debes seleccionar un programa.');
+      setSnackbarSeverity('error');
+      setMessage('Debes seleccionar un programa.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
     if (!cantidad || cantidad <= 0) {
-      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad debe ser mayor que 0.');
+      setOpenSnackbar(true);
       isValid = false;
     } else if (cantidad > dineroDisponible) {
-      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad no puede ser mayor que el dinero disponible.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
@@ -64,21 +75,27 @@ const AsignacionesPresupuesto_Pro = () => {
           axios.get('http://localhost:5000/asigPresProg/asignaciones'),
           axios.get('http://localhost:5000/asigPresProg/disponible')
         ])
-        .then(axios.spread((asignacionesRes, disponibleRes) => {
-          setAsignaciones(asignacionesRes.data);
-          setDineroDisponible(disponibleRes.data.dineroDisponible);
-        }))
-        .catch(err => console.error('Error fetching updated info:', err));
+          .then(axios.spread((asignacionesRes, disponibleRes) => {
+            setAsignaciones(asignacionesRes.data);
+            setDineroDisponible(disponibleRes.data.dineroDisponible);
+          }))
+          .catch(err => console.error('Error fetching updated info:', err));
 
         setProgramaSeleccionado('');
         setCantidad('');
       })
       .catch(err => {
-        if (err.response && err.response.status === 400) {
-          setErrorPrograma(err.response.data.message);
+        if (err.response) {
+          if (err.response.status === 400) {
+            setMessage('El programa ya tiene un presupuesto asignado.');
+          } else {
+            setMessage('Error al asignar presupueto.');
+          }
         } else {
-          console.error('Error assigning budget:', err);
+          setMessage('Error del servidor. Inténtalo de nuevo.');
         }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -87,15 +104,19 @@ const AsignacionesPresupuesto_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== id));
       })
-      .catch(err => console.error('Error deleting assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al eliminar la asignación.');
+        setOpenSnackbar(true);
+      });
   };
 
   const handleEditar = (asignacion) => {
-    setCurrentEditAsignacion(asignacion); 
-    setEditCantidad(asignacion.presupuesto); 
-    setErrorCantidad('');  
-    setEditModalOpen(true); 
-  };  
+    setCurrentEditAsignacion(asignacion);
+    setEditCantidad(asignacion.presupuesto);
+    setErrorCantidad('');
+    setEditModalOpen(true);
+  };
 
   const handleGuardarEdicion = () => {
     let isValid = true;
@@ -113,19 +134,23 @@ const AsignacionesPresupuesto_Pro = () => {
 
     const updatedAsignacion = {
       ...currentEditAsignacion,
-      amount: editCantidad  
+      amount: editCantidad
     };
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
       .then(() => {
         setAsignaciones(asignaciones.map(asignacion =>
           asignacion.id === currentEditAsignacion.id
-            ? { ...asignacion, presupuesto: editCantidad } 
+            ? { ...asignacion, presupuesto: editCantidad }
             : asignacion
         ));
         setEditModalOpen(false);
       })
-      .catch(err => console.error('Error editing assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al editar la asignación.');
+        setOpenSnackbar(true);
+      });
   };
 
   return (
@@ -136,10 +161,10 @@ const AsignacionesPresupuesto_Pro = () => {
       transition={{ duration: 0.5 }}
     >
 
-    {/* Título "Asignación" */}
-    <Typography variant="h3" align="center" color="primary" gutterBottom>
-      Asignación
-    </Typography>
+      {/* Título "Asignación" */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Asignación
+      </Typography>
 
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
@@ -181,7 +206,6 @@ const AsignacionesPresupuesto_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
-              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -200,13 +224,12 @@ const AsignacionesPresupuesto_Pro = () => {
                   style: { color: 'black' }, // Establece el color del texto ingresado a negro
                 }}
               />
-              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </Grid>
           </Grid>
 
           <div className="mt-6 flex justify-end">
             <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleAsignar}>
-              <FaPlus /> 
+              <FaPlus />
             </motion.button>
           </div>
 
@@ -267,7 +290,6 @@ const AsignacionesPresupuesto_Pro = () => {
                   style: { color: 'black' }, // Establece el color del texto ingresado a negro
                 }}
               />
-              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </DialogContent>
             <DialogActions>
               <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={() => setEditModalOpen(false)}>
@@ -280,6 +302,16 @@ const AsignacionesPresupuesto_Pro = () => {
           </Dialog>
         </CardContent>
       </Card>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };

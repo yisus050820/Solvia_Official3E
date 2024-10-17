@@ -302,7 +302,7 @@ const CrudProgramas = () => {
                 <td className="p-4">{truncateDescription(item.description)}</td>
                 <td className="p-4">{item.start_date.split('T')[0]}</td>
                 <td className="p-4">{item.end_date.split('T')[0]}</td>
-                <td className="p-4">{item.objectives}</td>
+                <td className="p-4">{truncateDescription(item.objectives)}</td>
                 <td className="p-4">{item.coordinator_name}</td>
                 <td className="p-4">
                   <span
