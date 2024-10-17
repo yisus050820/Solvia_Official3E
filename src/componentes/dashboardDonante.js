@@ -20,7 +20,7 @@ import { Feedback } from '@mui/icons-material';
 import Donar from './componentesDonador/Donar';
 import HistorialDonaciones from './componentesDonador/HistorialDonaciones';
 import InformesDelImpacto from './componentesDonador/InformesDeImpacto';
-import VerPersonas from './componentesDonador/VerPersonas';
+import VerPersonas from './componentesVol/OtrosVol';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';

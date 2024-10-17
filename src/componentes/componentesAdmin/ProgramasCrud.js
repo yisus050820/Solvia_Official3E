@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-
+import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Switch } from '@mui/material';
 
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -17,6 +16,7 @@ const CrudProgramas = () => {
   const [currentId, setCurrentId] = useState(null);
   const [newProgram, setNewProgram] = useState({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
   const [editProgram, setEditProgram] = useState(null);
+  const [mostrarCards, setMostrarCards] = useState(false);
   const [errors, setErrors] = useState({});
   const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
@@ -27,7 +27,6 @@ const CrudProgramas = () => {
     hidden: { opacity: 0, pathLength: 0 },
     visible: { opacity: 1, pathLength: 1 },
   };
-
 
   useEffect(() => {
     fetchPrograms();
@@ -42,7 +41,6 @@ const CrudProgramas = () => {
         console.error('Error fetching programs:', error);
       });
   };
-
 
     //Alerta se cierra automaticamente despues de 5 segundos
     useEffect(() => {
@@ -237,6 +235,20 @@ const CrudProgramas = () => {
     }
   };
 
+  // Función para determinar el color del estado
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-500';  // Verde para activo
+      case 'pause':
+        return 'bg-yellow-500'; // Amarillo para pausado
+      case 'unactive':
+        return 'bg-red-500';    // Rojo para inactivo
+      default:
+        return 'bg-gray-500';   // Gris por defecto
+    }
+  };
+
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
@@ -244,7 +256,21 @@ const CrudProgramas = () => {
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
           Gestionar Programas
         </Typography>
-        <div className="flex justify-end mb-4 space-x-4">
+        <div className="flex justify-between mb-4 space-x-4">
+        <div className="flex items-center space-x-2">
+
+            <Typography variant="body1" color="primary" className="mr-2">
+              Ver en tarjetas
+            </Typography>
+            <Switch
+              checked={mostrarCards}
+              onChange={() => setMostrarCards(!mostrarCards)}
+              color="primary"
+            />
+            </div>
+
+                {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
+            {!mostrarCards &&(
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
             whileHover={{ scale: 1.1 }}
@@ -253,68 +279,114 @@ const CrudProgramas = () => {
           >
             <FaPlus />
           </motion.button>
+          )}
         </div>
 
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Inicio</th>
-              <th className="p-4">Fecha Fin</th>
-              <th className="p-4">Objetivos</th>
-              <th className="p-4">Coordinador</th>
-              <th className="p-4">Estado</th>
-              <th className="p-4">Acciones</th>
-            </tr>
-          </thead>
-          <motion.tbody layout className="bg-gray-900">
-            {data.map((item) => (
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date.split('T')[0]}</td> 
-                <td className="p-4">{item.end_date.split('T')[0]}</td>   
-                <td className="p-4">{item.objectives}</td>
-                <td className="p-4">{item.coordinator_name}</td>
-                <td className="p-4">
-                  <span
-                    className={`text-lg font-bold ${
-                      item.status === 'active'
-                        ? 'text-green-500'
-                        : item.status === 'pause'
-                        ? 'text-yellow-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
-                  </span>
-                </td>
-                <td className="p-4 flex space-x-4">
-                  <motion.button
-                    className="bg-blue-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{scale: 0.9}}
-                    onClick={() => handleOpenEditModal(item)}
-                  >
-                    <FaEdit />
-                  </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleDeleteConfirm(item.id)}
-                  >
-                    <FaTrashAlt />
-                  </motion.button>
-                </td>
-              </motion.tr>
+        {mostrarCards ? (
+          <div className="flex justify-center flex-wrap mt-2">
+            {data.map((program) => (
+              <motion.div 
+                key={program.id}
+                className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+              >
+                <img
+                  className="w-full h-48 object-cover"
+                  src={program.program_image ? `http://localhost:5000${program.program_image}` : "https://via.placeholder.com/150"}
+                  alt={program.name}
+                />
+                <div className="p-4">
+                  <h2 className="text-white text-xl font-bold">{program.name}</h2>
+                  <div className="flex items-center mt-2">
+                    <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
+                    <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
+                  </div>
+                  <p className="text-gray-400 mt-2">
+                    {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
+                  </p>
+                  <div className="mt-4">
+                    <span className="text-green-400">Participantes: {program.participants || 0}</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-green-600">Donaciones: ${program.donations || 0}</span>
+                  </div>
+                  <div className="flex mt-4 space-x-4">
+                    <motion.button 
+                      className="bg-gray-700 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={handleOpenModal}
+                    >
+                      Más info
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
             ))}
-          </motion.tbody>
-        </motion.table>
+          </div>
+        ):(
+          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-4">Nombre</th>
+                <th className="p-4">Descripción</th>
+                <th className="p-4">Fecha Inicio</th>
+                <th className="p-4">Fecha Fin</th>
+                <th className="p-4">Objetivos</th>
+                <th className="p-4">Coordinador</th>
+                <th className="p-4">Estado</th>
+                <th className="p-4">Acciones</th>
+              </tr>
+            </thead>
+            <motion.tbody layout className="bg-gray-900">
+              {data.map((item) => (
+                <motion.tr key={item.id} className="border-b border-gray-700">
+                  <td className="p-4">{item.name}</td>
+                  <td className="p-4">{truncateDescription(item.description)}</td>
+                  <td className="p-4">{item.start_date.split('T')[0]}</td> 
+                  <td className="p-4">{item.end_date.split('T')[0]}</td>   
+                  <td className="p-4">{item.objectives}</td>
+                  <td className="p-4">{item.coordinator_name}</td>
+                  <td className="p-4">
+                    <span
+                      className={`text-lg font-bold ${
+                        item.status === 'active'
+                          ? 'text-green-500'
+                          : item.status === 'pause'
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="p-4 flex space-x-4">
+                    <motion.button
+                      className="bg-blue-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={() => handleOpenEditModal(item)}
+                    >
+                      <FaEdit />
+                    </motion.button>
+                    <motion.button
+                      className="bg-red-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteConfirm(item.id)}
+                    >
+                      <FaTrashAlt />
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
+          </motion.table>
+        )}
       </div>
+      );
+      );
 
       {/* Ventana emergente para agregar un nuevo registro */}
       <AnimatePresence>

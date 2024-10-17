@@ -248,7 +248,6 @@ const CrudUsuarios = () => {
         <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
-              <th className="p-4">ID</th>
               <th className="p-4">Nombre</th>
               <th className="p-4">Correo</th>
               <th className="p-4">Rol</th>
@@ -260,7 +259,6 @@ const CrudUsuarios = () => {
           <motion.tbody layout>
             {filteredData.map((item) => (
               <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
