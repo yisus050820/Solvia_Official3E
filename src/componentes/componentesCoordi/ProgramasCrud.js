@@ -101,7 +101,7 @@ return (
                 <td className="p-4">{truncateDescription(item.descripcion)}</td> {/* Limitar la descripción */}
                 <td className="p-4">{item.fechaInicio}</td>
                 <td className="p-4">{item.fechaFin}</td>
-                <td className="p-4">{item.objetivos}</td>
+                <td className="p-4">{truncateDescription(item.objetivos)}</td>
                 <td className="p-4">{item.coordinador}</td>
                 <td className="p-4 flex space-x-4">
                 <motion.button
