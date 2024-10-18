@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
-import { FaPlus } from 'react-icons/fa';
-import { Typography } from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Card, CardContent, Button } from '@mui/material';
+import { Visibility } from '@mui/icons-material';
 
 const MensajesRecibidos = () => {
   const [data, setData] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
     // Simulación de la petición al backend
@@ -18,8 +20,14 @@ const MensajesRecibidos = () => {
       });
   }, []);
 
-  const handleOpenModal = () => {
-    // Aquí puedes agregar lógica si necesitas abrir un modal para crear algo
+  const handleOpenDialog = (message) => {
+    setSelectedMessage(message);
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedMessage(null);
   };
 
   return (
@@ -29,40 +37,36 @@ const MensajesRecibidos = () => {
           Mensajes de los Usuarios
         </Typography>
 
-        <div className="flex justify-between mb-4 space-x-4">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          ></motion.div>
-
-        </div>
-
         {/* Tabla con las etiquetas alineadas a la izquierda */}
         <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
-              <th className="p-4 text-left" style={{ textAlign: 'left' }}>ID</th>
-              <th className="p-4 text-left" style={{ textAlign: 'left' }}>Nombre</th>
-              <th className="p-4 text-left" style={{ textAlign: 'left' }}>Correo</th>
-              <th className="p-4 text-left" style={{ textAlign: 'left' }}>Rol</th>
-              <th className="p-4 text-left" style={{ textAlign: 'left' }}>Mensajes</th>
+              <th className="p-4 text-left" style={{ textAlign: 'left', width: '35%' }}>Nombre</th>
+              <th className="p-4 text-left" style={{ textAlign: 'left', width: '10%' }}>Rol</th>
+              <th className="p-4 text-left" style={{ textAlign: 'left', width: '30%' }}>Mensaje</th>
+              <th className="p-4 text-left" style={{ textAlign: 'left', width: '20%' }}>Fecha y Hora</th>
             </tr>
           </thead>
           <motion.tbody layout>
             {data.length > 0 ? (
               data.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
-                  <td className="p-4" style={{ textAlign: 'left' }}>{item.id}</td>
                   <td className="p-4" style={{ textAlign: 'left' }}>{item.name}</td>
-                  <td className="p-4" style={{ textAlign: 'left' }}>{item.email}</td>
                   <td className="p-4" style={{ textAlign: 'left' }}>{item.role}</td>
-                  <td className="p-4" style={{ textAlign: 'left' }}></td>
+                  <td className="p-4" style={{ textAlign: 'left' }}>
+                    <IconButton 
+                      color="primary" 
+                      onClick={() => handleOpenDialog(item.MensajesRecibidos)}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </td>
+                  <td className="p-4" style={{ textAlign: 'left' }}>{item.date}</td>
                 </motion.tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="p-4 text-center">
+                <td colSpan="4" className="p-4 text-center">
                   No hay datos disponibles
                 </td>
               </tr>
@@ -70,6 +74,40 @@ const MensajesRecibidos = () => {
           </motion.tbody>
         </motion.table>
       </div>
+
+      {/* Dialog para mostrar el mensaje recibido con AnimatePresence */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Dialog open={open} onClose={handleCloseDialog}>
+              <DialogTitle>Mensaje Recibido</DialogTitle>
+              <DialogContent>
+                {selectedMessage ? (
+                  <Card>
+                    <CardContent>
+                      <Typography variant="body1" color="textSecondary">
+                        {selectedMessage}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Typography>No hay mensaje para mostrar</Typography>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDialog} color="primary">
+                  Cerrar
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
