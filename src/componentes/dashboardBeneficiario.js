@@ -117,7 +117,7 @@ function DemoPageContent({ pathname }) {
     >
     
     {pathname === '/configuracion-perfil' && <PerfilUsuario />}
-    {pathname === '/programas/disponibles' && <TarjetasProgramas />}
+    {pathname === '/programas/disponibles' && <ProgramasActivos />}
     {pathname === '/programas/actuales' && <MisProgramas />}
     {pathname === '/ayuda' && <ReportesDonaciones />}
     {pathname === '/comunicacion/feedback' && <Calificar />}

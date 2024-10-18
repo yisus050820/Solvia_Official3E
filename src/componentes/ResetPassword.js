@@ -62,6 +62,7 @@ const ResetPassword = () => {
         alignItems: 'center',
         justifyContent: 'center',
         p: 2,
+        backgroundImage: `url('https://img.freepik.com/foto-gratis/superficie-azul-herramientas-estudio_23-2147864592.jpg')`,
       }}
     >
       <Paper
@@ -70,6 +71,7 @@ const ResetPassword = () => {
           padding: { xs: 2, sm: 4 },
           borderRadius: '16px',
           width: { xs: '100%', sm: '400px', md: '450px' },
+          
         }}
       >
         <Typography variant="h4" component="h1" align="center" gutterBottom>
