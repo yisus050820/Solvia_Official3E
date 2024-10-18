@@ -37,6 +37,7 @@ const CrudUsuarios = () => {
       });
   }, []);
 
+<<<<<<< HEAD
   //Alerta se cierra automaticamente despues de 5 segundos
   useEffect(() => {
     if (successMessage) {
@@ -47,6 +48,13 @@ const CrudUsuarios = () => {
     }
   }, [successMessage]);
 
+=======
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+  
+>>>>>>> Flor
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
@@ -262,8 +270,13 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
+<<<<<<< HEAD
                 <td className="p-4">{item.description}</td>
                 <td className="p-4">{item.created_at}</td>
+=======
+                <td className="p-4">{truncateDescription(item.description)}</td>
+                <td className="p-4">{item.created_at}</td> 
+>>>>>>> Flor
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"

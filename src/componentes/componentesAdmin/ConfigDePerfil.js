@@ -3,14 +3,15 @@ import { Card, CardContent, Typography, Avatar, TextField, Grid, Button, IconBut
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
+import { Card, CardContent, Avatar, Grid, Typography, TextField, Button, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
 
 const PerfilUsuario = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [editInfo, setEditInfo] = useState({});
   const [newProfilePicture, setNewProfilePicture] = useState(null);
-  const [password, setPassword] = useState(''); // Estado para la nueva contraseña
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
@@ -20,8 +21,7 @@ const PerfilUsuario = () => {
   // Obtener la información del usuario al cargar el componente
   useEffect(() => {
     const token = localStorage.getItem('token');
-
-    // Verificar si el token existe y no está vacío
+    
     if (!token) {
       console.error('No se encontró el token.');
       setLoading(false);
@@ -32,11 +32,14 @@ const PerfilUsuario = () => {
     console.log('Tamaño del token:', token.length);
 
     const fetchProfile = async () => {
+      console.log('Se inicia la peticion del fetch')
       try {
-        const response = await axios.get('http://localhost:5000/perfil', {
+        const response = await axios.get('http://localhost:5000/perfil/', {
           headers: { Authorization: `Bearer ${token}` }
         });
-
+  
+        console.log('Respuesta del servidor:', response.data);
+  
         setUserInfo(response.data);
         setLoading(false);
       } catch (error) {
@@ -70,6 +73,7 @@ const PerfilUsuario = () => {
     formData.append('description', editInfo.description);
     if (newProfilePicture) {
       formData.append('profile_picture', newProfilePicture);
+      console.log(newProfilePicture);
     }
 
     // Si se ha ingresado una nueva contraseña
@@ -80,9 +84,9 @@ const PerfilUsuario = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await axios.put('http://localhost:5000/perfil', formData, {
+      const response = await axios.put('http://localhost:5000/perfil/', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: "Bearer ${token}",
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -96,31 +100,35 @@ const PerfilUsuario = () => {
     } catch (error) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
-        if (message.includes('correo')) {
+        if (typeof message === 'string' && message.includes('correo')) {
           setErrors({ ...errors, email: message });
-        } else if (message.includes('contraseña')) {
+        } else if (typeof message === 'string' && message.includes('contraseña')) {
           setErrors({ ...errors, password: message });
         }
       }
     }
   };
 
+  // Validar el tamaño del archivo de imagen antes de subirlo
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setNewProfilePicture(file);
+    if (file && file.size > 1024 * 1024) {  // Limitar a 1MB
+      setMessage('El tamaño de la imagen no debe exceder 1MB.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
     }
+    setNewProfilePicture(file);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');  // Limpiar el token al cerrar sesión
+    localStorage.clear();  // Limpiar localStorage completamente
     delete axios.defaults.headers.common['Authorization'];  // Limpiar encabezados globales
     window.location.href = '/index';  // Redirigir a la página de inicio o login
   };
 
   const toggleEdit = () => {
     setIsEditing(!isEditing);
-    // Al hacer clic en editar, copia los datos actuales del perfil al estado de edición
     setEditInfo(userInfo);
   };
 
@@ -142,7 +150,7 @@ const PerfilUsuario = () => {
             <Grid item xs={12} md={4}>
               <motion.div className="flex justify-center" whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
                 <Avatar
-                  src={userInfo.profile_picture}
+                  src={`http://localhost:5000${userInfo.profile_picture}?${new Date().getTime()}`}
                   alt={userInfo.name}
                   sx={{ width: 150, height: 150, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)' }}
                 />

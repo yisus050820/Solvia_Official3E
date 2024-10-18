@@ -37,7 +37,15 @@ const CrudUsuariosCoordi = () => {
       });
   }, []);
 
+<<<<<<< HEAD
   // Filtrar datos según el rol seleccionado
+=======
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+};
+
+>>>>>>> Flor
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
   return (
@@ -88,6 +96,7 @@ const CrudUsuariosCoordi = () => {
         {mostrarCards ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredData.map((item) => (
+<<<<<<< HEAD
               <motion.div
                 key={item.id}
                 className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
@@ -132,6 +141,16 @@ const CrudUsuariosCoordi = () => {
                   )}
                 </ul>
               </motion.div>
+=======
+              <motion.tr key={item.id} className="border-b border-gray-700">
+                <td className="p-4">{item.id}</td>
+                <td className="p-4">{item.name}</td>
+                <td className="p-4">{item.email}</td>
+                <td className="p-4">{item.role}</td>
+                <td className="p-4">{truncateDescription(item.description)}</td>
+                <td className="p-4">{item.created_at}</td> {/* Mostramos la fecha de creación */}
+              </motion.tr>
+>>>>>>> Flor
             ))}
           </div>
         ) : (
