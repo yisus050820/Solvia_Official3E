@@ -3,7 +3,8 @@ import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { FaDollarSign, FaMoneyBillWave, FaChartPie } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; 
+
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
