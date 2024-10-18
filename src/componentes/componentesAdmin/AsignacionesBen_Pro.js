@@ -131,7 +131,7 @@ const AsignacionesBen_Pro = () => {
       </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
-          <Typography variant="h4" color="white" gutterBottom>
+          <Typography variant="h4" align="center" color="white" gutterBottom>
             Asignar Beneficiario a Programa
           </Typography>
           <Grid container spacing={4}>

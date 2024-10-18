@@ -130,7 +130,7 @@ const AsignacionesVol_Pro = () => {
       </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
-          <Typography variant="h4" color="white" gutterBottom>Asignar Voluntario a Programa</Typography>
+          <Typography variant="h4" color="white" align='center' gutterBottom>Asignar Voluntario a Programa</Typography>
           {/* Formulario para asignar voluntario a programa */}
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
