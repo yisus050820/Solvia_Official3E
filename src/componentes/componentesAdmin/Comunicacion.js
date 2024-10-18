@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, TextField } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const Comunicacion = () => {
   const [adminSeleccionado, setAdminSeleccionado] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [mensajesRecibidos, setMensajesRecibidos] = useState([]); // Estado para los mensajes recibidos
 
   // Datos de ejemplo para los administradores
   const admins = [
@@ -29,21 +31,44 @@ const Comunicacion = () => {
     tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
 
-  // Espacio para manejar lógica de backend (vacío por ahora)
+  // Función para enviar el mensaje
   const enviarMensaje = () => {
-    // Aquí podrías realizar una petición a tu API para enviar el mensaje
-    // axios.post('TU_API_ENDPOINT', { admin: adminSeleccionado, mensaje })
-    //   .then(response => { console.log("Mensaje enviado:", response.data); })
-    //   .catch(error => { console.error("Error enviando el mensaje:", error); });
-
     if (!adminSeleccionado) {
       alert("Por favor selecciona un administrador.");
     } else if (!mensaje) {
       alert("Por favor escribe un mensaje.");
     } else {
       alert(`Mensaje enviado a ${admins.find(admin => admin.id === adminSeleccionado)?.name}: "${mensaje}"`);
+      
+      // Aquí se enviaría el mensaje a tu backend
+      // axios.post('TU_API_ENDPOINT', { admin: adminSeleccionado, mensaje })
+      //   .then(response => { console.log("Mensaje enviado:", response.data); })
+      //   .catch(error => { console.error("Error enviando el mensaje:", error); });
     }
   };
+
+  // Función para obtener los mensajes recibidos (simulación)
+  useEffect(() => {
+    const obtenerMensajesRecibidos = async () => {
+      try {
+        // Simulación de petición a la API para obtener los mensajes
+        // const response = await axios.get('TU_API_ENDPOINT');
+        // setMensajesRecibidos(response.data);
+
+        // Ejemplo de mensajes obtenidos
+        const mensajesEjemplo = [
+          { id: 1, remitente: 'Usuario 1', contenido: 'Hola Admin 1, ¿podrías ayudarme?' },
+          { id: 2, remitente: 'Usuario 2', contenido: 'Tengo una duda sobre el programa.' },
+          { id: 3, remitente: 'Usuario 3', contenido: 'Gracias por tu apoyo en el proyecto.' }
+        ];
+        setMensajesRecibidos(mensajesEjemplo);
+      } catch (error) {
+        console.error('Error al obtener los mensajes:', error);
+      }
+    };
+
+    obtenerMensajesRecibidos();
+  }, []);
 
   return (
     <motion.div
@@ -117,6 +142,28 @@ const Comunicacion = () => {
               Enviar Mensaje
             </motion.button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Sección para mostrar mensajes recibidos */}
+      <Typography variant="h4" align="center" color="primary" gutterBottom style={{ marginTop: '40px' }}>
+        Mensajes Recibidos
+      </Typography>
+      <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
+        <CardContent>
+          <List>
+            {mensajesRecibidos.length > 0 ? (
+              mensajesRecibidos.map((mensaje) => (
+                <ListItem key={mensaje.id}>
+                  <ListItemText primary={mensaje.remitente} secondary={mensaje.contenido} />
+                </ListItem>
+              ))
+            ) : (
+              <Typography variant="h6" color="white">
+                No hay mensajes recibidos.
+              </Typography>
+            )}
+          </List>
         </CardContent>
       </Card>
     </motion.div>
