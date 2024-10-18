@@ -377,7 +377,7 @@ const AsignacionesVol_Pro = () => {
           transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
           className="bg-gray-800 p-6 rounded-xl shadow-lg">
                         {/* Icono de palomita */}
-                     
+                  
             <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
             <div className='flex justify-center items-center'>
             <motion.div
