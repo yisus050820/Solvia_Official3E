@@ -282,7 +282,6 @@ const CrudProgramas = () => {
           )}
         </div>
 
-<<<<<<< HEAD
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
             {data.map((program) => (
@@ -324,62 +323,6 @@ const CrudProgramas = () => {
                   </div>
                 </div>
               </motion.div>
-=======
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Inicio</th>
-              <th className="p-4">Fecha Fin</th>
-              <th className="p-4">Objetivos</th>
-              <th className="p-4">Coordinador</th>
-              <th className="p-4">Estado</th>
-              <th className="p-4">Acciones</th>
-            </tr>
-          </thead>
-          <motion.tbody layout className="bg-gray-900">
-            {data.map((item) => (
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date.split('T')[0]}</td> 
-                <td className="p-4">{item.end_date.split('T')[0]}</td>   
-                <td className="p-4">{truncateDescription(item.objectives)}</td>
-                <td className="p-4">{item.coordinator_name}</td>
-                <td className="p-4">
-                  <span
-                    className={`text-lg font-bold ${
-                      item.status === 'active'
-                        ? 'text-green-500'
-                        : item.status === 'pause'
-                        ? 'text-yellow-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
-                  </span>
-                </td>
-                <td className="p-4 flex space-x-4">
-                  <motion.button
-                    className="bg-blue-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    onClick={() => handleOpenEditModal(item)}
-                  >
-                    <FaEdit />
-                  </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    onClick={() => handleDeleteConfirm(item.id)}
-                  >
-                    <FaTrashAlt />
-                  </motion.button>
-                </td>
-              </motion.tr>
->>>>>>> Flor
             ))}
           </div>
         ):(
@@ -442,7 +385,6 @@ const CrudProgramas = () => {
           </motion.table>
         )}
       </div>
-      );
       );
 
       {/* Ventana emergente para agregar un nuevo registro */}

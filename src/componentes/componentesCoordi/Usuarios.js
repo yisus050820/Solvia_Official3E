@@ -7,21 +7,17 @@ const CrudUsuariosCoordi = () => {
   const [data, setData] = useState([]);
   const [filtroRol, setFiltroRol] = useState('');
   const [mostrarCards, setMostrarCards] = useState(false);
-  const [programasInscritos, setProgramasInscritos] = useState({}); // Almacenamos los programas inscritos por usuario.
+  const [programasInscritos, setProgramasInscritos] = useState({});
 
   // Obtener usuarios y sus programas inscritos al cargar la página
   useEffect(() => {
-    // Obtener información de usuarios
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
-    
-    // Obtener información de los programas a los que están inscritos los beneficiarios
     const fetchProgramasInscritos = axios.get('http://localhost:5000/asigBenProg/asignaciones');
 
     Promise.all([fetchUsuarios, fetchProgramasInscritos])
       .then(([usuariosResponse, programasResponse]) => {
         setData(usuariosResponse.data);
-        
-        // Estructurar los programas inscritos por cada beneficiario
+
         const programasMap = {};
         programasResponse.data.forEach((asignacion) => {
           const { user_id, program_name } = asignacion;
@@ -37,16 +33,14 @@ const CrudUsuariosCoordi = () => {
       });
   }, []);
 
-<<<<<<< HEAD
-  // Filtrar datos según el rol seleccionado
-=======
+  // Filtrar usuarios por rol
+  const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
+
+  // Truncar descripción si es muy larga
   const truncateDescription = (description) => {
     if (!description) return '';
     return description.length > 50 ? description.slice(0, 50) + '...' : description;
-};
-
->>>>>>> Flor
-  const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
+  };
 
   return (
     <>
@@ -96,7 +90,6 @@ const CrudUsuariosCoordi = () => {
         {mostrarCards ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredData.map((item) => (
-<<<<<<< HEAD
               <motion.div
                 key={item.id}
                 className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
@@ -121,7 +114,7 @@ const CrudUsuariosCoordi = () => {
                   {item.email}
                 </Typography>
                 <Typography variant="body2" className="flex justify-center">
-                  {item.description}
+                  {truncateDescription(item.description)}
                 </Typography>
                 <Typography variant="body2" className="flex justify-center">
                   <br />
@@ -141,16 +134,6 @@ const CrudUsuariosCoordi = () => {
                   )}
                 </ul>
               </motion.div>
-=======
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{item.email}</td>
-                <td className="p-4">{item.role}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.created_at}</td> {/* Mostramos la fecha de creación */}
-              </motion.tr>
->>>>>>> Flor
             ))}
           </div>
         ) : (
@@ -171,7 +154,7 @@ const CrudUsuariosCoordi = () => {
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{item.email}</td>
                   <td className="p-4">{item.role}</td>
-                  <td className="p-4">{item.description}</td>
+                  <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">
                     {programasInscritos[item.id] && programasInscritos[item.id].length > 0 ? (
                       <ul className="list-disc list-inside">

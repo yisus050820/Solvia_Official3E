@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 
-
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
 const CrudUsuarios = () => {
@@ -21,11 +20,11 @@ const CrudUsuarios = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
-    // Variantes de animación para la palomita
-    const checkmarkVariants = {
-      hidden: { opacity: 0, pathLength: 0 },
-      visible: { opacity: 1, pathLength: 1 },
-    };
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
@@ -37,24 +36,20 @@ const CrudUsuarios = () => {
       });
   }, []);
 
-<<<<<<< HEAD
-  //Alerta se cierra automaticamente despues de 5 segundos
+  // Alerta se cierra automáticamente después de 5 segundos
   useEffect(() => {
     if (successMessage) {
       setTimeout(() => {
         setSuccessMessage('');
-      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-
+      }, 1000); // definir en cuanto tiempo desaparecerá la alerta (1 segundo)
     }
   }, [successMessage]);
 
-=======
   const truncateDescription = (description) => {
     if (!description) return '';
     return description.length > 50 ? description.slice(0, 50) + '...' : description;
   };
-  
->>>>>>> Flor
+
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
@@ -100,10 +95,9 @@ const CrudUsuarios = () => {
   };
 
   const handleAddUser = () => {
-    const validationErrors = validateUser(newUser, {}, false); 
+    const validationErrors = validateUser(newUser, {}, false);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log("Errores de validación:", validationErrors);
       return;
     }
 
@@ -119,7 +113,7 @@ const CrudUsuarios = () => {
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
         const createdUser = response.data;
-        setData([...data, createdUser]); 
+        setData([...data, createdUser]);
         handleCloseModal();
         setSuccessMessage('Usuario agregado exitosamente.'); // Mostrar mensaje de éxito
       })
@@ -138,7 +132,7 @@ const CrudUsuarios = () => {
       setErrors(validationErrors);
       return;
     }
-  
+
     const updatedUser = {
       name: editUser.name,
       email: editUser.email,
@@ -146,22 +140,22 @@ const CrudUsuarios = () => {
       description: editUser.description,
       ...(editUser.password ? { password: editUser.password } : {})
     };
-  
+
     axios.put(`http://localhost:5000/usuarios/${editUser.id}`, updatedUser)
-    .then(response => {
-      axios.get('http://localhost:5000/usuarios')
-        .then(response => {
-          setData(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching users:', error);
-        });
-      handleCloseEditModal();
-      setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
-    })
-    .catch(error => {
-      console.error('Error al actualizar usuario:', error);
-    });
+      .then(() => {
+        axios.get('http://localhost:5000/usuarios')
+          .then(response => {
+            setData(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching users:', error);
+          });
+        handleCloseEditModal();
+        setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
+      })
+      .catch(error => {
+        console.error('Error al actualizar usuario:', error);
+      });
   };
 
   const handleOpenEditModal = (user) => {
@@ -193,8 +187,8 @@ const CrudUsuarios = () => {
   };
 
   const handleDeleteClick = (id) => {
-    setCurrentId(id);  
-    setIsDeleteConfirmOpen(true);  
+    setCurrentId(id);
+    setIsDeleteConfirmOpen(true);
   };
 
   const confirmDelete = () => {
@@ -241,15 +235,14 @@ const CrudUsuarios = () => {
             </motion.select>
           </motion.div>
           <div className="flex justify-end mb-4 space-x-4">
-
-          <motion.button
-            className="bg-green-500 text-white p-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleOpenModal}
-          >
-            <FaPlus />
-          </motion.button>
+            <motion.button
+              className="bg-green-500 text-white p-2 rounded-full"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleOpenModal}
+            >
+              <FaPlus />
+            </motion.button>
           </div>
         </div>
 
@@ -270,26 +263,21 @@ const CrudUsuarios = () => {
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
-<<<<<<< HEAD
-                <td className="p-4">{item.description}</td>
-                <td className="p-4">{item.created_at}</td>
-=======
                 <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.created_at}</td> 
->>>>>>> Flor
+                <td className="p-4">{item.created_at}</td>
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
                     whileHover={{ scale: 1.1 }}
-                    whileTap={{scale: 0.9}}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleOpenEditModal(item)}
                   >
                     <FaEdit />
                   </motion.button>
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1}}
-                    whileTap={{ scale: 0.9}}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleDeleteClick(item.id)}
                   >
                     <FaTrashAlt />
@@ -304,17 +292,17 @@ const CrudUsuarios = () => {
       {/* Modal para añadir usuario */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <motion.div 
-            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: '-100vh' }}
+              animate={{ y: '0' }}
+              exit={{ y: '-100vh' }}
             >
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
@@ -372,18 +360,19 @@ const CrudUsuarios = () => {
                 {errors.password && <p className="text-red-500">{errors.password}</p>}
               </div>
               <div className="mt-4 flex justify-between">
-                <motion.button 
-                className="bg-green-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#38a169',scale: 1.1 }}
-                whileTap={{scale: 0.9}}
-                onClick={handleAddUser}>
+                <motion.button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleAddUser}
+                >
                   Agregar
-                  </motion.button>
-                  <motion.button 
-                className="bg-gray-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleCloseModal} 
+                </motion.button>
+                <motion.button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCloseModal}
                 >
                   Cancelar
                 </motion.button>
@@ -396,17 +385,17 @@ const CrudUsuarios = () => {
       {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
-          <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
-            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: '-100vh' }}
+              animate={{ y: '0' }}
+              exit={{ y: '-100vh' }}
             >
               <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
@@ -461,7 +450,7 @@ const CrudUsuarios = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2',scale: 1.1 }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditUser}
                 >
@@ -470,7 +459,7 @@ const CrudUsuarios = () => {
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }} 
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -508,7 +497,7 @@ const CrudUsuarios = () => {
                 className="bg-red-500 text-white px-4 py-2 rounded-full"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={confirmDelete}  
+                onClick={confirmDelete}
               >
                 Eliminar
               </motion.button>
@@ -519,48 +508,48 @@ const CrudUsuarios = () => {
 
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: 'easeIn' }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg"
             >
-              <FaCheck size={50} className="text-white"/>
+              {/* Icono de palomita */}
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className="flex justify-center items-center">
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: 'easeInOut' }}
+                  className="flex justify-center items-center"
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
-
+        )}
+      </AnimatePresence>
     </>
   );
 };

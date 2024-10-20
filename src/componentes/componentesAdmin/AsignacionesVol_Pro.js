@@ -96,15 +96,13 @@ const AsignacionesVol_Pro = () => {
       .catch(error => {
         if (error.response) {
           if (error.response.data.message === 'El voluntario ya está asignado a este programa.') {
-            setMessage('El voluntario ya está asignado a este programa.');
+            setSuccessMessage('El voluntario ya está asignado a este programa.');
           } else {
-            setMessage('Error al asignar voluntario.');
+            setSuccessMessage('Error al asignar voluntario.');
           }
         } else {
-          setMessage('Error al asignar voluntario. Por favor, inténtalo de nuevo.');
+          setSuccessMessage('Error al asignar voluntario. Por favor, inténtalo de nuevo.');
         }
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
       });
   };  
 
@@ -146,20 +144,13 @@ const AsignacionesVol_Pro = () => {
         // Manejar el error si el usuario ya está asignado a un programa
         if (error.response) {
           if (error.response.status === 409) {
-            // Mostrar error específico del backend
-            setMessage(error.response.data.message); // El mensaje enviado por el backend
+            setSuccessMessage(error.response.data.message); // El mensaje enviado por el backend
           } else if (error.response.status === 500) {
-            // Error del servidor
-            setMessage('Error al actualizar la asignación.');
+            setSuccessMessage('Error al actualizar la asignación.');
           }
         } else {
-          // Error de red o similar
-          setMessage('Error al editar asignación. Por favor, inténtalo de nuevo.');
+          setSuccessMessage('Error al editar asignación. Por favor, inténtalo de nuevo.');
         }
-        
-        // Mostrar el mensaje de error en el Snackbar
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
       });
   };
 

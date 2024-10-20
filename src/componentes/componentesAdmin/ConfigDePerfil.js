@@ -3,7 +3,7 @@ import { Card, CardContent, Typography, Avatar, TextField, Grid, Button, IconBut
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
-import { Card, CardContent, Avatar, Grid, Typography, TextField, Button, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
+
 
 const PerfilUsuario = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -16,8 +16,6 @@ const PerfilUsuario = () => {
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
-  
-
   // Obtener la información del usuario al cargar el componente
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -27,18 +25,12 @@ const PerfilUsuario = () => {
       setLoading(false);
       return;
     }
-    
-    // Revisar el tamaño del token (si es necesario)
-    console.log('Tamaño del token:', token.length);
 
     const fetchProfile = async () => {
-      console.log('Se inicia la peticion del fetch')
       try {
         const response = await axios.get('http://localhost:5000/perfil/', {
           headers: { Authorization: `Bearer ${token}` }
         });
-  
-        console.log('Respuesta del servidor:', response.data);
   
         setUserInfo(response.data);
         setLoading(false);
@@ -50,13 +42,13 @@ const PerfilUsuario = () => {
     fetchProfile();
   }, []);
 
-  //Aniamcion de exito al actualizar datos de perfil
+  // Animación de éxito al actualizar datos de perfil
   useEffect(() => {
     if (successMessage) {
       setTimeout(() => {
         setSuccessMessage('');
-      }, 1000); // El mensaje desaparecerá después de 1 segundos, se mide en ms
-      }
+      }, 1000); // El mensaje desaparecerá después de 1 segundo, se mide en ms
+    }
   }, [successMessage]);
 
   // Controlar los cambios en los campos de edición
@@ -73,7 +65,6 @@ const PerfilUsuario = () => {
     formData.append('description', editInfo.description);
     if (newProfilePicture) {
       formData.append('profile_picture', newProfilePicture);
-      console.log(newProfilePicture);
     }
 
     // Si se ha ingresado una nueva contraseña
@@ -86,7 +77,7 @@ const PerfilUsuario = () => {
     try {
       const response = await axios.put('http://localhost:5000/perfil/', formData, {
         headers: {
-          Authorization: 'Bearer ${token}',
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -113,9 +104,7 @@ const PerfilUsuario = () => {
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 1024 * 1024) {  // Limitar a 1MB
-      setMessage('El tamaño de la imagen no debe exceder 1MB.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+      setErrors({ ...errors, profilePicture: 'El tamaño de la imagen no debe exceder 1MB.' });
       return;
     }
     setNewProfilePicture(file);
@@ -190,7 +179,7 @@ const PerfilUsuario = () => {
                     variant="outlined"
                     margin="dense"
                     placeholder="Escribe tu nombre"
-                    sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Aseguramos que el texto sea negro
+                    sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
                   />
                   <TextField
                     name="email"
@@ -202,12 +191,11 @@ const PerfilUsuario = () => {
                     placeholder="Escribe tu correo"
                     error={!!errors.email}
                     helperText={errors.email}
-                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' }, color:'black' }} // Texto negro
+                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' }, color: 'black' }}
                   />
-                  {/* Campo de contraseña */}
                   <TextField  
                     name="password"
-                    type={showPassword ? 'text' : 'password'}  // Alternar entre mostrar y ocultar contraseña
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     fullWidth
@@ -223,7 +211,7 @@ const PerfilUsuario = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Texto negro
+                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
                     error={!!errors.password}
                     helperText={errors.password}
                   />
@@ -238,48 +226,48 @@ const PerfilUsuario = () => {
               </Typography>
             ) : (
               <TextField
-              name="description"
-              value={editInfo.description || ''}  // Asegurarse de que no sea undefined
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
-              margin="dense"
-              placeholder="Agrega una descripción"
-              sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }} // Aseguramos que el texto sea negro
+                name="description"
+                value={editInfo.description || ''}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                margin="dense"
+                placeholder="Agrega una descripción"
+                sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
               />
             )}
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
                 <>
                   <motion.button 
-                  className="bg-blue-500 text-white px-4 py-2 rounded-full" 
-                  whileHover={{scale: 1.1}}
-                  whileTap={{scale: 0.9}}
-                  onClick={toggleEdit}>
+                    className="bg-blue-500 text-white px-4 py-2 rounded-full"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={toggleEdit}>
                     <FaEdit />
                   </motion.button>
                   <motion.button 
-                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
-                  whileHover={{scale: 1.1}}
-                  whileTap={{scale: 0.9}}
-                  onClick={handleLogout}>
+                    className="bg-red-500 text-white px-4 py-2 rounded-full"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleLogout}>
                     <FaDoorOpen />
                   </motion.button>
                 </>
               ) : (
                 <div className="flex space-x-4">
                   <motion.button 
-                  className="bg-green-500 text-white px-4 py-2 rounded-full" 
-                  whileHover={{scale: 1.1}}
-                  whileTap={{scale: 0.9}}
-                  onClick={handleSave}>
+                    className="bg-green-500 text-white px-4 py-2 rounded-full"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleSave}>
                     Guardar
                   </motion.button>
                   <motion.button 
-                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
-                  whileHover={{scale: 1.1}}
-                  whileTap={{scale: 0.9}}
-                  onClick={() => setIsEditing(false)}>
+                    className="bg-red-500 text-white px-4 py-2 rounded-full"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setIsEditing(false)}>
                     Cancelar
                   </motion.button>
                 </div>
@@ -288,54 +276,52 @@ const PerfilUsuario = () => {
           </div>
         </CardContent>
       </Card>
-      {/* Modal para mensajes de éxito */}
-  <AnimatePresence>
-    {successMessage && (
-      <motion.div 
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <motion.div 
-        initial={{ y: -50 }}
-        animate={{ y: 0 }}
-        exit={{ y: 50 }}
-        transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-        className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          {/* Icono de palomita */}
-          <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-          <div className='flex justify-center items-center'>
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={{
-                hidden: { opacity: 0, pathLength: 0 },
-                visible: { opacity: 1, pathLength: 1 },
-              }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
-            </motion.div>
-          </div>
-        </motion.div>
-      </motion.div>
-    )}
-  </AnimatePresence>
 
-      </motion.div>
-    );
-  };
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <motion.div 
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, pathLength: 0 },
+                    visible: { opacity: 1, pathLength: 1 },
+                  }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',
+                    backgroundColor: '#4CAF50',
+                    width: '80px',
+                    height: '80px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 export default PerfilUsuario;
