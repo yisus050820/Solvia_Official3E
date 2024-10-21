@@ -19,6 +19,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import MessageIcon from '@mui/icons-material/Message';
 import { Feedback } from '@mui/icons-material';
+import ArticleIcon from '@mui/icons-material/Article';
 
 // Importaciones de los formularios hijos
 import ProgramasCrud from './componentesAdmin/ProgramasCrud';
@@ -33,6 +34,7 @@ import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuest
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import Comunicacion from './componentesAdmin/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
+import Mensajes from './componentesAdmin/Mensajes';
 
 
 const NAVIGATION = [
@@ -130,6 +132,11 @@ const NAVIGATION = [
         title: 'Ver feedback de programas',
         icon: <Feedback />,
       },
+      {
+        segment: 'mensajes',
+        title: 'Mensajes recibidos',
+        icon: <ArticleIcon />,
+      },
     ],
   },
     
@@ -177,6 +184,7 @@ function DemoPageContent({ pathname }) {
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
       {pathname === '/comunicacion/contacto' && <Comunicacion />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+      {pathname === '/comunicacion/mensajes' && <Mensajes />}
     </Box>
   );
 }
