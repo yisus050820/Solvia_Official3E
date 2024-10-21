@@ -241,14 +241,20 @@ const CrudProgramas = () => {
   };
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:5000/programs/${currentId}`)
+    axios.delete(`http://localhost:5000/programas/${currentId}`)
       .then(() => {
         setData(data.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
       })
       .catch(error => {
-        console.error('Error deleting program:', error);
+        let errorMessage = 'Error al eliminar programa, intente más tarde.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setMessage(errorMessage);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -557,7 +563,7 @@ const CrudProgramas = () => {
       </Dialog>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000} onClose={handleCloseSnackbar}
+        autoHideDuration={3000} onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>

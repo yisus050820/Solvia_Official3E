@@ -60,7 +60,7 @@ const CrudUsuarios = () => {
 
   const validateUser = (user, originalUser = {}, isEditing = false) => {
     const validationErrors = {};
-    
+
     if (!isEditing || (isEditing && user.email && user.email !== originalUser.email)) {
       if (!isValidEmail(user.email)) {
         validationErrors.email = 'El correo que ingresó no es válido, por favor ingrese un correo válido.';
@@ -208,8 +208,7 @@ const CrudUsuarios = () => {
         setMessage(errorMessage);
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
-        console.error('Error al eliminar usuario:', error);
-      });      
+      });
   };
 
   const handleDeleteClick = (id) => {
@@ -491,7 +490,7 @@ const CrudUsuarios = () => {
       </AnimatePresence>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >

@@ -102,15 +102,65 @@ router.put('/:id', upload.single('program_image'), (req, res) => {
 
 // Eliminar programa
 router.delete('/:id', (req, res) => {
-    const programId = req.params.id;
+  const programId = req.params.id;
 
-    db.query('DELETE FROM programs WHERE id = ?', [programId], (err, result) => {
-        if (err) {
-            console.error('Error deleting program:', err);
-            return res.status(500).json({ message: 'Error al eliminar programa.' });
-        }
-        res.status(200).json({ message: 'Programa eliminado exitosamente' });
-    });
+  const checkProgramBeneficiaryQuery = `
+  SELECT COUNT(*) as count
+  FROM beneficiaries
+  WHERE program_id = ?`;
+
+  const checkProgramVolunteersQuery = `
+  SELECT COUNT(*) as count
+  FROM volunteers
+  WHERE program_id = ?`;
+
+  // Verificar beneficiarios primero
+  db.query(checkProgramBeneficiaryQuery, [programId], (err, beneficiaryRows) => {
+      if (err) {
+          console.error('Error checking beneficiaries:', err);
+          return res.status(500).json({ message: 'Error al verificar asignación de beneficiarios.' });
+      }
+
+      const beneficiaryCount = beneficiaryRows[0].count;
+
+      // Luego verificar voluntarios
+      db.query(checkProgramVolunteersQuery, [programId], (err, volunteerRows) => {
+          if (err) {
+              console.error('Error checking volunteers:', err);
+              return res.status(500).json({ message: 'Error al verificar asignación de voluntarios.' });
+          }
+
+          const volunteerCount = volunteerRows[0].count;
+
+          // Generar los mensajes de error correspondientes
+          if (beneficiaryCount > 0 && volunteerCount > 0) {
+              return res.status(400).json({ 
+                  message: `No se puede eliminar el programa porque tiene ${beneficiaryCount} beneficiarios y ${volunteerCount} voluntarios asignados.` 
+              });
+          }
+
+          if (beneficiaryCount > 0) {
+              return res.status(400).json({ 
+                  message: `No se puede eliminar el programa porque tiene ${beneficiaryCount} beneficiarios asignados.` 
+              });
+          }
+
+          if (volunteerCount > 0) {
+              return res.status(400).json({ 
+                  message: `No se puede eliminar el programa porque tiene ${volunteerCount} voluntarios asignados.` 
+              });
+          }
+
+          // Si no tiene ni beneficiarios ni voluntarios, proceder a eliminar
+          db.query('DELETE FROM programs WHERE id = ?', [programId], (err, result) => {
+              if (err) {
+                  console.error('Error deleting program:', err);
+                  return res.status(500).json({ message: 'Error al eliminar el programa.' });
+              }
+              res.status(200).json({ message: 'Programa eliminado exitosamente' });
+          });
+      });
+  });
 });
 
 router.get('/beneficiaries/count/:id', (req, res) => {

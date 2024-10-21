@@ -99,19 +99,6 @@ router.put('/:id', authenticateToken, upload.single('program_image'), (req, res)
   });
 });
 
-// Eliminar programa
-router.delete('/:id', (req, res) => {
-    const programId = req.params.id;
-
-    db.query('DELETE FROM programs WHERE id = ?', [programId], (err, result) => {
-        if (err) {
-            console.error('Error deleting program:', err);
-            return res.status(500).json({ message: 'Error al eliminar programa.' });
-        }
-        res.status(200).json({ message: 'Programa eliminado exitosamente' });
-    });
-});
-
 router.get('/beneficiaries/count/:id', (req, res) => {
   const programId = req.params.id;
   const query = 'SELECT COUNT(*) AS count FROM beneficiaries WHERE program_id = ?';

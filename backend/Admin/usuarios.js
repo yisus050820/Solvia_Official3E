@@ -111,10 +111,22 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const userId = req.params.id;
 
-  // Verificar si el usuario está referenciado en las tablas programs, beneficiaries y volunteers
-  const checkProgramCoordinatorQuery = 'SELECT * FROM programs WHERE coordinator_charge = ?';
-  const checkBeneficiaryQuery = 'SELECT * FROM beneficiaries WHERE user_id = ?';
-  const checkVolunteerQuery = 'SELECT * FROM volunteers WHERE user_id = ?';
+  const checkProgramCoordinatorQuery = `
+    SELECT programs.name 
+    FROM programs 
+    WHERE coordinator_charge = ?`;
+  
+  const checkBeneficiaryQuery = `
+    SELECT programs.name 
+    FROM beneficiaries 
+    JOIN programs ON beneficiaries.program_id = programs.id 
+    WHERE beneficiaries.user_id = ?`; 
+  
+  const checkVolunteerQuery = `
+    SELECT programs.name 
+    FROM volunteers 
+    JOIN programs ON volunteers.program_id = programs.id 
+    WHERE volunteers.user_id = ?`; 
 
   db.query(checkProgramCoordinatorQuery, [userId], (err, programRows) => {
     if (err) {
@@ -123,7 +135,8 @@ router.delete('/:id', (req, res) => {
     }
 
     if (programRows.length > 0) {
-      return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como coordinador en un programa.' });
+      const programNames = programRows.map(row => row.name).join(', ');
+      return res.status(400).json({ message: `No se puede eliminar el usuario porque está asignado como coordinador en los siguientes programas: ${programNames}` });
     }
 
     db.query(checkBeneficiaryQuery, [userId], (err, beneficiaryRows) => {
@@ -133,7 +146,8 @@ router.delete('/:id', (req, res) => {
       }
 
       if (beneficiaryRows.length > 0) {
-        return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como beneficiario en un programa.' });
+        const beneficiaryNames = beneficiaryRows.map(row => row.name).join(', ');
+        return res.status(400).json({ message: `No se puede eliminar el usuario porque está asignado como beneficiario en los siguientes programas: ${beneficiaryNames}` });
       }
 
       db.query(checkVolunteerQuery, [userId], (err, volunteerRows) => {
@@ -143,10 +157,11 @@ router.delete('/:id', (req, res) => {
         }
 
         if (volunteerRows.length > 0) {
-          return res.status(400).json({ message: 'No se puede eliminar el usuario porque está asignado como voluntario en un programa.' });
+          const volunteerNames = volunteerRows.map(row => row.name).join(', ');
+          return res.status(400).json({ message: `No se puede eliminar el usuario porque está asignado como voluntario en los siguientes programas: ${volunteerNames}` });
         }
 
-        // Proceder con la eliminación si no hay relaciones en las tablas verificadas
+        // Si no está referenciado en ningún programa, proceder a eliminar
         db.query('DELETE FROM users WHERE id = ?', [userId], (err, result) => {
           if (err) {
             console.error('Error deleting user:', err);
@@ -158,7 +173,6 @@ router.delete('/:id', (req, res) => {
     });
   });
 });
-
 
 // Ruta protegida para editar el perfil del usuario actual
 router.put('/user', authenticateToken, async (req, res) => {
