@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Snackbar, Alert, FormControl, InputLabel, Select, MenuItem, InputAdornment, IconButton, FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { Link, useNavigate } from 'react-router-dom'; 
 import { motion } from 'framer-motion';
 
 const Registro = () => {
@@ -111,7 +111,7 @@ const Registro = () => {
       // Redirigir al usuario a la página de login
       setTimeout(() => {
         navigate('/login'); // Redirección tras éxito
-      }, 2000); // Esperar 2 segundos antes de redirigir
+      }, 1000); // Esperar 2 segundos antes de redirigir
 
       // Limpiar los campos del formulario
       setName('');

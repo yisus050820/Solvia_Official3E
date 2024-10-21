@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
@@ -15,6 +15,13 @@ const AsignacionesVol_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   // Cargar los voluntarios y programas al montar el componente
   useEffect(() => {
@@ -23,13 +30,13 @@ const AsignacionesVol_Pro = () => {
         setVoluntarios(res.data);
       })
       .catch(err => console.error('Error fetching volunteers:', err));
-  
+
     axios.get('http://localhost:5000/asigVolProg/programas')
       .then(res => {
         setProgramas(res.data);
       })
       .catch(err => console.error('Error fetching programs:', err));
-  
+
     axios.get('http://localhost:5000/asigVolProg/asignaciones')
       .then(res => {
         setAsignaciones(res.data);
@@ -43,31 +50,41 @@ const AsignacionesVol_Pro = () => {
       console.error('Error: Campos incompletos.');
       return;
     }
-  
+
     const nuevaAsignacion = {
       user_id: voluntarioSeleccionado,
       program_id: programaSeleccionado,
       task_status: taskStatusSeleccionado,
-      coordinator_id: 1 
+      coordinator_id: 1
     };
-  
+
     axios.post('http://localhost:5000/asigVolProg/voluntarios', nuevaAsignacion)
       .then(res => {
         const newAssignment = {
           ...nuevaAsignacion,
-          id: res.data.data, 
+          id: res.data.data,
           voluntario: voluntarios.find(v => v.id === voluntarioSeleccionado)?.name,
           programa: programas.find(p => p.id === programaSeleccionado)?.name
         };
-        setAsignaciones([...asignaciones, newAssignment]); 
-        setVoluntarioSeleccionado(''); 
-        setProgramaSeleccionado(''); 
+        setAsignaciones([...asignaciones, newAssignment]);
+        setVoluntarioSeleccionado('');
+        setProgramaSeleccionado('');
         setTaskStatusSeleccionado('active');
       })
-      .catch(err => {
-        console.error('Error assigning volunteer:', err);
+      .catch(error => {
+        if (error.response) {
+          if (error.response.data.message === 'El voluntario ya está asignado a este programa.') {
+            setMessage('El voluntario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al asignar voluntario.');
+          }
+        } else {
+          setMessage('Error al asignar voluntario. Por favor, inténtalo de nuevo.');
+        }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
-  };  
+  };
 
   // Manejar la edición de una asignación
   const handleEditar = (asignacion) => {
@@ -84,22 +101,48 @@ const AsignacionesVol_Pro = () => {
     const datosEditados = {
       user_id: voluntarioSeleccionado,
       program_id: programaSeleccionado,
-      task_status: taskStatusSeleccionado,
-      coordinator_id: 1 
+      task_status: taskStatusSeleccionado
     };
 
     axios.put(`http://localhost:5000/asigVolProg/voluntarios/${currentId}`, datosEditados)
-      .then(() => {
-        const nuevasAsignaciones = asignaciones.map(asignacion => 
-          asignacion.id === currentId ? { ...asignacion, ...datosEditados } : asignacion
+      .then((res) => {
+        const updatedData = res.data.updatedData;
+
+        // Si la edición fue exitosa, actualizar el estado
+        const updatedAsignaciones = asignaciones.map(asignacion =>
+          asignacion.id === currentId ? {
+            ...asignacion,
+            voluntario: voluntarios.find(v => v.id === updatedData.user_id)?.name || asignacion.voluntario,
+            programa: programas.find(p => p.id === updatedData.program_id)?.name || asignacion.programa,
+            task_status: updatedData.task_status,
+            user_id: updatedData.user_id,
+            program_id: updatedData.program_id
+          } : asignacion
         );
-        setAsignaciones(nuevasAsignaciones);
-        setIsEditModalOpen(false);
-        setVoluntarioSeleccionado(''); 
+        setAsignaciones(updatedAsignaciones);
+
+        setVoluntarioSeleccionado('');
         setProgramaSeleccionado('');
-        setTaskStatusSeleccionado('active');
+        setTaskStatusSeleccionado('');
+        setIsEditModalOpen(false);
       })
-      .catch(err => console.error('Error updating assignment:', err));
+      .catch(error => {
+        // Manejar el error si el usuario ya está asignado a un programa
+        if (error.response) {
+          if (error.response.status === 409) {
+            // Mostrar error específico del backend
+            setMessage(error.response.data.message); // El mensaje enviado por el backend
+          } else if (error.response.status === 500) {
+            // Error del servidor
+            setMessage('Error al actualizar la asignación.');
+          }
+        } else {
+          setMessage('Error al editar asignación. Por favor, inténtalo de nuevo.');
+        }
+
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
   };
 
   // Manejar la eliminación de una asignación
@@ -113,8 +156,13 @@ const AsignacionesVol_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setCurrentId(null);
       })
-      .catch(err => console.error('Error deleting assignment:', err));
+      .catch(err => {
+        console.error('Error deleting assignment:', err);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
   };
 
   const buttonVariants = {
@@ -123,7 +171,11 @@ const AsignacionesVol_Pro = () => {
   };
 
   return (
-    <motion.div className="max-w-6xl mx-auto mt-10" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <motion.div className="max-w-6xl mx-auto mt-2" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      {/* Título "Asignación" */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Asignación
+      </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Typography variant="h4" color="white" gutterBottom>Asignar Voluntario a Programa</Typography>
@@ -237,10 +289,10 @@ const AsignacionesVol_Pro = () => {
       <AnimatePresence>
         {isEditModalOpen && editAsignacion && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Asignación</h2>
+            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
+              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
               <div className="space-y-4">
-                <select className="w-full p-2 border border-gray-300 rounded" value={voluntarioSeleccionado} onChange={(e) => setVoluntarioSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={voluntarioSeleccionado} onChange={(e) => setVoluntarioSeleccionado(e.target.value)}>
                   <option value="">Selecciona un voluntario</option>
                   {voluntarios.map((voluntario) => (
                     <option key={voluntario.id} value={voluntario.id}>
@@ -249,7 +301,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
                   <option value="">Selecciona un programa</option>
                   {programas.map((programa) => (
                     <option key={programa.id} value={programa.id}>
@@ -258,7 +310,7 @@ const AsignacionesVol_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={taskStatusSeleccionado} onChange={(e) => setTaskStatusSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={taskStatusSeleccionado} onChange={(e) => setTaskStatusSeleccionado(e.target.value)}>
                   <option value="active">Activo</option>
                   <option value="pause">Pausado</option>
                   <option value="unactive">Inactivo</option>
@@ -292,6 +344,16 @@ const AsignacionesVol_Pro = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };

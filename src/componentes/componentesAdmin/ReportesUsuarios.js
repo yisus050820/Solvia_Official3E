@@ -12,7 +12,7 @@ const ReportesUsuarios = () => {
   const [nuevosUsuarios, setNuevosUsuarios] = useState(0);
   const [usuariosPorRoles, setUsuariosPorRoles] = useState([]);
   const [crecimientoUsuarios, setCrecimientoUsuarios] = useState([]);
-  const [coordinadores, setCoordinadores] = useState(0);  // Define el estado para coordinadores
+  const [coordinadores, setCoordinadores] = useState(0);  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +52,11 @@ const ReportesUsuarios = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-10">
+    <div className="max-w-6xl mx-auto mt-2">
+      {/* Título encima del contenido */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Reporte Usuarios
+      </Typography>
       {/* Resumen rápido - Total de usuarios, nuevos usuarios, usuarios por rol */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
@@ -153,7 +157,7 @@ const ReportesUsuarios = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, value }) => totalUsuarios > 0 ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%` : `${name}: 0%`}  // Asegura que no se divida por 0
+                label={({ name, value }) => totalUsuarios > 0 ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%` : `${name}: 0%`} 
                 outerRadius={120}
                 fill="#8884d8"
                 dataKey="value"

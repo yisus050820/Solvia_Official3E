@@ -32,6 +32,14 @@ const ResetPassword = () => {
       return;
     }
 
+    // Validación de longitud mínima de contraseña
+    if (password.length < 8) {
+      setMessage('La contraseña debe tener al menos 8 caracteres.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
     try {
       // Enviamos la nueva contraseña y el token al backend
       const response = await axios.post(`http://localhost:5000/resetPassword/reset/${token}`, { password });
@@ -68,8 +76,9 @@ const ResetPassword = () => {
           Restablecer Contraseña
         </Typography>
         <Box component="form" onSubmit={handleResetPassword} noValidate>
-          <TextField margin="normal" fullWidth label="Contraseña" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#black' }, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: '#b0b0b0' }}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment>), sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
-          <TextField margin="normal" fullWidth label="Confirmar Contraseña" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#black' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
+          
+        <TextField margin="normal" fullWidth label="Contraseña" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: 'black' }, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: '#b0b0b0' }}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment>), sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
+            <TextField margin="normal" fullWidth label="Confirmar Contraseña" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: 'black' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
           <Button
             type="submit"
             fullWidth

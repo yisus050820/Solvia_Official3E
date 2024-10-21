@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { Typography } from '@mui/material';
 
 const CrudUsuariosCoordi = () => {
   const [data, setData] = useState([]);
@@ -17,11 +18,19 @@ const CrudUsuariosCoordi = () => {
       });
   }, []);
 
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-10">
+      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Usuarios
+      </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -69,7 +78,7 @@ const CrudUsuariosCoordi = () => {
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
-                <td className="p-4">{item.description}</td>
+                <td className="p-4">{truncateDescription(item.description)}</td>
                 <td className="p-4">{item.created_at}</td> {/* Mostramos la fecha de creación */}
               </motion.tr>
             ))}

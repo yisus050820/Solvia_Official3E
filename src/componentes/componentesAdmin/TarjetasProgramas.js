@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { Typography } from '@mui/material';  // Importando Typography para el título
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +32,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
     <>
       {/* Tarjeta del programa */}
       <motion.div 
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
+        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"  // Reducido el margen de m-4 a m-2
         whileHover={{ scale: 1.05 }} 
         whileTap={{ scale: 0.95 }}   
       >
@@ -137,18 +138,25 @@ const TarjetasProgramas = () => {
   }, []);
 
   return (
-    <div className="flex justify-center flex-wrap">
-      {programs.map((program) => (
-        <ProgramCard
-          key={program.id}
-          title={program.name}
-          description={program.description}
-          participants={program.participants}
-          donations={program.donations}
-          status={program.status} 
-          imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
-        />
-      ))}
+    <div className="mt-4"> {/* Ajusta el margen superior */}
+      {/* Título de la sección */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Programas Disponibles
+      </Typography>
+
+      <div className="flex justify-center flex-wrap mt-2">  {/* Reducido el margen superior */}
+        {programs.map((program) => (
+          <ProgramCard
+            key={program.id}
+            title={program.name}
+            description={program.description}
+            participants={program.participants}
+            donations={program.donations}
+            status={program.status} 
+            imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
+          />
+        ))}
+      </div>
     </div>
   );
 };

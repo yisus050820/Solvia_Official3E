@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Typography } from '@mui/material';
 
 const ProgramCard = ({ title, description, participants, donations }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,17 +119,24 @@ const MisProgramas = () => {
   ];
 
   return (
-    // Flex para centrar y distribuir las tarjetas
-    <div className="flex justify-center flex-wrap">
-      {programs.map((program, index) => (
-        <ProgramCard
-          key={index}
-          title={program.title}
-          description={program.description}
-          participants={program.participants}
-          donations={program.donations}
-        />
-      ))}
+    <div className="mt-2"> {/* Ajusta el margen superior */}
+      {/* Título de la sección */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Mis Programas
+      </Typography>
+
+      {/* Flex para centrar y distribuir las tarjetas */}
+      <div className="flex justify-center flex-wrap">
+        {programs.map((program, index) => (
+          <ProgramCard
+            key={index}
+            title={program.title}
+            description={program.description}
+            participants={program.participants}
+            donations={program.donations}
+          />
+        ))}
+      </div>
     </div>
   );
 };

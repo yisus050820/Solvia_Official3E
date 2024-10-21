@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
 
@@ -14,6 +14,13 @@ const AsignacionesBen_Pro = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [editAsignacion, setEditAsignacion] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigBenProg/beneficiarios')
@@ -21,49 +28,71 @@ const AsignacionesBen_Pro = () => {
         setBeneficiarios(res.data);
       })
       .catch(err => console.error('Error fetching beneficiaries:', err));
-  
+
     axios.get('http://localhost:5000/asigBenProg/programas')
       .then(res => {
         setProgramas(res.data);
       })
       .catch(err => console.error('Error fetching programs:', err));
-  
+
     axios.get('http://localhost:5000/asigBenProg/asignaciones')
       .then(res => {
         setAsignaciones(res.data);
       })
       .catch(err => console.error('Error fetching assignments:', err));
-  }, [asignaciones]);  
+  }, []);
+
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
 
   const handleAsignar = () => {
     if (!beneficiarioSeleccionado || !programaSeleccionado) {
-      console.error('Error: Campos incompletos.');
+      setMessage('Error: Campos incompletos.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
   
     const nuevaAsignacion = {
       user_id: beneficiarioSeleccionado,
-      program_id: programaSeleccionado,
-      coordinator_id: 1 
+      program_id: programaSeleccionado
     };
   
     axios.post('http://localhost:5000/asigBenProg/beneficiarios', nuevaAsignacion)
-      .then(res => {
+      .then((res) => {
+        // Suponiendo que el backend devuelve el id de la nueva asignación creada
         const newAssignment = {
-          ...nuevaAsignacion,
-          id: res.data.data, 
+          id: res.data.data, // El ID de la asignación retornado por el backend
           beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name,
-          programa: programas.find(p => p.id === programaSeleccionado)?.name
+          programa: programas.find(p => p.id === programaSeleccionado)?.name,
+          user_id: beneficiarioSeleccionado,
+          program_id: programaSeleccionado
         };
-        setAsignaciones([...asignaciones, newAssignment]); 
+        
+        // Actualizamos el estado con la nueva asignación
+        setAsignaciones([...asignaciones, newAssignment]);
+  
+        // Limpiar campos después de una asignación exitosa
         setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado(''); 
+        setProgramaSeleccionado('');
       })
-      .catch(err => {
-        console.error('Error assigning volunteer:', err);
+      .catch(error => {
+        if (error.response) {
+          if (error.response.status === 409) {
+            setMessage('El beneficiario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al asignar beneficiario.');
+          }
+        } else {
+          setMessage('Error del servidor. Inténtalo de nuevo.');
+        }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
-  }; 
-
+  };
+  
   const handleEditar = (asignacion) => {
     setBeneficiarioSeleccionado(asignacion.user_id);
     setProgramaSeleccionado(asignacion.program_id);
@@ -79,26 +108,43 @@ const AsignacionesBen_Pro = () => {
     };
   
     axios.put(`http://localhost:5000/asigBenProg/beneficiarios/${currentId}`, datosEditados)
-      .then(() => {
-        const nuevasAsignaciones = asignaciones.map(asignacion =>
-          asignacion.id === currentId
-            ? {
-                ...asignacion,
-                ...datosEditados,
-                beneficiario: beneficiarios.find(v => v.id === beneficiarioSeleccionado)?.name, // Actualiza nombre beneficiario
-                programa: programas.find(p => p.id === programaSeleccionado)?.name // Actualiza nombre programa
-              }
-            : asignacion
+      .then((res) => {
+        const updatedData = res.data.updatedData;
+  
+        // Actualizamos la asignación en el estado con los datos retornados
+        const updatedAsignaciones = asignaciones.map(asignacion => 
+          asignacion.id === currentId ? { 
+            ...asignacion, 
+            beneficiario: beneficiarios.find(v => v.id === updatedData.user_id)?.name || asignacion.beneficiario,
+            programa: programas.find(p => p.id === updatedData.program_id)?.name || asignacion.programa,
+            user_id: updatedData.user_id,
+            program_id: updatedData.program_id
+          } : asignacion
         );
   
-        setAsignaciones(nuevasAsignaciones);
-        setIsEditModalOpen(false);
+        setAsignaciones(updatedAsignaciones);
+  
+        // Limpiar los campos después de una edición exitosa
         setBeneficiarioSeleccionado('');
         setProgramaSeleccionado('');
+        setIsEditModalOpen(false); // Cerramos el modal de edición
       })
-      .catch(err => console.error('Error updating assignment:', err));
-  };  
-
+      .catch(error => {
+        if (error.response) {
+          if (error.response.status === 409) {
+            setMessage('El beneficiario ya está asignado a este programa.');
+          } else {
+            setMessage('Error al actualizar la asignación.');
+          }
+        } else {
+          setMessage('Error de red. Inténtalo de nuevo.');
+        }
+  
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
+  };
+  
   const handleEliminar = (id) => {
     setIsDeleteConfirmOpen(true);
     setCurrentId(id);
@@ -109,9 +155,10 @@ const AsignacionesBen_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
+        setCurrentId(null); 
       })
       .catch(err => console.error('Error deleting assignment:', err));
-  };
+  };  
 
   const buttonVariants = {
     hover: { scale: 1.05, transition: { duration: 0.3 } },
@@ -120,11 +167,15 @@ const AsignacionesBen_Pro = () => {
 
   return (
     <motion.div
-      className="max-w-6xl mx-auto mt-10"
+      className="max-w-6xl mx-auto mt-2"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {/* Título "Asignación" */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Asignación
+      </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Typography variant="h4" color="white" gutterBottom>
@@ -142,14 +193,6 @@ const AsignacionesBen_Pro = () => {
                   sx={{
                     '.MuiSelect-select': {
                       color: beneficiarioSeleccionado ? 'black' : 'inherit',
-                    }
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 48 * 5 + 8,
-                        width: 250,
-                      }
                     }
                   }}
                 >
@@ -174,14 +217,6 @@ const AsignacionesBen_Pro = () => {
                       color: programaSeleccionado ? 'black' : 'inherit',
                     }
                   }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 48 * 5 + 8,
-                        width: 250,
-                      }
-                    }
-                  }}
                 >
                   {programas.map((programa) => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -193,14 +228,14 @@ const AsignacionesBen_Pro = () => {
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
-          <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
+            <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
           </div>
 
-          {/* Tabla de Asignaciones con estilo y animaciones */}
+          {/* Tabla de Asignaciones */}
           <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
-          <Table>
+            <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
                   <TableCell sx={{ color: '#fff' }}>Beneficiario</TableCell>
@@ -233,10 +268,10 @@ const AsignacionesBen_Pro = () => {
       <AnimatePresence>
         {isEditModalOpen && editAsignacion && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Asignación</h2>
+            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
+              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
               <div className="space-y-4">
-                <select className="w-full p-2 border border-gray-300 rounded" value={beneficiarioSeleccionado} onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={beneficiarioSeleccionado} onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}>
                   <option value="">Selecciona un beneficiario</option>
                   {beneficiarios.map((beneficiario) => (
                     <option key={beneficiario.id} value={beneficiario.id}>
@@ -245,7 +280,7 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border border-gray-300 rounded" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
+                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
                   <option value="">Selecciona un programa</option>
                   {programas.map((programa) => (
                     <option key={programa.id} value={programa.id}>
@@ -282,9 +317,18 @@ const AsignacionesBen_Pro = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };
 
 export default AsignacionesBen_Pro;
-

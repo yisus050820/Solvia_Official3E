@@ -15,9 +15,12 @@ import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import MessageIcon from '@mui/icons-material/Message';
+import { Feedback } from '@mui/icons-material';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import CrudProgramas from './componentesAdmin/ProgramasCrud';
+import CrudPrograms from './componentesCoordi/ProgramsCrud';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
@@ -26,9 +29,8 @@ import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
 import AsignacionesPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import CrudUsuariosCoordi from './componentesCoordi/Usuarios';
-
-
-
+import Comunicacion from './componentesAdmin/Comunicacion';
+import VerFeedback from './componentesAdmin/VerFeedback';
 
 const NAVIGATION = [
   {
@@ -109,6 +111,24 @@ const NAVIGATION = [
       
       ],
   },
+  {
+    segment: 'comunicacion',
+    title: 'Comunicacion',
+    icon: <ChatBubbleIcon />,
+    children: [
+
+      {
+        segment: 'contacto',
+        title: 'Contactar con un usuario',
+        icon: <MessageIcon />,
+      },
+      {
+        segment: 'ver-feedback',
+        title: 'Ver feedback de programas',
+        icon: <Feedback />,
+      },
+    ],
+  }
     
 ];
 
@@ -144,7 +164,7 @@ function DemoPageContent({ pathname }) {
     >
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/users' && <CrudUsuariosCoordi />}
-        {pathname === '/programas/gestionar-programas' && <CrudProgramas />}
+        {pathname === '/programas/gestionar-programas' && <CrudPrograms />}
         {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
         {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
         {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
@@ -152,7 +172,8 @@ function DemoPageContent({ pathname }) {
         {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
         {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
         {pathname === '/asignaciones/presupuesto-programa' && <AsignacionesPresupuesto_Pro />}
-        
+        {pathname === '/comunicacion/contacto' && <Comunicacion />}
+        {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
         
     </Box>
   );

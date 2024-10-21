@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 
@@ -12,9 +12,16 @@ const AsignacionesPresupuesto_Pro = () => {
   const [cantidad, setCantidad] = useState('');
   const [errorCantidad, setErrorCantidad] = useState('');
   const [errorPrograma, setErrorPrograma] = useState('');
-  const [editModalOpen, setEditModalOpen] = useState(false); // Modal para editar
-  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null); // Asignación a editar
-  const [editCantidad, setEditCantidad] = useState(''); // Cantidad a editar
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentEditAsignacion, setCurrentEditAsignacion] = useState(null);
+  const [editCantidad, setEditCantidad] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigPresProg/asignaciones')
@@ -30,22 +37,27 @@ const AsignacionesPresupuesto_Pro = () => {
       .catch(err => console.error('Error fetching available funds:', err));
   }, []);
 
+  console.log(dineroDisponible);
+
   const handleAsignar = () => {
     let isValid = true;
-    setErrorCantidad('');
-    setErrorPrograma('');
 
-    // Validaciones
     if (!programaSeleccionado) {
-      setErrorPrograma('Debes seleccionar un programa.');
+      setSnackbarSeverity('error');
+      setMessage('Debes seleccionar un programa.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
     if (!cantidad || cantidad <= 0) {
-      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad debe ser mayor que 0.');
+      setOpenSnackbar(true);
       isValid = false;
     } else if (cantidad > dineroDisponible) {
-      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad no puede ser mayor que el dinero disponible.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
@@ -63,21 +75,27 @@ const AsignacionesPresupuesto_Pro = () => {
           axios.get('http://localhost:5000/asigPresProg/asignaciones'),
           axios.get('http://localhost:5000/asigPresProg/disponible')
         ])
-        .then(axios.spread((asignacionesRes, disponibleRes) => {
-          setAsignaciones(asignacionesRes.data);
-          setDineroDisponible(disponibleRes.data.dineroDisponible);
-        }))
-        .catch(err => console.error('Error fetching updated info:', err));
+          .then(axios.spread((asignacionesRes, disponibleRes) => {
+            setAsignaciones(asignacionesRes.data);
+            setDineroDisponible(disponibleRes.data.dineroDisponible);
+          }))
+          .catch(err => console.error('Error fetching updated info:', err));
 
         setProgramaSeleccionado('');
         setCantidad('');
       })
       .catch(err => {
-        if (err.response && err.response.status === 400) {
-          setErrorPrograma(err.response.data.message);
+        if (err.response) {
+          if (err.response.status === 400) {
+            setMessage('El programa ya tiene un presupuesto asignado.');
+          } else {
+            setMessage('Error al asignar presupueto.');
+          }
         } else {
-          console.error('Error assigning budget:', err);
+          setMessage('Error del servidor. Inténtalo de nuevo.');
         }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -86,15 +104,19 @@ const AsignacionesPresupuesto_Pro = () => {
       .then(() => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== id));
       })
-      .catch(err => console.error('Error deleting assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al eliminar la asignación.');
+        setOpenSnackbar(true);
+      });
   };
 
   const handleEditar = (asignacion) => {
-    setCurrentEditAsignacion(asignacion); // Asignación seleccionada para editar
-    setEditCantidad(asignacion.presupuesto); // Cantidad inicial a editar
-    setErrorCantidad('');  // Limpiar cualquier error anterior
-    setEditModalOpen(true); // Abrir el modal de edición
-  };  
+    setCurrentEditAsignacion(asignacion);
+    setEditCantidad(asignacion.presupuesto);
+    setErrorCantidad('');
+    setEditModalOpen(true);
+  };
 
   const handleGuardarEdicion = () => {
     let isValid = true;
@@ -112,29 +134,38 @@ const AsignacionesPresupuesto_Pro = () => {
 
     const updatedAsignacion = {
       ...currentEditAsignacion,
-      amount: editCantidad  
+      amount: editCantidad
     };
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
       .then(() => {
-        // Actualiza las asignaciones localmente sin refrescar la página
         setAsignaciones(asignaciones.map(asignacion =>
           asignacion.id === currentEditAsignacion.id
-            ? { ...asignacion, presupuesto: editCantidad } // Actualiza solo la cantidad
+            ? { ...asignacion, presupuesto: editCantidad }
             : asignacion
         ));
         setEditModalOpen(false);
       })
-      .catch(err => console.error('Error editing assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al editar la asignación.');
+        setOpenSnackbar(true);
+      });
   };
 
   return (
     <motion.div
-      className="max-w-6xl mx-auto mt-10"
+      className="max-w-6xl mx-auto mt-0"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+
+      {/* Título "Asignación" */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Asignación
+      </Typography>
+
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Typography variant="h4" color="white" gutterBottom>
@@ -148,13 +179,25 @@ const AsignacionesPresupuesto_Pro = () => {
           <Grid container spacing={4} sx={{ marginTop: '20px' }}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label" sx={{ color: 'gray' }}>Selecciona un Programa</InputLabel>
+                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
                   label="Selecciona un Programa"
-                  sx={{ backgroundColor: 'black', borderRadius: '5px' }}
+                  sx={{
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
+                  }}
                 >
                   {programas.map(programa => (
                     <MenuItem key={programa.id} value={programa.id}>
@@ -163,24 +206,30 @@ const AsignacionesPresupuesto_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
-              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
 
             <Grid item xs={12} md={6}>
-            <TextField
-              label="Cantidad"
-              type="number"
-              value={cantidad}
-              onChange={(e) => setCantidad(Number(e.target.value))}
-              fullWidth
-            />
-              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
+              <TextField
+                label="Cantidad"
+                type="number"
+                value={cantidad}
+                onChange={(e) => setCantidad(Number(e.target.value))}
+                fullWidth
+                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                InputLabelProps={{
+                  // Mismo color que el label de Selecciona un Programa
+                  style: { color: 'black' },
+                }}
+                inputProps={{
+                  style: { color: 'black' }, // Establece el color del texto ingresado a negro
+                }}
+              />
             </Grid>
           </Grid>
 
           <div className="mt-6 flex justify-end">
             <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleAsignar}>
-              <FaPlus /> 
+              <FaPlus />
             </motion.button>
           </div>
 
@@ -221,8 +270,10 @@ const AsignacionesPresupuesto_Pro = () => {
                 label="Programa"
                 value={currentEditAsignacion?.programa || ''}
                 fullWidth
-                sx={{ marginBottom: '16px' }}
-                disabled
+                sx={{ marginBottom: '16px', backgroundColor: '#fff', borderRadius: '5px' }}
+                InputProps={{
+                  style: { color: 'black' }, // Establece el color del texto a negro
+                }}
               />
               <TextField
                 label="Cantidad"
@@ -230,20 +281,37 @@ const AsignacionesPresupuesto_Pro = () => {
                 value={editCantidad}
                 onChange={(e) => setEditCantidad(Number(e.target.value))}
                 fullWidth
+                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                InputLabelProps={{
+                  // Mismo color que el label de Selecciona un Programa
+                  style: { color: 'black' },
+                }}
+                inputProps={{
+                  style: { color: 'black' }, // Establece el color del texto ingresado a negro
+                }}
               />
-              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
-              </DialogContent>
+            </DialogContent>
             <DialogActions>
-              <Button onClick={() => setEditModalOpen(false)} color="primary">
+              <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={() => setEditModalOpen(false)}>
                 Cancelar
-              </Button>
-              <Button onClick={handleGuardarEdicion} color="primary">
+              </motion.button>
+              <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.05 }} onClick={handleGuardarEdicion}>
                 Guardar
-              </Button>
+              </motion.button>
             </DialogActions>
           </Dialog>
         </CardContent>
       </Card>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };

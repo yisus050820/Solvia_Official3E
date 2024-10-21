@@ -60,7 +60,11 @@ const ReportesProgramasAyuda = () => {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto mt-10">
+    <div className="max-w-6xl mx-auto mt-2">
+      {/* Título encima del contenido */}
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Reporte Programas
+      </Typography>
       {/* Resumen rápido - Total de programas, beneficiarios, voluntarios */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
@@ -84,7 +88,7 @@ const ReportesProgramasAyuda = () => {
                 <FaUserFriends className="text-green-500 mr-2" size={40} />
                 <div>
                   <Typography variant="h4">{beneficiariosTotales}</Typography>
-                  <Typography variant="subtitle1">Beneficiarios Totales</Typography>
+                  <Typography variant="subtitle1">Beneficiarios Activos</Typography>
                 </div>
               </div>
             </CardContent>
@@ -98,7 +102,7 @@ const ReportesProgramasAyuda = () => {
                 <FaUsers className="text-purple-500 mr-2" size={40} />
                 <div>
                   <Typography variant="h4">{voluntariosTotales}</Typography>
-                  <Typography variant="subtitle1">Voluntarios Totales</Typography>
+                  <Typography variant="subtitle1">Voluntarios Activos</Typography>
                 </div>
               </div>
             </CardContent>
@@ -162,9 +166,7 @@ const ReportesProgramasAyuda = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ program_name, total_beneficiaries }) =>
-                  `${program_name}: ${((total_beneficiaries / beneficiariosTotales) * 100).toFixed(2)}%`
-                }
+                label={({ program_name, total_beneficiaries }) => total_beneficiaries > 0 ? `${program_name}: ${((total_beneficiaries / beneficiariosTotales) * 100).toFixed(2)}% ` : `${program_name}: 0%`}
                 outerRadius={120}
                 fill="#8884d8"
                 dataKey="total_beneficiaries"

@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from '@mui/material';
 
-const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
+const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
   const [data, setData] = useState([]);
@@ -16,16 +16,22 @@ const CrudProgramas = () => {
   const [currentId, setCurrentId] = useState(null);
   const [newProgram, setNewProgram] = useState({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
   const [editProgram, setEditProgram] = useState(null);
-  const [errors, setErrors] = useState({});
   const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
+  const [message, setMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [errors, setErrors] = useState({});
+  const [originalProgram, setOriginalProgram] = useState(null);
 
-  // Obtener programas cuando se carga la página
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
   useEffect(() => {
     fetchPrograms();
   }, []);
 
-  // Obtener programas desde el servidor
   const fetchPrograms = () => {
     axios.get('http://localhost:5000/programas')
       .then(response => {
@@ -36,7 +42,6 @@ const CrudProgramas = () => {
       });
   };
 
-  // Obtener coordinadores cuando se abre el modal
   useEffect(() => {
     if (isModalOpen || isEditModalOpen) {
       axios.get('http://localhost:5000/usuarios/coordinadores')
@@ -69,75 +74,112 @@ const CrudProgramas = () => {
     setErrors({});
   };
 
-  const validateProgram = (program) => {
+  const validateProgram = (program, originalProgram = {}, isEditing = false) => {
     const validationErrors = {};
-    const todayDate = new Date(today.setHours(0, 0, 0, 0));
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0); 
 
-    if (!program.nombre || !program.nombre.trim()) {
-      validationErrors.nombre = 'El nombre no puede estar vacío.';
+    if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
+      if (program.descripcion.length < 10) {
+        validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
+      }
     }
 
-    if (!program.descripcion || program.descripcion.trim().length < 10) {
-      validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
-    }
-
-    if (!program.fechaInicio) {
+    if (!isEditing && !program.fechaInicio || (isEditing && program.fechaInicio !== originalProgram.fechaInicio)) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
-    } else if (program.fechaInicio < todayDate) {
+    } else if (new Date(program.fechaInicio) < todayDate) {
       validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
 
-    if (!program.fechaFin) {
-      validationErrors.fechaFin = 'La fecha de fin es obligatoria.';
-    } else if (program.fechaInicio && program.fechaFin < program.fechaInicio) {
-      validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+    if (!isEditing && !program.fechaFin || (isEditing && program.fechaFin !== originalProgram.fechaFin)) {
+      if (program.fechaInicio && new Date(program.fechaFin) < new Date(program.fechaInicio)) {
+        validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+      }
     }
 
-    if (!program.objetivos || !program.objetivos.trim()) {
-      validationErrors.objetivos = 'Los objetivos no pueden estar vacíos.';
+    if (!isEditing || (isEditing && program.objetivos !== originalProgram.objetivos)) {
+      if (program.objetivos.length < 10) {
+        validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
+      }
     }
 
     if (!program.coordinador || isNaN(program.coordinador)) {
-      validationErrors.coordinador = 'El coordinador es obligatorio y debe ser un valor válido.';
+      validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
     }
 
     return validationErrors;
+};
+
+
+  const showErrorMessage = (errors) => {
+    const firstError = Object.values(errors)[0];
+    setMessage(firstError);
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
   };
 
-  // Añadir programa nuevo
   const handleAddProgram = () => {
-    const validationErrors = validateProgram(newProgram);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
+
+    // Verificación de campos vacíos
+    const missingFields = [];
+    if (!nombre) missingFields.push('Nombre');
+    if (!descripcion) missingFields.push('Descripción');
+    if (!fechaInicio) missingFields.push('Fecha de inicio');
+    if (!fechaFin) missingFields.push('Fecha de fin');
+    if (!objetivos) missingFields.push('Objetivos');
+    if (!coordinador) missingFields.push('Coordinador');
+
+    if (missingFields.length > 0) {
+      setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
 
+    // Validación de los datos
+    const validationErrors = validateProgram(newProgram, {}, false);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+
+      const firstError = Object.values(validationErrors)[0];
+      setMessage(firstError);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Formateo de los datos para el envío
     const programData = {
-      name: newProgram.nombre,
-      description: newProgram.descripcion,
-      start_date: formatDateForMySQL(newProgram.fechaInicio),
-      end_date: formatDateForMySQL(newProgram.fechaFin),
-      objectives: newProgram.objetivos,
-      coordinator_charge: newProgram.coordinador,
-      program_image: newProgram.program_image || defaultProgramPicture,
+      name: nombre,
+      description: descripcion,
+      start_date: formatDateForMySQL(fechaInicio),
+      end_date: formatDateForMySQL(fechaFin),
+      objectives: objetivos,
+      coordinator_charge: coordinador,
+      program_image: program_image || defaultProgramPicture,
       status: newProgram.status || 'active',
     };
 
     axios.post('http://localhost:5000/programas', programData)
       .then(() => {
-        fetchPrograms(); // Recargar los datos después de añadir un nuevo programa
-        handleCloseModal(); // Cerrar el modal
+        fetchPrograms();
+        handleCloseModal();
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
+        setMessage('Error al añadir el programa, intente más tarde.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
-  // Editar programa existente
   const handleEditProgram = () => {
     const validationErrors = validateProgram(editProgram);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      showErrorMessage(validationErrors);
       return;
     }
 
@@ -162,7 +204,7 @@ const CrudProgramas = () => {
       }
     })
       .then(() => {
-        fetchPrograms(); // Recargar los datos después de editar el programa
+        fetchPrograms();
         handleCloseEditModal();
       })
       .catch(error => {
@@ -182,6 +224,7 @@ const CrudProgramas = () => {
       status: program.status || 'active',
       program_image: program.program_image || defaultProgramPicture,
     });
+    setOriginalProgram({ ...program });
     setIsEditModalOpen(true);
     setErrors({});
   };
@@ -204,7 +247,13 @@ const CrudProgramas = () => {
         setCurrentId(null);
       })
       .catch(error => {
-        console.error('Error deleting program:', error);
+        let errorMessage = 'Error al eliminar programa, intente más tarde.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setMessage(errorMessage);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -221,7 +270,11 @@ const CrudProgramas = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-10">
+      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+        {/* Título encima del contenido */}
+        <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
+          Gestionar Programas
+        </Typography>
         <div className="flex justify-end mb-4 space-x-4">
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
@@ -233,8 +286,7 @@ const CrudProgramas = () => {
           </motion.button>
         </div>
 
-        {/* Tabla de programas */}
-        <table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
               <th className="p-4">ID</th>
@@ -248,25 +300,24 @@ const CrudProgramas = () => {
               <th className="p-4">Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-gray-900">
+          <motion.tbody layout className="bg-gray-900">
             {data.map((item) => (
-              <tr key={item.id} className="border-b border-gray-700">
+              <motion.tr key={item.id} className="border-b border-gray-700">
                 <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date.split('T')[0]}</td> {/* Mostrar solo la fecha */}
-                <td className="p-4">{item.end_date.split('T')[0]}</td>   {/* Mostrar solo la fecha */}
-                <td className="p-4">{item.objectives}</td>
+                <td className="p-4">{item.start_date.split('T')[0]}</td>
+                <td className="p-4">{item.end_date.split('T')[0]}</td>
+                <td className="p-4">{truncateDescription(item.objectives)}</td>
                 <td className="p-4">{item.coordinator_name}</td>
                 <td className="p-4">
                   <span
-                    className={`text-lg font-bold ${
-                      item.status === 'active'
-                        ? 'text-green-500'
-                        : item.status === 'pause'
+                    className={`text-lg font-bold ${item.status === 'active'
+                      ? 'text-green-500'
+                      : item.status === 'pause'
                         ? 'text-yellow-500'
                         : 'text-red-500'
-                    }`}
+                      }`}
                   >
                     {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
                   </span>
@@ -287,10 +338,10 @@ const CrudProgramas = () => {
                     <FaTrashAlt />
                   </motion.button>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
-          </tbody>
-        </table>
+          </motion.tbody>
+        </motion.table>
       </div>
 
       {/* Ventana emergente para agregar un nuevo registro */}
@@ -303,60 +354,55 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
+              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.nombre ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={newProgram.nombre}
                   onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
                 />
-                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.descripcion ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={newProgram.descripcion}
                   onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
                 />
-                {errors.descripcion && <p className="text-red-500 text-sm">{errors.descripcion}</p>}
 
                 <DatePicker
                   selected={newProgram.fechaInicio}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
                 />
-                {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
 
                 <DatePicker
                   selected={newProgram.fechaFin}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
-                {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.objetivos ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Objetivos"
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
                 />
-                {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
-                  className={`w-full p-2 border ${errors.coordinador ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.coordinador}
                   onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
                 >
@@ -367,9 +413,8 @@ const CrudProgramas = () => {
                     </option>
                   ))}
                 </select>
-                {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.status || 'active'}
                   onChange={(e) => setNewProgram({ ...newProgram, status: e.target.value })}
                 >
@@ -379,7 +424,7 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'new')}
                 />
@@ -415,60 +460,55 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Editar Programa</h2>
+              <h2 className="text-white text-2xl font-bold mb-4">Editar Programa</h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.nombre ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Nombre"
                   value={editProgram.nombre || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, nombre: e.target.value })}
                 />
-                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.descripcion ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Descripción"
                   value={editProgram.descripcion || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, descripcion: e.target.value })}
                 />
-                {errors.descripcion && <p className="text-red-500 text-sm">{errors.descripcion}</p>}
 
                 <DatePicker
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
                 />
-                {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
 
                 <DatePicker
                   selected={editProgram.fechaFin}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className={`w-full p-2 border ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
-                {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
-                  className={`w-full p-2 border ${errors.objetivos ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholder="Objetivos"
                   value={editProgram.objetivos || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
                 />
-                {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
-                  className={`w-full p-2 border ${errors.coordinador ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.coordinador || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, coordinador: e.target.value })}
                 >
@@ -481,7 +521,7 @@ const CrudProgramas = () => {
                 </select>
                 {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.status || 'active'}
                   onChange={(e) => setEditProgram({ ...editProgram, status: e.target.value })}
                 >
@@ -491,7 +531,7 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'edit')}
                 />
@@ -517,7 +557,6 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
 
-      {/* Confirmación de eliminar */}
       <Dialog
         open={isDeleteConfirmOpen}
         onClose={() => setIsDeleteConfirmOpen(false)}
@@ -547,6 +586,15 @@ const CrudProgramas = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000} onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

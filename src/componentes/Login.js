@@ -111,13 +111,22 @@ const Login = () => {
       // Enviar la solicitud al backend para generar el token y enviar el correo de restablecimiento
       const response = await axios.post('http://localhost:5000/resetPassword', { email: resetEmail });
       console.log('Info enviada desde el front al back');
-
       setMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
       setShowResetForm(false); // Cerrar el formulario
     } catch (error) {
-      setMessage('Error al enviar el correo de restablecimiento.');
+      if (error.response) {
+        if (error.response.data.message === 'Error en el servidor.') {
+          setMessage('Error en el servidor.');
+        } else if (error.response.data.message === 'Usuario no encontrado.') {
+          setMessage('Usuario no encontrado.');
+        } else {
+          setMessage('Error');
+        }
+      } else {
+        setMessage('Error al enviar el correo de restablecimiento.');
+      }
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
     }
