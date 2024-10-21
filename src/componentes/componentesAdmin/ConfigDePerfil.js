@@ -84,7 +84,7 @@ const PerfilUsuario = () => {
     try {
       const response = await axios.put('http://localhost:5000/perfil/', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: 'Bearer ${token}',
           'Content-Type': 'multipart/form-data'
         }
       });

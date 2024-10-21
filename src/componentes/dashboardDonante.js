@@ -19,7 +19,6 @@ import { Feedback } from '@mui/icons-material';
 
 import Donar from './componentesDonador/Donar';
 import HistorialDonaciones from './componentesDonador/HistorialDonaciones';
-import InformesDelImpacto from './componentesDonador/InformesDeImpacto';
 import VerPersonas from './componentesDonador/VerPersonas';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
@@ -64,22 +63,10 @@ import VerFeedback from './componentesDonador/VerFeedback';
       ],
     },
     {
-      segment: 'informes',
-      title: 'Informes',
+      segment: 'informes-generales',
+      title: 'Reporte General',
       icon: <DescriptionIcon />,
-      children: [
-        {
-          segment: 'informes-generales',
-          title: 'Informes Generales',
-          icon: <DescriptionIcon />,
-        },
-        {
-          segment: 'informes-impacto',
-          title: 'Informes de Impacto',
-          icon: <DescriptionIcon />,
-        },
-      ],
-    },
+    },      
     {
       segment: 'beneficiarios-programas',
       title: 'Beneficiarios y Programas',
@@ -153,8 +140,7 @@ import VerFeedback from './componentesDonador/VerFeedback';
       >
         {pathname === '/donaciones/donar' && <Donar />}
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
-        {pathname === '/informes/informes-generales' && <ReportesDonaciones />}
-        {pathname === '/informes/informes-impacto' && <InformesDelImpacto />}
+        {pathname === '/informes-generales' && <ReportesDonaciones />}
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
