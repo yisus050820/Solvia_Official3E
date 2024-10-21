@@ -114,6 +114,7 @@ const AsignacionesVol_Pro = () => {
             ...asignacion,
             voluntario: voluntarios.find(v => v.id === updatedData.user_id)?.name || asignacion.voluntario,
             programa: programas.find(p => p.id === updatedData.program_id)?.name || asignacion.programa,
+            task_status: updatedData.task_status,
             user_id: updatedData.user_id,
             program_id: updatedData.program_id
           } : asignacion
@@ -122,7 +123,7 @@ const AsignacionesVol_Pro = () => {
 
         setVoluntarioSeleccionado('');
         setProgramaSeleccionado('');
-        setTaskStatusSeleccionado('active');
+        setTaskStatusSeleccionado('');
         setIsEditModalOpen(false);
       })
       .catch(error => {

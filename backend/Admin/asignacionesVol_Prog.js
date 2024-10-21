@@ -137,7 +137,7 @@ router.put('/voluntarios/:id', [
 
             // Obtener los datos actualizados
             const selectQuery = `
-                SELECT v.id, u.name AS voluntario, p.name AS programa, v.user_id, v.program_id
+                SELECT v.id, u.name AS voluntario, p.name AS programa, v.task_status AS estado, v.user_id, v.program_id
                 FROM volunteers v
                 JOIN users u ON v.user_id = u.id
                 JOIN programs p ON v.program_id = p.id

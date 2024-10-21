@@ -140,10 +140,9 @@ router.put('/beneficiarios/:id', [
                     return res.status(500).json({ message: 'Error al obtener los datos actualizados.' });
                 }
 
-                // Devolver los datos actualizados al cliente
                 res.json({
                     message: 'Asignación actualizada con éxito.',
-                    updatedData: updatedResult[0]  // Enviamos los datos actualizados
+                    updatedData: updatedResult[0]  
                 });
             });
         });
