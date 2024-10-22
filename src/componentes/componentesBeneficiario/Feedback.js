@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
+import { FaCheck } from 'react-icons/fa';
+
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [errorRating, setErrorRating] = useState('');
+  const [errorFeedback, setErrorFeedback] = useState('');
+
+
+
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -31,13 +44,37 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   };
 
   const handleSubmitFeedback = () => {
+    let isValid = true; // Variable para verificar si los campos son válidos
+  
+    // Resetear los mensajes de error antes de validar
+    setErrorRating('');
+    setErrorFeedback('');
+  
+    // Validar que la calificación no esté vacía
+    if (!rating || rating < 1 || rating > 10) {
+      setErrorRating('Debes proporcionar una calificación entre 1 y 10.');
+      isValid = false;
+    }
+  
+    // Validar que los comentarios no estén vacíos
+    if (!feedback.trim()) {
+      setErrorFeedback('Debes proporcionar un comentario.');
+      isValid = false;
+    }
+  
+    // Si no es válido, no enviar feedback
+    if (!isValid) return;
+  
+    // Aquí procesamos el feedback si es válido
     console.log(`Feedback enviado para ${title}:`);
     console.log(`Calificación: ${rating}`);
     console.log(`Comentario: ${feedback}`);
-    
-    resetForm();
-    setIsModalOpen(false);
+  
+    resetForm(); // Reinicia el formulario
+    setIsModalOpen(false); // Cierra el modal
+    setSuccessMessage('Comentarios agregados exitosamente.'); // Muestra mensaje de éxito
   };
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -52,12 +89,22 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
     }
   };
 
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
+
   return (
     <>
       <motion.div 
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
         whileHover={{ scale: 1.05 }} 
-        whileTap={{ scale: 0.95 }}   
+        whileTap={{ scale: 0.9 }}   
       >
         <img
           className="w-full h-48 object-cover"
@@ -82,7 +129,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
           <div className="flex mt-4 space-x-4">
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
+              whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+              whileTap={{scale: 0.9}}
               onClick={handleOpenModal}
             >
               Dar Feedback
@@ -120,6 +168,9 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
                   className="w-full p-2 border border-gray-500 rounded bg-white text-black"
                   placeholder="Calificación"
                 />
+                  {errorRating && (
+    <p className="text-red-500 text-sm mt-1">{errorRating}</p>
+  )}
               </div>
               
               <div className="mb-4">
@@ -133,12 +184,16 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
                   rows="4" 
                   placeholder="Escribe tu comentario aquí..."
                 />
+                {errorFeedback && (
+    <p className="text-red-500 text-sm mt-1">{errorFeedback}</p>
+  )}
               </div>
               
               <div className="flex justify-between mt-4">
                 <motion.button 
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363', scale:1.1 }}
+                  whileTap={{scale: 0.9}}
                   onClick={handleCloseModal}
                 >
                   Cancelar
@@ -146,7 +201,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
                 
                 <motion.button 
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  whileTap={{scale: 0.9}}
                   onClick={handleSubmitFeedback}
                 >
                   Enviar Feedback
@@ -156,6 +212,50 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
           </motion.div>
         )}
       </AnimatePresence>
+
+       {/* Modal para mensajes de éxito */}
+       <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
     </>
   );
 };

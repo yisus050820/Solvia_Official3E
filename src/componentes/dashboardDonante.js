@@ -19,7 +19,7 @@ import { Feedback } from '@mui/icons-material';
 
 import Donar from './componentesDonador/Donar';
 import HistorialDonaciones from './componentesDonador/HistorialDonaciones';
-import VerPersonas from './componentesDonador/VerPersonas';
+import VerPersonas from './componentesVol/OtrosVol';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
@@ -138,11 +138,11 @@ import VerFeedback from './componentesDonador/VerFeedback';
           width: '100%',
         }}
       >
+        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/donaciones/donar' && <Donar />}
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
         {pathname === '/informes-generales' && <ReportesDonaciones />}
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
-        {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <Comunicacion />}
@@ -163,7 +163,7 @@ import VerFeedback from './componentesDonador/VerFeedback';
   function DashboardDonante(props) {
     const { window } = props;
   
-    const [pathname, setPathname] = React.useState('configuracion-perfil');
+    const [pathname, setPathname] = React.useState('/configuracion-perfil');
 
   
     const router = React.useMemo(() => {
@@ -181,6 +181,10 @@ import VerFeedback from './componentesDonador/VerFeedback';
       // preview-start
       <AppProvider
         navigation={NAVIGATION}
+        branding={{
+          logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+          title: 'SOLVIA',
+        }}
         router={router}
         theme={demoTheme}
         window={demoWindow}

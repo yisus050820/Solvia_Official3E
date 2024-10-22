@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
+
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -26,6 +27,13 @@ const CrudUsuarios = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
+    // Variantes de animación para la palomita
+    const checkmarkVariants = {
+      hidden: { opacity: 0, pathLength: 0 },
+      visible: { opacity: 1, pathLength: 1 },
+    };
 
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
@@ -41,6 +49,16 @@ const CrudUsuarios = () => {
     if (!description) return '';
     return description.length > 50 ? description.slice(0, 50) + '...' : description;
   };
+
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
 
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
@@ -125,6 +143,7 @@ const CrudUsuarios = () => {
         const createdUser = response.data;
         setData([...data, createdUser]);
         handleCloseModal();
+        setSuccessMessage('Usuario agregado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
         if (error.response && error.response.status === 409) {
@@ -171,7 +190,8 @@ const CrudUsuarios = () => {
             console.error('Error fetching users:', error);
           });
         handleCloseEditModal();
-      })
+        setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
+    })
       .catch(error => {
         setMessage(`Error al actualizar usuario, intente más tarde.`);
         setSnackbarSeverity('error');
@@ -199,6 +219,7 @@ const CrudUsuarios = () => {
     axios.delete(`http://localhost:5000/usuarios/${id}`)
       .then(() => {
         setData(data.filter(user => user.id !== id));
+        setSuccessMessage('Usuario eliminado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
         let errorMessage = 'Error al eliminar usuario, intente más tarde.';
@@ -261,6 +282,7 @@ const CrudUsuarios = () => {
               <option value="beneficiary">Beneficiario</option>
             </motion.select>
           </motion.div>
+          <div className="flex justify-end mb-4 space-x-4">
 
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
@@ -270,12 +292,12 @@ const CrudUsuarios = () => {
           >
             <FaPlus />
           </motion.button>
+          </div>
         </div>
 
         <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
-              <th className="p-4">ID</th>
               <th className="p-4">Nombre</th>
               <th className="p-4">Correo</th>
               <th className="p-4">Rol</th>
@@ -287,7 +309,6 @@ const CrudUsuarios = () => {
           <motion.tbody layout>
             {filteredData.map((item) => (
               <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>
                 <td className="p-4">{item.role}</td>
@@ -296,12 +317,16 @@ const CrudUsuarios = () => {
                 <td className="p-4 flex space-x-4">
                   <motion.button
                     className="bg-blue-500 text-white p-2 rounded-full"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{scale: 0.9}}
                     onClick={() => handleOpenEditModal(item)}
                   >
                     <FaEdit />
                   </motion.button>
                   <motion.button
                     className="bg-red-500 text-white p-2 rounded-full"
+                    whileHover={{ scale: 1.1}}
+                    whileTap={{ scale: 0.9}}
                     onClick={() => handleDeleteClick(item.id)}
                   >
                     <FaTrashAlt />
@@ -316,8 +341,18 @@ const CrudUsuarios = () => {
       {/* Modal para añadir usuario */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          >
+            <motion.div 
+            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+            initial={{ y: "-100vh" }}
+            animate={{ y: "0" }}
+            exit={{ y: "-100vh" }}
+            >
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -368,9 +403,22 @@ const CrudUsuarios = () => {
                   </button>
                 </div>
               </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cancelar</button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleAddUser}>Agregar</button>
+              <div className="mt-4 flex justify-between">
+                <motion.button 
+                className="bg-green-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#38a169',scale: 1.1 }}
+                whileTap={{scale: 0.9}}
+                onClick={handleAddUser}>
+                  Agregar
+                  </motion.button>
+                  <motion.button 
+                className="bg-gray-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleCloseModal} 
+                >
+                  Cancelar
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
@@ -380,8 +428,18 @@ const CrudUsuarios = () => {
       {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+            initial={{ y: "-100vh" }}
+            animate={{ y: "0" }}
+            exit={{ y: "-100vh" }}
+            >
               <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -435,14 +493,16 @@ const CrudUsuarios = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
+                  whileHover={{ backgroundColor: '#4A90E2',scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleEditUser}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }} 
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -498,6 +558,51 @@ const CrudUsuarios = () => {
           {message}
         </Alert>
       </Snackbar>
+
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
+
     </>
   );
 };

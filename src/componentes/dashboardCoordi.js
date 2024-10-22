@@ -51,18 +51,6 @@ const NAVIGATION = [
     segment: 'programas',
     title: 'Programas',
     icon: <Event />,
-    children: [
-      {
-        segment: 'gestionar-programas',
-        title: 'Gestionar programas',
-        icon: <SettingsIcon />,
-      },
-      {
-        segment: 'todos-programas',
-        title: 'Todos los programas',
-        icon: <Event />,
-      }
-    ],
   },  
   
   {
@@ -164,7 +152,7 @@ function DemoPageContent({ pathname }) {
     >
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/users' && <CrudUsuariosCoordi />}
-        {pathname === '/programas/gestionar-programas' && <CrudPrograms />}
+        {pathname === '/programas' && <CrudPrograms />}
         {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
         {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
         {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
@@ -205,6 +193,10 @@ function DashboardCoordi(props) {
     // preview-start
     <AppProvider
       navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        title: 'SOLVIA',
+      }}
       router={router}
       theme={demoTheme}
       window={demoWindow}

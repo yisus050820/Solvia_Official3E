@@ -9,7 +9,7 @@
     "@floating-ui/react": "^0.26.24",
     "@floating-ui/react-dom": "^2.1.2",
     "@mui/icons-material": "^6.1.4",
-    "@mui/material": "^6.0.1",
+    "@mui/material": "^6.0.3",
     "@mui/toolpad-core": "^0.1.51",
     "@mui/x-data-grid-generator": "^7.16.0",
     "@mui/x-data-grid-pro": "^7.16.0",
