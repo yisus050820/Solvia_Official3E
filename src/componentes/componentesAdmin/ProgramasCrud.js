@@ -102,12 +102,6 @@ const CrudProgramas = () => {
       }
     }    
   
-    if (!program.fechaInicio || (isEditing && program.fechaInicio !== originalProgram.fechaInicio)) {
-      validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
-    } else if (new Date(program.fechaInicio) < todayDate) {
-      validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
-    }
-  
     if (!program.fechaFin || new Date(program.fechaFin) < new Date(program.fechaInicio)) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }
@@ -443,8 +437,7 @@ const CrudProgramas = () => {
           </motion.table>
         )}
       </div>
-      );
-      );
+      
 
       {/* Ventana emergente para agregar un nuevo registro */}
       <AnimatePresence>
@@ -591,8 +584,9 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border border-gray-300 rounded bg-gray-300 text-black"
                   placeholderText="Fecha de Inicio"
+                  disabled
                 />
 
                 <DatePicker
