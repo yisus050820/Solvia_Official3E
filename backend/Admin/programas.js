@@ -53,7 +53,7 @@ router.get('/', (req, res) => {
 
 // Crear programa
 router.post('/', upload.single('program_image'), (req, res) => {
-    const { name, description, start_date, end_date, objectives, status = 'active' } = req.body;  
+    const { name, description, start_date, end_date, objectives, coordinator_charge, status = 'active' } = req.body;  
     const program_image = req.file ? `/uploads/${req.file.filename}` : null; // Guarda la ruta de la imagen
 
     db.query(
