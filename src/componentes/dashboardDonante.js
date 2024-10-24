@@ -21,7 +21,6 @@ import Donar from './componentesDonador/Donar';
 import HistorialDonaciones from './componentesDonador/HistorialDonaciones';
 import VerPersonas from './componentesVol/OtrosVol';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
@@ -143,7 +142,6 @@ import VerFeedback from './componentesDonador/VerFeedback';
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
         {pathname === '/informes-generales' && <ReportesDonaciones />}
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
-        {pathname === '/beneficiarios-programas/ver-programas' && <TarjetasProgramas />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <Comunicacion />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}

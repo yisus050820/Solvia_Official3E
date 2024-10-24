@@ -88,7 +88,7 @@ const CrudProgramas = () => {
 
     if (!isEditing && !program.fechaInicio || (isEditing && program.fechaInicio !== originalProgram.fechaInicio)) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
-    } else if (new Date(program.fechaInicio) < todayDate) {
+    } else if (new Date(program.fechaInicio) < todayDate && !isEditing) {
       validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
 

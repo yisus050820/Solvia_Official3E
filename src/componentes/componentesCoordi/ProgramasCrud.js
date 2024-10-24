@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
@@ -16,7 +17,6 @@ const CrudProgramas = () => {
   const [newProgram, setNewProgram] = useState({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
   const [editProgram, setEditProgram] = useState(null);
   const [mostrarCards, setMostrarCards] = useState(false);
-  const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -24,6 +24,8 @@ const CrudProgramas = () => {
   const [errors, setErrors] = useState({});
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [originalProgram, setOriginalProgram] = useState(null);
+  const [usuarioActualId, setUsuarioActualId] = useState(null);
+  const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -37,11 +39,20 @@ const CrudProgramas = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setUsuarioActualId(decodedToken.id);
+      setUsuarioActualNombre(decodedToken.nombre);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchPrograms();
   }, []);
 
   const fetchPrograms = () => {
-    axios.get('http://localhost:5000/programas')
+    axios.get('http://localhost:5000/programs')
       .then(response => {
         setData(response.data);
       })
@@ -59,18 +70,6 @@ const CrudProgramas = () => {
   
       }
     }, [successMessage]);
-  
-  useEffect(() => {
-    if (isModalOpen || isEditModalOpen) {
-      axios.get('http://localhost:5000/usuarios/coordinadores')
-        .then(response => {
-          setCoordinadores(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching coordinators:', error);
-        });
-    }
-  }, [isModalOpen, isEditModalOpen]);
 
   const truncateDescription = (description) => {
     if (!description) return '';
@@ -119,10 +118,6 @@ const CrudProgramas = () => {
       }
     }
   
-    if (!program.coordinador || isNaN(Number(program.coordinador))) {
-      validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
-    }
-  
     return validationErrors;
   };
   
@@ -134,16 +129,21 @@ const CrudProgramas = () => {
   };
 
   const handleAddProgram = () => {
-    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
+    const token = localStorage.getItem('token');
 
-    // Verificación de campos vacíos
+    if (!token) {
+      console.error('No se encontró el token.');
+      return;
+    }
+
+    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, program_image } = newProgram;
+
     const missingFields = [];
     if (!nombre) missingFields.push('Nombre');
     if (!descripcion) missingFields.push('Descripción');
     if (!fechaInicio) missingFields.push('Fecha de inicio');
     if (!fechaFin) missingFields.push('Fecha de fin');
     if (!objetivos) missingFields.push('Objetivos');
-    if (!coordinador) missingFields.push('Coordinador');
 
     if (missingFields.length > 0) {
       setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
@@ -152,12 +152,10 @@ const CrudProgramas = () => {
       return;
     }
 
-    // Validación de los datos
-    const validationErrors = validateProgram(newProgram, null, false);
+    const validationErrors = validateProgram(newProgram, {}, false);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
       setMessage(firstError);
       setSnackbarSeverity('error');
@@ -165,24 +163,24 @@ const CrudProgramas = () => {
       return;
     }
 
-    // Formateo de los datos para el envío
     const programData = {
       name: nombre,
       description: descripcion,
       start_date: formatDateForMySQL(fechaInicio),
       end_date: formatDateForMySQL(fechaFin),
       objectives: objetivos,
-      coordinator_charge: coordinador,
       program_image: program_image || defaultProgramPicture,
       status: newProgram.status || 'active',
     };
 
-    axios.post('http://localhost:5000/programas', programData)
+    axios.post('http://localhost:5000/programs', programData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(() => {
         fetchPrograms();
         handleCloseModal();
-        setSuccessMessage('Programa agregado exitosamente.');
-        originalProgram = programData;
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
@@ -213,7 +211,6 @@ const CrudProgramas = () => {
     formData.append('start_date', formatDateForMySQL(editProgram.fechaInicio));
     formData.append('end_date', formatDateForMySQL(editProgram.fechaFin));
     formData.append('objectives', editProgram.objetivos);
-    formData.append('coordinator_charge', editProgram.coordinador);
     formData.append('status', editProgram.status || 'active');
 
     if (editProgram.program_image instanceof File) {
@@ -222,7 +219,7 @@ const CrudProgramas = () => {
       formData.append('program_image', editProgram.program_image);
     }
 
-    axios.put(`http://localhost:5000/programas/${editProgram.id}`, formData, {
+    axios.put(`http://localhost:5000/programs/${editProgram.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
@@ -523,19 +520,6 @@ const CrudProgramas = () => {
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
                 />
-
-                <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                  value={newProgram.coordinador}
-                  onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
-                >
-                  <option value="">Selecciona un coordinador</option>
-                  {coordinadores.map((coordinador) => (
-                    <option key={coordinador.id} value={coordinador.id}>
-                      {coordinador.name}
-                    </option>
-                  ))}
-                </select>
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.status || 'active'}
@@ -590,9 +574,6 @@ const CrudProgramas = () => {
       >
         <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
         <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
-        <div className="mt-4">
-          <span className="text-green-400">Coordinador: {selectedProgram.coordinator_name}</span>
-        </div>
         <div className="mt-2">
           <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
         </div>
@@ -667,19 +648,6 @@ const CrudProgramas = () => {
                   value={editProgram.objetivos || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
                 />
-
-                <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                  value={editProgram.coordinador || ''}
-                  onChange={(e) => setEditProgram({ ...editProgram, coordinador: e.target.value })}
-                >
-                  <option value="">Selecciona un coordinador</option>
-                  {coordinadores.map((coordinador) => (
-                    <option key={coordinador.id} value={coordinador.id}>
-                      {coordinador.name}
-                    </option>
-                  ))}
-                </select>
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.status || 'active'}

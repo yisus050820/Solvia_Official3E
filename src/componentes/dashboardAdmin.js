@@ -26,7 +26,6 @@ import ProgramasCrud from './componentesAdmin/ProgramasCrud';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import UsuariosCrud from './componentesAdmin/UsuariosCrud';
 import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
