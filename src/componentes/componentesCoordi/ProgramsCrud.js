@@ -291,7 +291,6 @@ const CrudProgramas = () => {
         <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
           <thead className="bg-gray-700">
             <tr>
-              <th className="p-4">ID</th>
               <th className="p-4">Nombre</th>
               <th className="p-4">Descripción</th>
               <th className="p-4">Fecha Inicio</th>
@@ -305,7 +304,6 @@ const CrudProgramas = () => {
           <motion.tbody layout className="bg-gray-900">
             {data.map((item) => (
               <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{truncateDescription(item.description)}</td>
                 <td className="p-4">{item.start_date.split('T')[0]}</td>

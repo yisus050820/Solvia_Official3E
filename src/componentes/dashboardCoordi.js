@@ -20,7 +20,7 @@ import { Feedback } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import CrudPrograms from './componentesAdmin/ProgramasCrud';
+import CrudPrograms from './componentesCoordi/ProgramsCrud';
 import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
