@@ -52,9 +52,6 @@ const Login = () => {
       const response = await axios.post('http://localhost:5000/login', { email, password });
       const { token, role } = response.data;
       localStorage.setItem('token', token);
-      setMessage('Inicio de sesión exitoso');
-      setSnackbarSeverity('success');
-      setOpenSnackbar(true);
       setEmail('');
       setPassword('');
 

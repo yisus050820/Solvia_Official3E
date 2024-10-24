@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaPlus, FaCheck } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
@@ -22,7 +22,6 @@ const CrudProgramas = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
-  const [selectedProgram, setSelectedProgram] = useState(null);
   const [originalProgram, setOriginalProgram] = useState(null);
 
   const handleCloseSnackbar = () => {
@@ -30,8 +29,8 @@ const CrudProgramas = () => {
   };
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
-   // Variantes de animación para la palomita
-   const checkmarkVariants = {
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
     hidden: { opacity: 0, pathLength: 0 },
     visible: { opacity: 1, pathLength: 1 },
   };
@@ -50,16 +49,16 @@ const CrudProgramas = () => {
       });
   };
 
-    //Alerta se cierra automaticamente despues de 5 segundos
-    useEffect(() => {
-      if (successMessage) {
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-  
-      }
-    }, [successMessage]);
-  
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
+
   useEffect(() => {
     if (isModalOpen || isEditModalOpen) {
       axios.get('http://localhost:5000/usuarios/coordinadores')
@@ -96,30 +95,36 @@ const CrudProgramas = () => {
     const validationErrors = {};
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
-  
-    if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
-      if (!program.descripcion || program.descripcion.length < 10) {
-        validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
+
+    if (!program.descripcion || program.descripcion.length < 10) {
+      validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
+    }
+
+    if (!isEditing) {
+      if (!program.fechaInicio) {
+        validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
+      } else if (new Date(program.fechaInicio) < todayDate) {
+        validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
       }
-    }    
-  
-    if (!program.fechaFin || new Date(program.fechaFin) < new Date(program.fechaInicio)) {
+    }
+
+    if (!program.fechaFin) {
+      validationErrors.fechaFin = 'La fecha de fin es obligatoria.';
+    } else if (new Date(program.fechaFin) < new Date(program.fechaInicio)) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }
-  
-    if (!isEditing || (isEditing && program.objetivos !== originalProgram.objetivos)) {
-      if (program.objetivos.length < 10) {
-        validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
-      }
+
+    if (!program.objetivos || program.objetivos.length < 10) {
+      validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
     }
-  
+
     if (!program.coordinador || isNaN(Number(program.coordinador))) {
       validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
     }
-  
+
     return validationErrors;
   };
-  
+
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
     setMessage(firstError);
@@ -186,10 +191,17 @@ const CrudProgramas = () => {
       });
   };
 
-  const handleEditProgram = (program) => {
-    console.log(editProgram)
-    console.log(program)
-    const validationErrors = validateProgram(editProgram, program, true);
+  const handleEditProgram = () => {
+    const validationErrors = validateProgram(editProgram, {}, true);
+
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    if (editProgram.fechaInicio && editProgram.fechaInicio !== originalProgram.fechaInicio) {
+      if (new Date(editProgram.fechaInicio) < todayDate) {
+        validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
+      }
+    }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -290,7 +302,7 @@ const CrudProgramas = () => {
 
   // Función para determinar el color del estado
   const getStatusColor = (status) => {
-    switch (status) { 
+    switch (status) {
       case 'active':
         return 'bg-green-500';  // Verde para activo
       case 'pause':
@@ -310,7 +322,7 @@ const CrudProgramas = () => {
           Gestionar Programas
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
-        <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
 
             <Typography variant="body1" color="primary" className="mr-2">
               Ver en tarjetas
@@ -320,28 +332,28 @@ const CrudProgramas = () => {
               onChange={() => setMostrarCards(!mostrarCards)}
               color="primary"
             />
-            </div>
+          </div>
 
-                {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
-            
-          <motion.button
-            className="bg-green-500 text-white p-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleOpenModal}
-          >
-            <FaPlus />
-          </motion.button>
-          
+          {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
+          {!mostrarCards && (
+            <motion.button
+              className="bg-green-500 text-white p-2 rounded-full"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleOpenModal}
+            >
+              <FaPlus />
+            </motion.button>
+          )}
         </div>
 
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
             {data.map((program) => (
-              <motion.div 
+              <motion.div
                 key={program.id}
                 className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
-                whileHover={{ scale: 1.05 }} 
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <img
@@ -358,48 +370,27 @@ const CrudProgramas = () => {
                   <p className="text-gray-400 mt-2">
                     {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
                   </p>
-                 
+                  <div className="mt-4">
+                    <span className="text-green-400">Participantes: {program.participants || 0}</span>
+                  </div>
                   <div className="mt-2">
                     <span className="text-green-600">Donaciones: ${program.donations || 0}</span>
                   </div>
-                  <div className="flex mt-4 justify-between">
-                    <motion.button 
+                  <div className="flex mt-4 space-x-4">
+                    <motion.button
                       className="bg-gray-700 text-white px-4 py-2 rounded"
                       whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                      whileTap={{scale: 0.9}}
-                      onClick={() => setSelectedProgram(program)}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleOpenModal}
                     >
                       Más info
                     </motion.button>
-
-                    <div className='flex space-x-2'>
-                     {/* Botón de editar */}
-                    <motion.button 
-                      className="bg-blue-500 text-white p-2 rounded-full"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleOpenEditModal(program)}
-                      >
-                        <FaEdit />
-                    </motion.button>
-                    
-                    {/* Botón de eliminar */}
-                    <motion.button 
-                      className="bg-red-500 text-white p-2 rounded-full"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDeleteConfirm(program.id)}
-                    >
-                      <FaTrashAlt />
-                      </motion.button>
-                      </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        ):(
-          
+        ) : (
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
             <thead className="bg-gray-700">
               <tr>
@@ -418,19 +409,18 @@ const CrudProgramas = () => {
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
-                  <td className="p-4">{item.start_date.split('T')[0]}</td> 
-                  <td className="p-4">{item.end_date.split('T')[0]}</td>   
-                  <td className="p-4">{item.objectives}</td>
+                  <td className="p-4">{item.start_date.split('T')[0]}</td>
+                  <td className="p-4">{item.end_date.split('T')[0]}</td>
+                  <td className="p-4">{truncateDescription(item.objectives)}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
-                      className={`text-lg font-bold ${
-                        item.status === 'active'
+                      className={`text-lg font-bold ${item.status === 'active'
                           ? 'text-green-500'
                           : item.status === 'pause'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                      }`}
+                            ? 'text-yellow-500'
+                            : 'text-red-500'
+                        }`}
                     >
                       {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
                     </span>
@@ -439,7 +429,7 @@ const CrudProgramas = () => {
                     <motion.button
                       className="bg-blue-500 text-white p-2 rounded-full"
                       whileHover={{ scale: 1.1 }}
-                      whileTap={{scale: 0.9}}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => handleOpenEditModal(item)}
                     >
                       <FaEdit />
@@ -459,7 +449,8 @@ const CrudProgramas = () => {
           </motion.table>
         )}
       </div>
-      
+      );
+      );
 
       {/* Ventana emergente para agregar un nuevo registro */}
       <AnimatePresence>
@@ -568,41 +559,6 @@ const CrudProgramas = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <AnimatePresence>
-  {selectedProgram && (
-    <motion.div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-        initial={{ y: "-100vh" }}
-        animate={{ y: "0" }}
-        exit={{ y: "-100vh" }}
-      >
-        <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
-        <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
-        <div className="mt-4">
-          <span className="text-green-400">Coordinador: {selectedProgram.coordinator_name}</span>
-        </div>
-        <div className="mt-2">
-          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
-        </div>
-        {/* Botón para cerrar la ventana */}
-        <motion.button 
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-          whileHover={{ backgroundColor: '#4A90E2' }}
-          onClick={() => setSelectedProgram(null)}  // Cierra el modal
-        >
-          Cerrar
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
-
 
       {/* Ventana emergente para editar un registro existente */}
       <AnimatePresence>
@@ -641,9 +597,8 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-300 text-black"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
-                  disabled
                 />
 
                 <DatePicker
@@ -693,7 +648,7 @@ const CrudProgramas = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale:1.1 }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditProgram}
                 >
@@ -701,7 +656,7 @@ const CrudProgramas = () => {
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363',scale:1.1 }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
@@ -729,7 +684,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-gray-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9}}
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsDeleteConfirmOpen(false)}
           >
             Cancelar
@@ -737,7 +692,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9}}
+            whileTap={{ scale: 0.9 }}
             onClick={handleDelete}
           >
             Eliminar
@@ -755,47 +710,47 @@ const CrudProgramas = () => {
       </Snackbar>
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
+        )}
+      </AnimatePresence>
 
     </>
   );

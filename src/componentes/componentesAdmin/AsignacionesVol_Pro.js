@@ -144,6 +144,7 @@ const AsignacionesVol_Pro = () => {
         setVoluntarioSeleccionado('');
         setProgramaSeleccionado('');
         setTaskStatusSeleccionado('');
+        setIsEditModalOpen(false);
         setSuccessMessage('Asignacion actualizada exitosamente.')
       })
       .catch(error => {
