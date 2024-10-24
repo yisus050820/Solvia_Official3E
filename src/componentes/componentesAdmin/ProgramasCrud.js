@@ -22,6 +22,7 @@ const CrudProgramas = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const [originalProgram, setOriginalProgram] = useState(null);
 
   const handleCloseSnackbar = () => {
@@ -289,7 +290,7 @@ const CrudProgramas = () => {
 
   // Función para determinar el color del estado
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status) { 
       case 'active':
         return 'bg-green-500';  // Verde para activo
       case 'pause':
@@ -322,7 +323,7 @@ const CrudProgramas = () => {
             </div>
 
                 {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
-            {!mostrarCards &&(
+            
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
             whileHover={{ scale: 1.1 }}
@@ -331,7 +332,7 @@ const CrudProgramas = () => {
           >
             <FaPlus />
           </motion.button>
-          )}
+          
         </div>
 
         {mostrarCards ? (
@@ -357,27 +358,48 @@ const CrudProgramas = () => {
                   <p className="text-gray-400 mt-2">
                     {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
                   </p>
-                  <div className="mt-4">
-                    <span className="text-green-400">Participantes: {program.participants || 0}</span>
-                  </div>
+                 
                   <div className="mt-2">
                     <span className="text-green-600">Donaciones: ${program.donations || 0}</span>
                   </div>
-                  <div className="flex mt-4 space-x-4">
+                  <div className="flex mt-4 justify-between">
                     <motion.button 
                       className="bg-gray-700 text-white px-4 py-2 rounded"
                       whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                       whileTap={{scale: 0.9}}
-                      onClick={handleOpenModal}
+                      onClick={() => setSelectedProgram(program)}
                     >
                       Más info
                     </motion.button>
+
+                    <div className='flex space-x-2'>
+                     {/* Botón de editar */}
+                    <motion.button 
+                      className="bg-blue-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleOpenEditModal(program)}
+                      >
+                        <FaEdit />
+                    </motion.button>
+                    
+                    {/* Botón de eliminar */}
+                    <motion.button 
+                      className="bg-red-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteConfirm(program.id)}
+                    >
+                      <FaTrashAlt />
+                      </motion.button>
+                      </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
         ):(
+          
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
             <thead className="bg-gray-700">
               <tr>
@@ -546,6 +568,41 @@ const CrudProgramas = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+  {selectedProgram && (
+    <motion.div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+        initial={{ y: "-100vh" }}
+        animate={{ y: "0" }}
+        exit={{ y: "-100vh" }}
+      >
+        <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
+        <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+        <div className="mt-4">
+          <span className="text-green-400">Coordinador: {selectedProgram.coordinator_name}</span>
+        </div>
+        <div className="mt-2">
+          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
+        </div>
+        {/* Botón para cerrar la ventana */}
+        <motion.button 
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          whileHover={{ backgroundColor: '#4A90E2' }}
+          onClick={() => setSelectedProgram(null)}  // Cierra el modal
+        >
+          Cerrar
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
 
       {/* Ventana emergente para editar un registro existente */}
       <AnimatePresence>

@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
-
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -23,17 +22,18 @@ const CrudUsuarios = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
+  const [mostrarCards, setMostrarCards] = useState(false); // Estado para el switch de tarjetas
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
-    // Variantes de animación para la palomita
-    const checkmarkVariants = {
-      hidden: { opacity: 0, pathLength: 0 },
-      visible: { opacity: 1, pathLength: 1 },
-    };
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
@@ -56,7 +56,6 @@ const CrudUsuarios = () => {
       setTimeout(() => {
         setSuccessMessage('');
       }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-
     }
   }, [successMessage]);
 
@@ -282,6 +281,16 @@ const CrudUsuarios = () => {
               <option value="beneficiary">Beneficiario</option>
             </motion.select>
           </motion.div>
+          <div className="flex items-center">
+            <Typography variant="body1" color="primary" className="mr-2">
+              Ver en tarjetas
+            </Typography>
+            <Switch
+              checked={mostrarCards}
+              onChange={() => setMostrarCards(!mostrarCards)}
+              color="primary"
+            />
+          </div>
           <div className="flex justify-end mb-4 space-x-4">
 
           <motion.button
@@ -295,47 +304,82 @@ const CrudUsuarios = () => {
           </div>
         </div>
 
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Correo</th>
-              <th className="p-4">Rol</th>
-              <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Creación</th>
-              <th className="p-4">Acciones</th>
-            </tr>
-          </thead>
-          <motion.tbody layout>
+        {/* Mostrar contenido dependiendo del estado del switch */}
+        {mostrarCards ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredData.map((item) => (
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{item.email}</td>
-                <td className="p-4">{item.role}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.created_at}</td>
-                <td className="p-4 flex space-x-4">
-                  <motion.button
-                    className="bg-blue-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{scale: 0.9}}
-                    onClick={() => handleOpenEditModal(item)}
-                  >
-                    <FaEdit />
-                  </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1}}
-                    whileTap={{ scale: 0.9}}
-                    onClick={() => handleDeleteClick(item.id)}
-                  >
-                    <FaTrashAlt />
-                  </motion.button>
-                </td>
-              </motion.tr>
+              <motion.div
+                key={item.id}
+                className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex justify-center items-center">
+                  <img
+                    src={item.profile_picture || defaultProfilePicture}
+                    alt={item.name}
+                    className="flex h-32 object-cover rounded-full mb-4 justify-center"
+                  />
+                </div>
+                <Typography variant="h5" gutterBottom className="flex justify-center">
+                  {item.name}
+                </Typography>
+                <Typography variant="body1" gutterBottom className="flex justify-center">
+                  {item.role}
+                </Typography>
+                <Typography variant="body2" gutterBottom className="flex justify-center">
+                  {item.email}
+                </Typography>
+                <Typography variant="body2" className="flex justify-center">
+                  {truncateDescription(item.description)}
+                </Typography>
+              </motion.div>
             ))}
-          </motion.tbody>
-        </motion.table>
+          </div>
+        ) : (
+          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-4">Nombre</th>
+                <th className="p-4">Correo</th>
+                <th className="p-4">Rol</th>
+                <th className="p-4">Descripción</th>
+                <th className="p-4">Fecha Creación</th>
+                <th className="p-4">Acciones</th>
+              </tr>
+            </thead>
+            <motion.tbody layout>
+              {filteredData.map((item) => (
+                <motion.tr key={item.id} className="border-b border-gray-700">
+                  <td className="p-4">{item.name}</td>
+                  <td className="p-4">{item.email}</td>
+                  <td className="p-4">{item.role}</td>
+                  <td className="p-4">{truncateDescription(item.description)}</td>
+                  <td className="p-4">{item.created_at}</td>
+                  <td className="p-4 flex space-x-4">
+                    <motion.button
+                      className="bg-blue-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleOpenEditModal(item)}
+                    >
+                      <FaEdit />
+                    </motion.button>
+                    <motion.button
+                      className="bg-red-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteClick(item.id)}
+                    >
+                      <FaTrashAlt />
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
+          </motion.table>
+        )}
       </div>
 
       {/* Modal para añadir usuario */}
@@ -601,7 +645,7 @@ const CrudUsuarios = () => {
           </motion.div>
         </motion.div>
       )}
-              </AnimatePresence>
+      </AnimatePresence>
 
     </>
   );
