@@ -26,6 +26,7 @@ import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesDonador/VerFeedback';
+import ProgramasDisp from './componentesDonador/VerProgramasDisp';
 
 
 
@@ -55,13 +56,27 @@ const NAVIGATION = [
     ],
   },
 
-
   {
-    segment: 'programas-inscritos',
-    title: 'Programas Inscritos',
-    icon: <AssignmentInd />,
+    segment: 'programas',
+    title: 'Programas',
+    icon: <People />,
+    children: [
+      {
+        segment: 'programas-inscritos',
+        title: 'Programas Inscritos',
+        icon: <AssignmentInd />,   
+      },
 
+      {
+        segment: 'programas-disponibles',
+        title: 'Programas Disponibles',
+        icon: <AssignmentInd />,   
+      },
+    ],
   },
+
+
+
   {
     segment: 'comunicacion',
     title: 'Comunicación', // Título actualizado
@@ -69,7 +84,7 @@ const NAVIGATION = [
     children: [
       {
         segment: 'contacto',
-        title: 'Contactar con un administrador',
+        title: 'Mensajería',
         icon: <MessageIcon />,
       },
       {
@@ -118,7 +133,8 @@ function DemoPageContent({ pathname }) {
       }}
     >
       {pathname === '/voluntarios/otros-voluntarios' && <OtrosVoluntarios />}
-      {pathname === '/programas-inscritos' && <MisProgramas />}
+      {pathname === '/programas/programas-inscritos' && <MisProgramas />}
+      {pathname === '/programas/programas-disponibles' && <ProgramasDisp />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}
       {pathname === '/comunicacion/contacto' && <Comunicacion />}
       {pathname === '/comunicacion/feedback' && <Calificar />}

@@ -31,7 +31,6 @@ import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import Comunicacion from './componentesAdmin/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import Mensajes from './componentesAdmin/Mensajes';
 
@@ -108,12 +107,6 @@ const NAVIGATION = [
     title: 'Comunicacion',
     icon: <ChatBubbleIcon />,
     children: [
-
-      {
-        segment: 'contacto',
-        title: 'Contactar con un usuario',
-        icon: <MessageIcon />,
-      },
       {
         segment: 'ver-feedback',
         title: 'Ver feedback de programas',
@@ -121,7 +114,7 @@ const NAVIGATION = [
       },
       {
         segment: 'mensajes',
-        title: 'Mensajes recibidos',
+        title: 'Mensajería',
         icon: <ArticleIcon />,
       },
     ],
@@ -168,7 +161,6 @@ function DemoPageContent({ pathname }) {
       {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
-      {pathname === '/comunicacion/contacto' && <Comunicacion />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
       {pathname === '/comunicacion/mensajes' && <Mensajes />}
     </Box>

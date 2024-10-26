@@ -66,7 +66,7 @@ const NAVIGATION = [
     children: [
       {
         segment: 'contacto',
-        title: 'Contactar con un administrador',
+        title: 'Mensajería',
         icon: <MessageIcon />,
       },
       {

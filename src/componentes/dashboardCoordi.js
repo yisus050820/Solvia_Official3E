@@ -106,7 +106,7 @@ const NAVIGATION = [
 
       {
         segment: 'contacto',
-        title: 'Contactar con un usuario',
+        title: 'Mensajería',
         icon: <MessageIcon />,
       },
       {

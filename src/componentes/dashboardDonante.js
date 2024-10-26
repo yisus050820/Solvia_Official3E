@@ -25,6 +25,7 @@ import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesDonador/VerFeedback';
+import ProgramasDisp from './componentesDonador/VerProgramasDisp';
 
 
   const NAVIGATION = [
@@ -90,7 +91,7 @@ import VerFeedback from './componentesDonador/VerFeedback';
       children: [
         {
           segment: 'contacto',
-          title: 'Contactar con un administrador',
+          title: 'Mensajería',
           icon: <MessageIcon />,
         },
         {
@@ -142,6 +143,7 @@ import VerFeedback from './componentesDonador/VerFeedback';
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
         {pathname === '/informes-generales' && <ReportesDonaciones />}
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
+        {pathname === '/beneficiarios-programas/ver-programas' && <ProgramasDisp />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <Comunicacion />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
