@@ -127,6 +127,7 @@ const CrudUsuarios = () => {
       setOpenSnackbar(true);
       return;
     }
+    
 
     const userData = {
       name,
@@ -255,8 +256,9 @@ const CrudUsuarios = () => {
         <Typography variant="h3" align="center" color="primary" gutterBottom>
           Usuarios
         </Typography>
-        <div className="flex justify-between mb-4 space-x-4">
+        <div className="flex justify-between items-center mb-4">
           <motion.div
+            className="flex items-center"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -281,6 +283,7 @@ const CrudUsuarios = () => {
               <option value="beneficiary">Beneficiario</option>
             </motion.select>
           </motion.div>
+          <div className="flex items-center space-x-4">
           <div className="flex items-center">
             <Typography variant="body1" color="primary" className="mr-2">
               Ver en tarjetas
@@ -291,7 +294,6 @@ const CrudUsuarios = () => {
               color="primary"
             />
           </div>
-          <div className="flex justify-end mb-4 space-x-4">
 
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
@@ -317,7 +319,7 @@ const CrudUsuarios = () => {
               >
                 <div className="flex justify-center items-center">
                   <img
-                    src={item.profile_picture || defaultProfilePicture}
+                    src={`http://localhost:5000${item.profile_picture}` || defaultProfilePicture}
                     alt={item.name}
                     className="flex h-32 object-cover rounded-full mb-4 justify-center"
                   />
@@ -332,7 +334,7 @@ const CrudUsuarios = () => {
                   {item.email}
                 </Typography>
                 <Typography variant="body2" className="flex justify-center">
-                  {truncateDescription(item.description)}
+                  {item.description}
                 </Typography>
               </motion.div>
             ))}
@@ -592,61 +594,6 @@ const CrudUsuarios = () => {
           </Dialog>
         )}
       </AnimatePresence>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {message}
-        </Alert>
-      </Snackbar>
-
-      {/* Modal para mensajes de éxito */}
-      <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
-            </motion.div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-      </AnimatePresence>
-
     </>
   );
 };
