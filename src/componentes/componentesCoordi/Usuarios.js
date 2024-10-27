@@ -37,7 +37,11 @@ const CrudUsuariosCoordi = () => {
       });
   }, []);
 
-  // Filtrar datos según el rol seleccionado
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
   return (

@@ -20,8 +20,7 @@ import { Feedback } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import CrudProgramas from './componentesAdmin/ProgramasCrud';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
+import CrudPrograms from './componentesCoordi/ProgramasCrud';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
@@ -152,8 +151,7 @@ function DemoPageContent({ pathname }) {
     >
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/users' && <CrudUsuariosCoordi />}
-        {pathname === '/programas' && <CrudProgramas />}
-        {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
+        {pathname === '/programas' && <CrudPrograms />}
         {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
         {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
         {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}

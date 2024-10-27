@@ -4,9 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Switch } from '@mui/material';
-
-const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
+import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
+const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
   const [data, setData] = useState([]);
@@ -17,9 +16,18 @@ const CrudProgramas = () => {
   const [newProgram, setNewProgram] = useState({ nombre: '', descripcion: '', fechaInicio: null, fechaFin: null, objetivos: '', coordinador: '', program_image: '' });
   const [editProgram, setEditProgram] = useState(null);
   const [mostrarCards, setMostrarCards] = useState(false);
-  const [errors, setErrors] = useState({});
   const [coordinadores, setCoordinadores] = useState([]);
   const [today] = useState(new Date());
+  const [message, setMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [errors, setErrors] = useState({});
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [originalProgram, setOriginalProgram] = useState(null);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
    // Variantes de animación para la palomita
@@ -84,74 +92,118 @@ const CrudProgramas = () => {
     setErrors({});
   };
 
-  const validateProgram = (program) => {
+  const validateProgram = (program, originalProgram, isEditing) => {
     const validationErrors = {};
-    const todayDate = new Date(today.setHours(0, 0, 0, 0));
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+  
+    if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
+      if (!program.descripcion || program.descripcion.length < 10) {
+        validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
+      }
+    }    
 
-    if (!program.nombre || !program.nombre.trim()) {
-      validationErrors.nombre = 'El nombre no puede estar vacío.';
-    }
-
-    if (!program.descripcion || program.descripcion.trim().length < 10) {
-      validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
-    }
-
-    if (!program.fechaInicio) {
+    if (!isEditing && !program.fechaInicio) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
-    } else if (program.fechaInicio < todayDate) {
+    } else if (new Date(program.fechaInicio) < todayDate && !isEditing) {
       validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
-
-    if (!program.fechaFin) {
-      validationErrors.fechaFin = 'La fecha de fin es obligatoria.';
-    } else if (program.fechaInicio && program.fechaFin < program.fechaInicio) {
+  
+    if (!program.fechaFin || new Date(program.fechaFin) < new Date(program.fechaInicio)) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }
-
-    if (!program.objetivos || !program.objetivos.trim()) {
-      validationErrors.objetivos = 'Los objetivos no pueden estar vacíos.';
+  
+    if (!isEditing || (isEditing && program.objetivos !== originalProgram.objetivos)) {
+      if (program.objetivos.length < 10) {
+        validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
+      }
     }
-
-    if (!program.coordinador || isNaN(program.coordinador)) {
-      validationErrors.coordinador = 'El coordinador es obligatorio y debe ser un valor válido.';
+  
+    if (!program.coordinador || isNaN(Number(program.coordinador))) {
+      validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
     }
-
+  
     return validationErrors;
+  };
+  
+  const showErrorMessage = (errors) => {
+    const firstError = Object.values(errors)[0];
+    setMessage(firstError);
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
   };
 
   const handleAddProgram = () => {
-    const validationErrors = validateProgram(newProgram);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
+
+    // Verificación de campos vacíos
+    const missingFields = [];
+    if (!nombre) missingFields.push('Nombre');
+    if (!descripcion) missingFields.push('Descripción');
+    if (!fechaInicio) missingFields.push('Fecha de inicio');
+    if (!fechaFin) missingFields.push('Fecha de fin');
+    if (!objetivos) missingFields.push('Objetivos');
+    if (!coordinador) missingFields.push('Coordinador');
+
+    if (missingFields.length > 0) {
+      setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
 
+    // Validación de los datos
+    const validationErrors = validateProgram(newProgram, null, false);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+
+      const firstError = Object.values(validationErrors)[0];
+      setMessage(firstError);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Formateo de los datos para el envío
     const programData = {
-      name: newProgram.nombre,
-      description: newProgram.descripcion,
-      start_date: formatDateForMySQL(newProgram.fechaInicio),
-      end_date: formatDateForMySQL(newProgram.fechaFin),
-      objectives: newProgram.objetivos,
-      coordinator_charge: newProgram.coordinador,
-      program_image: newProgram.program_image || defaultProgramPicture,
+      name: nombre,
+      description: descripcion,
+      start_date: formatDateForMySQL(fechaInicio),
+      end_date: formatDateForMySQL(fechaFin),
+      objectives: objetivos,
+      coordinator_charge: coordinador,
+      program_image: program_image || defaultProgramPicture,
       status: newProgram.status || 'active',
     };
 
     axios.post('http://localhost:5000/programas', programData)
       .then(() => {
-        fetchPrograms(); 
-        handleCloseModal(); 
-        setSuccessMessage('Programa agregado exitosamente.')
+        fetchPrograms();
+        handleCloseModal();
+        setSuccessMessage('Programa agregado exitosamente.');
+        originalProgram = programData;
       })
       .catch(error => {
         console.error('Error al añadir programa:', error);
+        setMessage('Error al añadir el programa, intente más tarde.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
-  const handleEditProgram = () => {
-    const validationErrors = validateProgram(editProgram);
+  const handleEditProgram = (program) => {
+    console.log(editProgram)
+    console.log(program)
+    const validationErrors = validateProgram(editProgram, program, true);
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+
+      const firstError = Object.values(validationErrors)[0];
+      setMessage(firstError);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -176,7 +228,7 @@ const CrudProgramas = () => {
       }
     })
       .then(() => {
-        fetchPrograms(); 
+        fetchPrograms();
         handleCloseEditModal();
         setSuccessMessage('Programa actualizado exitosamente.')
       })
@@ -197,6 +249,7 @@ const CrudProgramas = () => {
       status: program.status || 'active',
       program_image: program.program_image || defaultProgramPicture,
     });
+    setOriginalProgram({ ...program });
     setIsEditModalOpen(true);
     setErrors({});
   };
@@ -220,7 +273,13 @@ const CrudProgramas = () => {
         setSuccessMessage('Programa eliminado exitosamente.')
       })
       .catch(error => {
-        console.error('Error deleting program:', error);
+        let errorMessage = 'Error al eliminar programa, intente más tarde.';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+        setMessage(errorMessage);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -237,7 +296,7 @@ const CrudProgramas = () => {
 
   // Función para determinar el color del estado
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status) { 
       case 'active':
         return 'bg-green-500';  // Verde para activo
       case 'pause':
@@ -270,7 +329,7 @@ const CrudProgramas = () => {
             </div>
 
                 {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
-            {!mostrarCards &&(
+            
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
             whileHover={{ scale: 1.1 }}
@@ -279,7 +338,7 @@ const CrudProgramas = () => {
           >
             <FaPlus />
           </motion.button>
-          )}
+          
         </div>
 
         {mostrarCards ? (
@@ -305,27 +364,48 @@ const CrudProgramas = () => {
                   <p className="text-gray-400 mt-2">
                     {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
                   </p>
-                  <div className="mt-4">
-                    <span className="text-green-400">Participantes: {program.participants || 0}</span>
-                  </div>
+                 
                   <div className="mt-2">
-                    <span className="text-green-600">Donaciones: ${program.donations || 0}</span>
+                    <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
                   </div>
-                  <div className="flex mt-4 space-x-4">
+                  <div className="flex mt-4 justify-between">
                     <motion.button 
                       className="bg-gray-700 text-white px-4 py-2 rounded"
                       whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                       whileTap={{scale: 0.9}}
-                      onClick={handleOpenModal}
+                      onClick={() => setSelectedProgram(program)}
                     >
                       Más info
                     </motion.button>
+
+                    <div className='flex space-x-2'>
+                     {/* Botón de editar */}
+                    <motion.button 
+                      className="bg-blue-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleOpenEditModal(program)}
+                      >
+                        <FaEdit />
+                    </motion.button>
+                    
+                    {/* Botón de eliminar */}
+                    <motion.button 
+                      className="bg-red-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteConfirm(program.id)}
+                    >
+                      <FaTrashAlt />
+                      </motion.button>
+                      </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
         ):(
+          
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
             <thead className="bg-gray-700">
               <tr>
@@ -346,7 +426,7 @@ const CrudProgramas = () => {
                   <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">{item.start_date.split('T')[0]}</td> 
                   <td className="p-4">{item.end_date.split('T')[0]}</td>   
-                  <td className="p-4">{item.objectives}</td>
+                  <td className="p-4">{truncateDescription(item.objectives)}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
@@ -385,8 +465,7 @@ const CrudProgramas = () => {
           </motion.table>
         )}
       </div>
-      );
-      );
+      
 
       {/* Ventana emergente para agregar un nuevo registro */}
       <AnimatePresence>
@@ -412,7 +491,6 @@ const CrudProgramas = () => {
                   value={newProgram.nombre}
                   onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
                 />
-                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}
 
                 <input
                   type="text"
@@ -421,7 +499,6 @@ const CrudProgramas = () => {
                   value={newProgram.descripcion}
                   onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
                 />
-                {errors.descripcion && <p className="text-red-500 text-sm">{errors.descripcion}</p>}
 
                 <DatePicker
                   selected={newProgram.fechaInicio}
@@ -430,7 +507,6 @@ const CrudProgramas = () => {
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
                 />
-                {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
 
                 <DatePicker
                   selected={newProgram.fechaFin}
@@ -439,7 +515,6 @@ const CrudProgramas = () => {
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
-                {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
@@ -448,7 +523,6 @@ const CrudProgramas = () => {
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
                 />
-                {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -462,7 +536,6 @@ const CrudProgramas = () => {
                     </option>
                   ))}
                 </select>
-                {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={newProgram.status || 'active'}
@@ -501,6 +574,41 @@ const CrudProgramas = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+  {selectedProgram && (
+    <motion.div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+        initial={{ y: "-100vh" }}
+        animate={{ y: "0" }}
+        exit={{ y: "-100vh" }}
+      >
+        <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
+        <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+        <div className="mt-4">
+          <span className="text-green-400">Coordinador: {selectedProgram.coordinator_name}</span>
+        </div>
+        <div className="mt-2">
+          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
+        </div>
+        {/* Botón para cerrar la ventana */}
+        <motion.button 
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          whileHover={{ backgroundColor: '#4A90E2' }}
+          onClick={() => setSelectedProgram(null)}  // Cierra el modal
+        >
+          Cerrar
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
 
       {/* Ventana emergente para editar un registro existente */}
       <AnimatePresence>
@@ -526,7 +634,6 @@ const CrudProgramas = () => {
                   value={editProgram.nombre || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, nombre: e.target.value })}
                 />
-                {errors.nombre && <p className="text-red-500 text-sm">{errors.nombre}</p>}
 
                 <input
                   type="text"
@@ -535,16 +642,15 @@ const CrudProgramas = () => {
                   value={editProgram.descripcion || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, descripcion: e.target.value })}
                 />
-                {errors.descripcion && <p className="text-red-500 text-sm">{errors.descripcion}</p>}
 
                 <DatePicker
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border border-gray-300 rounded bg-gray-300 text-black"
                   placeholderText="Fecha de Inicio"
+                  disabled
                 />
-                {errors.fechaInicio && <p className="text-red-500 text-sm">{errors.fechaInicio}</p>}
 
                 <DatePicker
                   selected={editProgram.fechaFin}
@@ -553,7 +659,6 @@ const CrudProgramas = () => {
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
                 />
-                {errors.fechaFin && <p className="text-red-500 text-sm">{errors.fechaFin}</p>}
 
                 <input
                   type="text"
@@ -562,7 +667,6 @@ const CrudProgramas = () => {
                   value={editProgram.objetivos || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
                 />
-                {errors.objetivos && <p className="text-red-500 text-sm">{errors.objetivos}</p>}
 
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -576,7 +680,6 @@ const CrudProgramas = () => {
                     </option>
                   ))}
                 </select>
-                {errors.coordinador && <p className="text-red-500 text-sm">{errors.coordinador}</p>}
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editProgram.status || 'active'}
@@ -647,6 +750,15 @@ const CrudProgramas = () => {
           </motion.button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000} onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
       {successMessage && (

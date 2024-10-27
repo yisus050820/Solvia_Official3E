@@ -1,29 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  DialogContentText,
-} from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion'; 
+import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert } from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaCheck } from 'react-icons/fa';
 
 const AsignacionesPresupuesto_Pro = () => {
@@ -40,6 +18,13 @@ const AsignacionesPresupuesto_Pro = () => {
   const [currentId, setCurrentId] = useState(null);
   const [editCantidad, setEditCantidad] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [message, setMessage] = useState('');
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   const checkmarkVariants = {
     hidden: { opacity: 0, pathLength: 0 },
@@ -65,26 +50,30 @@ const AsignacionesPresupuesto_Pro = () => {
       const timeoutId = setTimeout(() => {
         setSuccessMessage('');
       }, 1000);
-  
+
       return () => clearTimeout(timeoutId);
     }
   }, [successMessage]);
 
   const handleAsignar = () => {
     let isValid = true;
-    setErrorCantidad('');
-    setErrorPrograma('');
 
     if (!programaSeleccionado) {
-      setErrorPrograma('Debes seleccionar un programa.');
+      setSnackbarSeverity('error');
+      setMessage('Debes seleccionar un programa.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
     if (!cantidad || cantidad <= 0) {
-      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad debe ser mayor que 0.');
+      setOpenSnackbar(true);
       isValid = false;
     } else if (cantidad > dineroDisponible) {
-      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      setSnackbarSeverity('error');
+      setMessage('La cantidad no puede ser mayor que el dinero disponible.');
+      setOpenSnackbar(true);
       isValid = false;
     }
 
@@ -102,22 +91,28 @@ const AsignacionesPresupuesto_Pro = () => {
           axios.get('http://localhost:5000/asigPresProg/asignaciones'),
           axios.get('http://localhost:5000/asigPresProg/disponible')
         ])
-        .then(([asignacionesRes, disponibleRes]) => {
-          setAsignaciones(asignacionesRes.data);
-          setDineroDisponible(disponibleRes.data.dineroDisponible);
-        })
-        .catch(err => console.error('Error fetching updated info:', err));
+          .then(([asignacionesRes, disponibleRes]) => {
+            setAsignaciones(asignacionesRes.data);
+            setDineroDisponible(disponibleRes.data.dineroDisponible);
+          })
+          .catch(err => console.error('Error fetching updated info:', err));
 
         setProgramaSeleccionado('');
         setCantidad('');
         setSuccessMessage('Asignación realizada exitosamente.');
       })
       .catch(err => {
-        if (err.response && err.response.status === 400) {
-          setErrorPrograma(err.response.data.message);
+        if (err.response) {
+          if (err.response.status === 400) {
+            setMessage('El programa ya tiene un presupuesto asignado.');
+          } else {
+            setMessage('Error al asignar presupueto.');
+          }
         } else {
-          console.error('Error assigning budget:', err);
+          setMessage('Error del servidor. Inténtalo de nuevo.');
         }
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       });
   };
 
@@ -133,7 +128,11 @@ const AsignacionesPresupuesto_Pro = () => {
         setIsDeleteConfirmOpen(false);
         setSuccessMessage('Asignación eliminada exitosamente.');
       })
-      .catch(err => console.error('Error deleting assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al eliminar la asignación.');
+        setOpenSnackbar(true);
+      });
   };
 
   const handleEditar = (asignacion) => {
@@ -147,11 +146,16 @@ const AsignacionesPresupuesto_Pro = () => {
     let isValid = true;
     setErrorCantidad('');
 
+    // Validación de la cantidad editada
     if (!editCantidad || editCantidad <= 0) {
-      setErrorCantidad('La cantidad debe ser mayor que 0.');
+      setMessage('La cantidad debe ser mayor que 0.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true); // Abrir Snackbar solo si hay error
       isValid = false;
     } else if (editCantidad > dineroDisponible) {
-      setErrorCantidad('La cantidad no puede ser mayor que el dinero disponible.');
+      setMessage('La cantidad no puede ser mayor que el dinero disponible.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true); // Abrir Snackbar solo si hay error
       isValid = false;
     }
 
@@ -164,15 +168,25 @@ const AsignacionesPresupuesto_Pro = () => {
 
     axios.put(`http://localhost:5000/asigPresProg/asignacion/${currentEditAsignacion.id}`, updatedAsignacion)
       .then(() => {
-        setAsignaciones(asignaciones.map(asignacion =>
-          asignacion.id === currentEditAsignacion.id
-            ? { ...asignacion, presupuesto: editCantidad }
-            : asignacion
-        ));
+        Promise.all([
+          axios.get('http://localhost:5000/asigPresProg/asignaciones'),
+          axios.get('http://localhost:5000/asigPresProg/disponible')
+        ])
+          .then(([asignacionesRes, disponibleRes]) => {
+            setAsignaciones(asignacionesRes.data);
+            setDineroDisponible(disponibleRes.data.dineroDisponible);
+          })
+          .catch(err => console.error('Error fetching updated info:', err));
+
         setEditModalOpen(false);
         setSuccessMessage('Asignación actualizada exitosamente.');
       })
-      .catch(err => console.error('Error editing assignment:', err));
+      .catch(err => {
+        setSnackbarSeverity('error');
+        setMessage('Error al editar la asignación.');
+        setOpenSnackbar(true);
+      });
+
   };
 
   return (
@@ -225,7 +239,6 @@ const AsignacionesPresupuesto_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
-              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -243,13 +256,12 @@ const AsignacionesPresupuesto_Pro = () => {
                   style: { color: 'black' },
                 }}
               />
-              {errorCantidad && <span style={{ color: 'red' }}>{errorCantidad}</span>}
             </Grid>
           </Grid>
 
           <div className="mt-6 flex justify-end">
             <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleAsignar}>
-              <FaPlus /> 
+              <FaPlus />
             </motion.button>
           </div>
 
@@ -283,16 +295,16 @@ const AsignacionesPresupuesto_Pro = () => {
 
           <AnimatePresence>
             {editModalOpen && (
-              <motion.div 
-                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <motion.div 
-                  className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" 
-                  initial={{ y: '-100vh' }} 
-                  animate={{ y: '0' }} 
+                <motion.div
+                  className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+                  initial={{ y: '-100vh' }}
+                  animate={{ y: '0' }}
                   exit={{ y: '-100vh' }}
                 >
                   <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
@@ -314,20 +326,19 @@ const AsignacionesPresupuesto_Pro = () => {
                       inputProps={{ style: { color: 'white' } }}
                       sx={{ backgroundColor: '#2D3748', borderRadius: '5px' }}
                     />
-                    {errorCantidad && <span className="text-red-500">{errorCantidad}</span>}
                   </DialogContent>
-                  <div className="flex justify-between mt-4"> 
-                  <motion.button 
-                      className="bg-blue-500 text-white px-4 py-2 rounded" 
-                      whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }} 
+                  <div className="flex justify-between mt-4">
+                    <motion.button
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={handleGuardarEdicion}
                     >
                       Guardar
                     </motion.button>
-                    <motion.button 
-                      className="bg-gray-500 text-white px-4 py-2 rounded" 
-                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }} 
+                    <motion.button
+                      className="bg-gray-500 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setEditModalOpen(false)}
                     >
@@ -345,18 +356,18 @@ const AsignacionesPresupuesto_Pro = () => {
               <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
             </DialogContent>
             <DialogActions>
-              <motion.button 
-                className="bg-gray-500 text-white px-4 py-2 rounded-full" 
+              <motion.button
+                className="bg-gray-500 text-white px-4 py-2 rounded-full"
                 whileHover={{ scale: 1.1 }}
-                whileTap={{scale: 0.9}}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setIsDeleteConfirmOpen(false)}
               >
                 Cancelar
               </motion.button>
-              <motion.button 
-                className="bg-red-500 text-white px-4 py-2 rounded-full" 
-                whileHover={{ scale: 1.1 }} 
-                whileTap={{scale: 0.9}}
+              <motion.button
+                className="bg-red-500 text-white px-4 py-2 rounded-full"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={confirmDelete}
               >
                 Eliminar
@@ -366,14 +377,14 @@ const AsignacionesPresupuesto_Pro = () => {
 
           <AnimatePresence>
             {successMessage && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2, ease: "easeIn" }}
                 className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
               >
-                <motion.div 
+                <motion.div
                   initial={{ y: -50 }}
                   animate={{ y: 0 }}
                   exit={{ y: 50 }}
@@ -399,7 +410,7 @@ const AsignacionesPresupuesto_Pro = () => {
                         alignItems: 'center'
                       }}
                     >
-                      <FaCheck size={50} className="text-white"/>
+                      <FaCheck size={50} className="text-white" />
                     </motion.div>
                   </div>
                 </motion.div>
@@ -408,6 +419,16 @@ const AsignacionesPresupuesto_Pro = () => {
           </AnimatePresence>
         </CardContent>
       </Card>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };

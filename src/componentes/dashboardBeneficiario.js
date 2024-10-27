@@ -15,12 +15,12 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import MisProgramas from './componentesBeneficiario/MisProgramas';
 import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesDonador/VerFeedback';
+import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
 
 
 
@@ -117,7 +117,7 @@ function DemoPageContent({ pathname }) {
     >
     
     {pathname === '/configuracion-perfil' && <PerfilUsuario />}
-    {pathname === '/programas/disponibles' && <TarjetasProgramas />}
+    {pathname === '/programas/disponibles' && <ProgramasActivos />}
     {pathname === '/programas/actuales' && <MisProgramas />}
     {pathname === '/ayuda' && <AyudaRecibida />}
     {pathname === '/comunicacion/feedback' && <Calificar />}
