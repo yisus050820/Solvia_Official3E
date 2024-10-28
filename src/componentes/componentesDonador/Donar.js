@@ -1,234 +1,460 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, TextField
+  Card, CardContent, Typography, Grid, TextField, Button, RadioGroup, FormControlLabel, Radio, Snackbar, Alert
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import jsPDF from 'jspdf';
+
+const stripePromise = loadStripe('pk_test_wk6O7Cc5k3McBIG2Hut2irGs');
 
 const Donar = () => {
   const [cantidad, setCantidad] = useState('');
-  const [donaciones, setDonaciones] = useState([]);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [step, setStep] = useState(1);
+  const [metodoPago, setMetodoPago] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [formData, setFormData] = useState({
+    nombre: '',
+    direccion: '',
+    ciudad: '',
+    codigoPostal: '',
+    pais: '',
+  });
+  const [message, setMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
 
+  const stripe = useStripe();
+  const elements = useElements();
 
-  const handleDonar = () => {
-    if (cantidad > 0) {
-      const nuevaDonacion = {
-        id: donaciones.length + 1, // Generar un ID simple
-        cantidad: Number(cantidad).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
-        fecha: new Date().toISOString().split('T')[0] // Fecha en formato YYYY-MM-DD
-      };
-      setDonaciones([...donaciones, nuevaDonacion]);
-      setCantidad('');
-      setSuccessMessage('Donacion hecha exitosamente.'); // Mostrar mensaje de éxito
+  // Función para cerrar el Snackbar
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
+  // Función para validar el formulario
+  const validateForm = () => {
+    const { nombre, direccion, ciudad, codigoPostal, pais } = formData;
+
+    if (!nombre || !direccion || !ciudad || !codigoPostal || !pais || !cantidad || !metodoPago) {
+      setMessage('Por favor, complete todos los campos.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return false;
+    }
+
+    if (isNaN(cantidad) || cantidad <= 0) {
+      setMessage('Por favor, ingrese una cantidad válida.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  // Función para generar el PDF de la donación con el formato exacto
+  const generarFacturaPDF = () => {
+    const { nombre, direccion, ciudad, codigoPostal, pais } = formData;
+    const subtotal = Number(cantidad);
+    const iva = subtotal * 0.16; // IVA del 16%
+    const total = subtotal + iva;
+
+    const doc = new jsPDF();
+
+    // Encabezado del recibo
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Comprobante de donación', 20, 20);
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Número de orden: #1234567', 20, 30);
+    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, 20, 36);
+
+    // Línea de separación
+    doc.line(20, 40, 190, 40);
+
+    // Información del cliente y vendedor
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cliente', 20, 50);
+    doc.text('Nosotros', 130, 50);
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    // Información del cliente
+    doc.text(`${nombre}`, 20, 58);
+    doc.text(`${direccion}`, 20, 64);
+    doc.text(`${ciudad}, ${codigoPostal}`, 20, 70);
+
+    // Información del vendedor
+    doc.text('SOLVIA ONG', 130, 58);
+    doc.text('Manzanillo, Col. El naranjo', 130, 64);
+    doc.text('solviacorp@gmail.com', 130, 70);
+
+    // Línea de separación para la tabla
+    doc.line(20, 80, 190, 80);
+
+    // Tabla de descripción, cantidad y precio
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Descripción', 25, 88);
+    doc.text('Cantidad', 100, 88);
+    doc.text('Precio', 160, 88);
+
+    // Valores de la tabla
+    doc.setFont('helvetica', 'normal');
+    doc.text('Donación para Solvia', 25, 96);
+    doc.text('1', 110, 96);
+    doc.text(`${Number(cantidad).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`, 160, 96);
+
+    // Línea de separación debajo de la tabla
+    doc.line(20, 102, 190, 102);
+
+    // Totales: Subtotal, IVA y Total
+    doc.setFontSize(12);
+    doc.text(`Subtotal: ${subtotal.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`, 140, 110);
+    doc.text(`IVA (16%): ${iva.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`, 140, 116);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total: ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`, 140, 122);
+
+    // Firma simulada y agradecimiento
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(20, 150, 80, 150); // Línea de firma
+    doc.setFont('helvetica', 'normal');
+    doc.text('Firma', 20, 160);
+
+    doc.setFontSize(16);
+    doc.setTextColor(255, 165, 0);
+    doc.text('¡Gracias!', 160, 160);
+
+    // Guardar el documento
+    doc.save('Comprobante_Donacion.pdf');
+  };
+
+  // Función para manejar el envío del pago
+  const handleDonar = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const cardElement = elements.getElement(CardElement);
+
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+    });
+
+    if (error) {
+      console.error(error);
+      setMessage('Error procesando el pago.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    } else {
+      console.log('Pago exitoso!', paymentMethod);
+      generarFacturaPDF();
+      setSuccessMessage('Donación hecha exitosamente.');
+
+      setTimeout(() => {
+        setSuccessMessage('');
+        setStep(1);
+      }, 2000);
     }
   };
 
-      // Variantes de animación para la palomita
-  const checkmarkVariants = {
-    hidden: { opacity: 0, pathLength: 0 },
-    visible: { opacity: 1, pathLength: 1 },
-  };
-
-  const handleEliminar = (id) => {
-    setIsDeleteConfirmOpen(true);
-    setCurrentId(id);
-  };
-
-  const confirmDelete = () => {
-    setDonaciones(donaciones.filter(donacion => donacion.id !== currentId));
-    setIsDeleteConfirmOpen(false);
-    setSuccessMessage('Donacion eliminada exitosamente.'); // Mostrar mensaje de éxito
-  };
-
-  const buttonVariants = {
-    hover: { scale: 1.1, transition: { duration: 0.3 } },
-    tap: { scale: 0.9, transition: { duration: 0.2 } },
-  };
-
-    //Alerta se cierra automaticamente despues de 5 segundos
-    useEffect(() => {
-      if (successMessage) {
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-  
-      }
-    }, [successMessage]);
-
   return (
-    <motion.div
-      className="max-w-6xl mx-auto mt-2"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-    <Typography variant="h3" align="center" color="primary" gutterBottom>
-      Donar
-    </Typography>
+    <motion.div className="max-w-6xl mx-auto mt-2">
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
+        Donar
+      </Typography>
+
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
-          <Typography variant="h4" color="white" gutterBottom>
-            Donar Cantidad
-          </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Cantidad a Donar (MXN)"
-                value={cantidad}
-                onChange={(e) => setCantidad(e.target.value)}
-                type="number"
-                sx={{
-                  backgroundColor: '#fff',
-                  borderRadius: '5px',
-                  '& .MuiInputBase-input': { color: 'black' },
-                  '& .MuiInputLabel-root': { color: 'black' },
-                }}
-              />
+          {step === 1 && (
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h4" color="white" gutterBottom>
+                  Selecciona el método de pago
+                </Typography>
+                <RadioGroup value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)}>
+                  <FormControlLabel value="credito" control={<Radio />} label="Tarjeta de Crédito" />
+                  <FormControlLabel value="debito" control={<Radio />} label="Tarjeta de Débito" />
+                </RadioGroup>
+                <TextField
+                  fullWidth
+                  label="Cantidad a Donar (MXN)"
+                  value={cantidad}
+                  onChange={(e) => setCantidad(e.target.value)}
+                  type="number"
+                  sx={{
+                    backgroundColor: '#fff',
+                    borderRadius: '5px',
+                    '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                    '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: '#000', // Color del borde
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#000', // Borde al hacer hover
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#000', // Borde cuando está enfocado
+                      },
+                    },
+                    '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    marginTop: '20px',
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setStep(2)}
+                  disabled={!metodoPago || !cantidad}
+                  sx={{ mt: 2 }}
+                >
+                  Siguiente
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-          <div className="mt-6 flex justify-end">
-            <motion.button
-              className="bg-green-500 text-white px-4 py-2 rounded-full"
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-              onClick={handleDonar}
-            >
-              <FaPlus />
-            </motion.button>
-          </div>
+          )}
 
-          {/* Tabla de Donaciones */}
-          <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
-            <Table>
-              <TableHead sx={{ backgroundColor: '#4a5568' }}>
-                <TableRow>
-                  <TableCell sx={{ color: '#fff' }}>ID</TableCell>
-                  <TableCell sx={{ color: '#fff' }}>Cantidad</TableCell>
-                  <TableCell sx={{ color: '#fff' }}>Fecha</TableCell>
-                  <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <AnimatePresence>
-                  {donaciones.map((donacion) => (
-                    <motion.tr
-                      key={donacion.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.5 }}
-                      style={{ borderBottom: '1px solid #4a5568' }}
-                    >
-                      <TableCell sx={{ color: '#fff' }}>{donacion.id}</TableCell>
-                      <TableCell sx={{ color: '#fff' }}>{donacion.cantidad}</TableCell>
-                      <TableCell sx={{ color: '#fff' }}>{donacion.fecha}</TableCell>
-                      <TableCell sx={{ color: '#fff' }}>
-                        <motion.button
-                          className="bg-red-500 text-white px-4 py-2 rounded-full"
-                          variants={buttonVariants}
-                          whileHover="hover"
-                          whileTap="tap"
-                          onClick={() => handleEliminar(donacion.id)}
-                        >
-                          <FaTrashAlt />
-                        </motion.button>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {step === 2 && (
+            <form onSubmit={handleDonar}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography variant="h4" color="white" gutterBottom>
+                    Ingresa los datos de tu tarjeta
+                  </Typography>
+
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          color: '#fff',
+                          fontSize: '16px',
+                          '::placeholder': { color: '#87bbfd' },
+                        },
+                        invalid: { color: '#ff6b6b' },
+                      },
+                    }}
+                  />
+
+                  {/* Campo de nombre del titular */}
+                  <TextField
+                    fullWidth
+                    label="Nombre del Titular"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                    sx={{
+                      backgroundColor: '#fff',
+                      borderRadius: '5px',
+                      marginTop: '20px',
+                      '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                      '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#000', // Color del borde
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#000', // Borde al hacer hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#000', // Borde cuando está enfocado
+                        },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Dirección"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
+                    sx={{
+                      backgroundColor: '#fff',
+                      borderRadius: '5px',
+                      marginTop: '20px',
+                      '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                      '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#000', // Color del borde
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#000', // Borde al hacer hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#000', // Borde cuando está enfocado
+                        },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Ciudad"
+                    name="ciudad"
+                    value={formData.ciudad}
+                    onChange={(e) => setFormData({ ...formData, ciudad: e.target.value })}
+                    sx={{
+                      backgroundColor: '#fff',
+                      borderRadius: '5px',
+                      marginTop: '20px',
+                      '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                      '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#000', // Color del borde
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#000', // Borde al hacer hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#000', // Borde cuando está enfocado
+                        },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Código Postal"
+                    name="codigoPostal"
+                    value={formData.codigoPostal}
+                    onChange={(e) => setFormData({ ...formData, codigoPostal: e.target.value })}
+                    sx={{
+                      backgroundColor: '#fff',
+                      borderRadius: '5px',
+                      marginTop: '20px',
+                      '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                      '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#000', // Color del borde
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#000', // Borde al hacer hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#000', // Borde cuando está enfocado
+                        },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label="País"
+                    name="pais"
+                    value={formData.pais}
+                    onChange={(e) => setFormData({ ...formData, pais: e.target.value })}
+                    sx={{
+                      backgroundColor: '#fff',
+                      borderRadius: '5px',
+                      marginTop: '20px',
+                      '& .MuiInputBase-input': { color: 'black' }, // Texto ingresado en negro
+                      '& .MuiInputLabel-root': { color: 'black' }, // Etiqueta en negro
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#000', // Color del borde
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#000', // Borde al hacer hover
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#000', // Borde cuando está enfocado
+                        },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'black' }, // Placeholder en negro
+                    }}
+                  />
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}
+                    disabled={!stripe}
+                  >
+                    Pagar
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          )}
         </CardContent>
       </Card>
 
-      {/* Ventana emergente de confirmación de eliminación */}
-      <Dialog
-        open={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta donación?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Esta acción no se puede deshacer. ¿Deseas continuar?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <motion.button
-            className="bg-gray-500 text-white px-4 py-2 rounded-full"
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
-            onClick={() => setIsDeleteConfirmOpen(false)}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: 'easeIn' }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           >
-            Cancelar
-          </motion.button>
-          <motion.button
-            className="bg-red-500 text-white px-4 py-2 rounded-full"
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
-            onClick={confirmDelete}
-          >
-            Eliminar
-          </motion.button>
-        </DialogActions>
-      </Dialog>
-       {/* Modal para mensajes de éxito */}
-       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+              className="bg-gray-800 p-6 rounded-xl shadow-lg"
             >
-              <FaCheck size={50} className="text-white"/>
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <motion.div
+                className="flex justify-center items-center"
+                style={{
+                  borderRadius: '50%',
+                  backgroundColor: '#4CAF50',
+                  width: '80px',
+                  height: '80px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <FaCheck size={50} className="text-white" />
+              </motion.div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      {/* Snackbar para mostrar mensajes de error */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </motion.div>
-    
   );
 };
 
-export default Donar;
+const DonarConStripe = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <Donar />
+    </Elements>
+  );
+};
+
+export default DonarConStripe;
