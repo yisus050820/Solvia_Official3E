@@ -10,6 +10,7 @@ import DashboardBeneficiario from './componentes/dashboardBeneficiario';
 import LandingPage from './componentes/index';
 import ResetPassword from './componentes/ResetPassword';
 import DashboardVoluntario from './componentes/dashboardVoluntario';
+import TeacherDashboard from './componentes/componentesVol/InterfazVoluntario';
 
 
 
@@ -64,7 +65,7 @@ function App() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<TeacherDashboard />} />
         <Route path="/register" element={<Registro />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/Admin" element={<DashboardAdmin />} />
