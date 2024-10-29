@@ -66,7 +66,7 @@ const initialTasks = [
 ];
 
 const users = [
-  { id: 1, name: "Ana García", role: "student" },
+  { id: 1, name: "Ana García", role: "student"  },
   { id: 2, name: "Carlos Rodríguez", role: "student" },
   { id: 3, name: "María López", role: "student" },
   { id: 4, name: "Juan Martínez", role: "student" },
