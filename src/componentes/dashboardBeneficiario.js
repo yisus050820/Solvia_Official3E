@@ -19,7 +19,7 @@ import MisProgramas from './componentesBeneficiario/MisProgramas';
 import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
-import VerFeedback from './componentesDonador/VerFeedback';
+import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
 
 
@@ -71,12 +71,12 @@ const NAVIGATION = [
       },
       {
         segment: 'feedback', // Nuevo hijo "Feedback"
-        title: 'Feedback',
+        title: 'Dar feedback',
         icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
       },
       {
         segment: 'ver-feedback',
-        title: 'Ver feedback de programas',
+        title: 'Ver feedback',
         icon: <Feedback />,
       },
     ],

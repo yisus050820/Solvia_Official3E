@@ -24,12 +24,17 @@ const upload = multer({ storage });
 
 // Endpoint de registro
 router.post('/', upload.single('profile_picture'), (req, res) => {
-  const { name, email, password, role, description } = req.body;
+  let { name, email, birth_date, password, role, description } = req.body;
+  console.log(req.body);
+
+  // Convertir birth_date a formato YYYY-MM-DD
+  birth_date = new Date(birth_date).toISOString().slice(0, 10);
 
   // Verificar si todos los campos están completos
   const missingFields = [];
   if (!name) missingFields.push('Nombre');
   if (!email) missingFields.push('Correo Electrónico');
+  if (!birth_date) missingFields.push('Fecha de nacimiento');
   if (!password) missingFields.push('Contraseña');
   if (!role) missingFields.push('Rol');
   if (!description) missingFields.push('Descripción');
@@ -47,8 +52,8 @@ router.post('/', upload.single('profile_picture'), (req, res) => {
 
   // Insertar el usuario en la base de datos
   db.query(
-    'INSERT INTO users (name, email, password, role, profile_picture, description) VALUES (?, ?, ?, ?, ?, ?)',
-    [name, email, hashedPassword, role, profilePicture, description],
+    'INSERT INTO users (name, email, birth_date, password, role, profile_picture, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [name, email, birth_date, hashedPassword, role, profilePicture, description],
     (err, result) => {
       if (err) {
         console.error('Error al registrar usuario:', err);

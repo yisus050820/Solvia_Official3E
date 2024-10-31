@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -13,7 +15,7 @@ const CrudUsuarios = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
+  const [newUser, setNewUser] = useState({ name: '', email: '', birth_date: null, role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
   const [editUser, setEditUser] = useState(null);
   const [originalUser, setOriginalUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -75,13 +77,26 @@ const CrudUsuarios = () => {
     return regex.test(email);
   };
 
+  const calculateAge = (birthdate) => {
+    const diffMs = Date.now() - new Date(birthdate).getTime();
+    const ageDate = new Date(diffMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  };
+
   const validateUser = (user, originalUser = {}, isEditing = false) => {
     const validationErrors = {};
+    const age = user.birth_date ? calculateAge(user.birth_date) : 0;
 
     if (!isEditing || (isEditing && user.email && user.email !== originalUser.email)) {
       if (!isValidEmail(user.email)) {
         validationErrors.email = 'El correo que ingresó no es válido, por favor ingrese un correo válido.';
       }
+    }
+
+    if ( !isEditing && (user.role === 'beneficiary' && age < 9)) {
+      validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
+    } else if (user.role !== 'beneficiary' && age < 18) {
+      validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
     }
 
     if (!isEditing || (isEditing && user.password && user.password.trim() !== "")) {
@@ -98,7 +113,7 @@ const CrudUsuarios = () => {
   };
 
   const handleAddUser = () => {
-    const { name, email, password, description, role, profile_picture } = newUser;
+    const { name, email, password, description, role, birth_date, profile_picture } = newUser;
 
     const missingFields = [];
     if (!name) missingFields.push('Nombre');
@@ -106,6 +121,7 @@ const CrudUsuarios = () => {
     if (!password) missingFields.push('Contraseña');
     if (!description) missingFields.push('Descripción');
     if (!role) missingFields.push('Rol');
+    if (!birth_date) missingFields.push('Fecha de Nacimiento');
     if (!profile_picture) missingFields.push('Foto de Perfil');
 
     if (missingFields.length > 0) {
@@ -116,33 +132,23 @@ const CrudUsuarios = () => {
     }
 
     const validationErrors = validateUser(newUser, {}, false);
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
-
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
 
-    const userData = {
-      name,
-      email,
-      role,
-      description,
-      password,
-      profile_picture: profile_picture || defaultProfilePicture,
-    };
+    const userData = { name, email, birth_date, role, description, password, profile_picture: profile_picture || defaultProfilePicture };
 
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
         const createdUser = response.data;
         setData([...data, createdUser]);
         handleCloseModal();
-        setSuccessMessage('Usuario agregado exitosamente.'); // Mostrar mensaje de éxito
+        setSuccessMessage('Usuario agregado exitosamente.');
       })
       .catch(error => {
         if (error.response && error.response.status === 409) {
@@ -190,7 +196,7 @@ const CrudUsuarios = () => {
           });
         handleCloseEditModal();
         setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
-    })
+      })
       .catch(error => {
         setMessage(`Error al actualizar usuario, intente más tarde.`);
         setSnackbarSeverity('error');
@@ -293,14 +299,14 @@ const CrudUsuarios = () => {
           </div>
           <div className="flex justify-end mb-4 space-x-4">
 
-          <motion.button
-            className="bg-green-500 text-white p-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleOpenModal}
-          >
-            <FaPlus />
-          </motion.button>
+            <motion.button
+              className="bg-green-500 text-white p-2 rounded-full"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleOpenModal}
+            >
+              <FaPlus />
+            </motion.button>
           </div>
         </div>
 
@@ -331,6 +337,9 @@ const CrudUsuarios = () => {
                 <Typography variant="body2" gutterBottom className="flex justify-center">
                   {item.email}
                 </Typography>
+                <Typography variant="body2" gutterBottom className="flex justify-center">
+                  {item.birth_date}
+                </Typography>
                 <Typography variant="body2" className="flex justify-center">
                   {truncateDescription(item.description)}
                 </Typography>
@@ -343,6 +352,7 @@ const CrudUsuarios = () => {
               <tr>
                 <th className="p-4">Nombre</th>
                 <th className="p-4">Correo</th>
+                <th className="p-4">Fechad de nacimiento</th>
                 <th className="p-4">Rol</th>
                 <th className="p-4">Descripción</th>
                 <th className="p-4">Fecha Creación</th>
@@ -354,6 +364,7 @@ const CrudUsuarios = () => {
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{item.email}</td>
+                  <td className="p-4">{item.birth_date}</td>
                   <td className="p-4">{item.role}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">{item.created_at}</td>
@@ -385,17 +396,17 @@ const CrudUsuarios = () => {
       {/* Modal para añadir usuario */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <motion.div 
-            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
             >
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
@@ -412,6 +423,13 @@ const CrudUsuarios = () => {
                   placeholder="Correo"
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                />
+                <DatePicker
+                  selected={newUser.birth_date}
+                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Fecha de nacimiento"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -448,18 +466,18 @@ const CrudUsuarios = () => {
                 </div>
               </div>
               <div className="mt-4 flex justify-between">
-                <motion.button 
-                className="bg-green-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#38a169',scale: 1.1 }}
-                whileTap={{scale: 0.9}}
-                onClick={handleAddUser}>
+                <motion.button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleAddUser}>
                   Agregar
-                  </motion.button>
-                  <motion.button 
-                className="bg-gray-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleCloseModal} 
+                </motion.button>
+                <motion.button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCloseModal}
                 >
                   Cancelar
                 </motion.button>
@@ -472,17 +490,17 @@ const CrudUsuarios = () => {
       {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
-          <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
-            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
             >
               <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
@@ -537,7 +555,7 @@ const CrudUsuarios = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2',scale: 1.1 }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditUser}
                 >
@@ -546,7 +564,7 @@ const CrudUsuarios = () => {
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }} 
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -605,46 +623,46 @@ const CrudUsuarios = () => {
 
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
       </AnimatePresence>
 
     </>

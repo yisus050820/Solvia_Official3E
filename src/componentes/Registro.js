@@ -4,10 +4,13 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { motion } from 'framer-motion';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Registro = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [birthdate, setBirthDate] = useState(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState(''); 
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +45,12 @@ const Registro = () => {
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const calculateAge = (birthdate) => {
+    const diffMs = Date.now() - new Date(birthdate).getTime();
+    const ageDate = new Date(diffMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +90,20 @@ const Registro = () => {
       return;
     }
 
+    const age = birthdate ? calculateAge(birthdate) : 0;
+    
+    if (role === 'beneficiary' && age < 9) {
+      setMessage('El beneficiario debe tener al menos 9 años.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    } else if (role !== 'beneficiary' && age < 18) {
+      setMessage('Los usuarios deben tener al menos 18 años.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
     // Validación de coincidencia de contraseñas
     if (password !== confirmPassword) {
       setMessage('Las contraseñas no coinciden.');
@@ -97,6 +120,7 @@ const Registro = () => {
     formData.append('role', role);
     formData.append('description', description);
     formData.append('profile_picture', profilePicture);
+    formData.append('birth_date', birthdate)
 
     try {
       const response = await axios.post('http://localhost:5000/register', formData, {
@@ -143,6 +167,13 @@ const Registro = () => {
             <TextField margin="normal" fullWidth label="Correo Electrónico" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#ffffff' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
             <TextField margin="normal" fullWidth label="Contraseña" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#ffffff' }, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: '#b0b0b0' }}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton></InputAdornment>), sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
             <TextField margin="normal" fullWidth label="Confirmar Contraseña" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#ffffff' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
+            <DatePicker
+              selected={birthdate}
+              onChange={(date) => setBirthDate(date)}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Fecha de nacimiento"
+              className="w-full p-2 border border-gray-300 rounded bg-gray text-black"
+            />
             <FormControl fullWidth margin="normal" required>
               <InputLabel sx={{ color: '#b0b0b0' }}>Rol</InputLabel>
               <Select value={role} onChange={(e) => setRole(e.target.value)} label="Rol" sx={{ color: '#ffffff', borderRadius: '12px', '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } }}>

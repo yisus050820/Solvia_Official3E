@@ -31,6 +31,7 @@ const asigPresProgRoutes = require('./Admin/aignacionesPresupuesto_Prog');
 const asigVolProgRoutes = require('./Admin/asignacionesVol_Prog');
 const perfilRoutes = require('./Admin/perfil');
 const programsRoutes = require('./Coordi/programs');
+const feedbackRoutes = require('./Beneficiary/feedback');
 
 // Usar las rutas
 app.use('/usuarios', userRoutes);
@@ -46,6 +47,8 @@ app.use('/asigPresProg', asigPresProgRoutes);
 app.use('/asigVolProg', asigVolProgRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/programs', programsRoutes);
+app.use('/feedback', feedbackRoutes);
+
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

@@ -21,7 +21,7 @@ function authenticateToken(req, res, next) {
 // Obtener todos los usuarios
 router.get('/', (req, res) => {
   const { role } = req.query;
-  let query = 'SELECT id, name, email, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users';
+  let query = 'SELECT id, name, email, DATE_FORMAT(birth_date, "%Y-%m-%d") AS birth_date , role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users';
   
   if (role) {
     query += ' WHERE role = ?';
@@ -51,13 +51,17 @@ router.get('/coordinadores', (req, res) => {
 
 // Crear usuario 
 router.post('/', (req, res) => {
-  const { name, email, password, role, description, profile_picture } = req.body;
+  let { name, email, birth_date: raw_birth_date, password, role, description, profile_picture } = req.body;
+
+  // Convertir birth_date a formato YYYY-MM-DD
+  const birth_date = new Date(raw_birth_date).toISOString().slice(0, 10);
+
   const profilePicture = profile_picture || 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
   const hashedPassword = bcrypt.hashSync(password, 8);
 
   db.query(
-    'INSERT INTO users (name, email, password, role, profile_picture, description) VALUES (?, ?, ?, ?, ?, ?)',
-    [name, email, hashedPassword, role, profilePicture, description],
+    'INSERT INTO users (name, email, birth_date, password, role, profile_picture, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [name, email, birth_date, hashedPassword, role, profilePicture, description],
     (err, result) => {
       if (err) {
         console.error('Error inserting user:', err);
@@ -65,7 +69,7 @@ router.post('/', (req, res) => {
       }
 
       const newUserId = result.insertId;
-      db.query('SELECT id, name, email, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users WHERE id = ?', [newUserId], (err, newUser) => {
+      db.query('SELECT id, name, email, DATE_FORMAT(birth_date, "%Y-%m-%d") AS birth_date, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users WHERE id = ?', [newUserId], (err, newUser) => {
         if (err) {
           console.error('Error fetching newly created user:', err);
           return res.status(500).json({ message: 'Error al recuperar el usuario recién creado.' });
