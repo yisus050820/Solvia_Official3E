@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';  // Importando Typography para el título
-import StudentDashboard from './InterfazBeneficiario';
+import TeacherDashboard from './InterfazVoluntario';
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,7 +88,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
             >
               <h2 className="text-white text-3xl font-bold mb-4">{title}</h2>
               {isDashboard ? (
-                <StudentDashboard /> // Muestra el componente StudentDashboard en el modal
+                <TeacherDashboard /> // Muestra el componente StudentDashboard en el modal
               ) : (
                 <p className="text-gray-600">{description}</p> // Descripción completa
               )}
@@ -108,7 +108,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   );
 };
 
-const MisProgramas  = () => {
+const MisProgramasVol  = () => {
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
@@ -162,4 +162,4 @@ const MisProgramas  = () => {
   );
 };
 
-export default MisProgramas;
+export default MisProgramasVol;
