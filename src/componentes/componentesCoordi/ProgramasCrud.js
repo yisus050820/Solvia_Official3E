@@ -567,13 +567,18 @@ const CrudProgramas = () => {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+        className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
         initial={{ y: "-100vh" }}
         animate={{ y: "0" }}
         exit={{ y: "-100vh" }}
       >
-        <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
-        <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+        <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
+        <img 
+          className="w-full h-48 object-cover shadow-md rounded"
+          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+        />
+        <p className="text-gray-400 mt-4">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
         <div className="mt-2">
           <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
         </div>
