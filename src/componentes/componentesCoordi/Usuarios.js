@@ -100,10 +100,10 @@ const CrudUsuariosCoordi = () => {
                 transition={{ duration: 0.5 }}
               >
                 <div className="flex justify-center items-center">
-                  <img
-                    src={item.profile_picture || 'https://via.placeholder.com/150'}
+                <img
+                    src={`http://localhost:5000${item.profile_picture}`}
                     alt={item.name}
-                    className="flex h-32 object-cover rounded-full mb-4 justify-center"
+                    className="h-32 w-32 object-cover rounded-full mb-4"
                   />
                 </div>
                 <Typography variant="h5" gutterBottom className="flex justify-center">
@@ -118,23 +118,6 @@ const CrudUsuariosCoordi = () => {
                 <Typography variant="body2" className="flex justify-center">
                   {item.description}
                 </Typography>
-                <Typography variant="body2" className="flex justify-center">
-                  <br />
-                  Programas inscritos:
-                </Typography>
-                <ul className="list-disc list-inside">
-                  {programasInscritos[item.id] && programasInscritos[item.id].length > 0 ? (
-                    programasInscritos[item.id].map((programa, index) => (
-                      <Typography variant="body2" key={programa} className="flex justify-center">
-                        <li>{programa}</li>
-                      </Typography>
-                    ))
-                  ) : (
-                    <Typography variant="body2" className="flex justify-center">
-                      No inscrito en ningún programa
-                    </Typography>
-                  )}
-                </ul>
               </motion.div>
             ))}
           </div>

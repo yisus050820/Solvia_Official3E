@@ -321,7 +321,7 @@ const CrudUsuarios = () => {
                   <img
                     src={`http://localhost:5000${item.profile_picture}` || defaultProfilePicture}
                     alt={item.name}
-                    className="flex h-32 object-cover rounded-full mb-4 justify-center"
+                    className="h-32 w-32 object-cover rounded-full mb-4"
                   />
                 </div>
                 <Typography variant="h5" gutterBottom className="flex justify-center">
