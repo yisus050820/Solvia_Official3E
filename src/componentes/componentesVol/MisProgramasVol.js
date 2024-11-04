@@ -1,68 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { Typography } from '@mui/material';  // Importando Typography para el título
+import { Typography } from '@mui/material';
 import TeacherDashboard from './InterfazVoluntario';
 
-const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
+// Componente para mostrar una tarjeta de programa
+const ProgramCard = ({ title, description, participants, donations, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDashboard, setIsDashboard] = useState(false); // Nuevo estado para manejar el tipo de contenido en el modal
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const handleOpenModal = (showDashboard = false) => {
-    setIsDashboard(showDashboard); // Cambia a verdadero si es "Gestionar"
+    setShowDashboard(showDashboard);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIsDashboard(false); // Reinicia el estado al cerrar
   };
 
   return (
     <>
-      {/* Tarjeta del programa */}
       <motion.div 
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"  // Reducido el margen de m-4 a m-2
-        whileHover={{ scale: 1.05 }} 
-        whileTap={{ scale: 0.95 }}   
+        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
           src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
-        {/* Contenido principal de la tarjeta */}
         <div className="p-4">
           <h2 className="text-white text-xl font-bold">{title}</h2>
-          {/* Estado del programa con un círculo de color */}
-          <div className="flex items-center mt-2">
-          </div>
-          {/* Limitar la descripción a un máximo de 100 caracteres */}
           <p className="text-gray-400 mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
-          {/* Participantes */}
           <div className="mt-4">
             <span className="text-green-400">Participantes: {participants}</span>
           </div>
-          {/* Donaciones */}
           <div className="mt-2">
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
-            {/* Botón para abrir la ventana emergente */}
-            <motion.button 
+            <motion.button
+              className="bg-red-700 text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#b22222' }}
+            >
+              Salir
+            </motion.button>
+            <motion.button
               className="bg-gray-700 text-white px-4 py-2 rounded"
               whileHover={{ backgroundColor: '#636363' }}
-              onClick={() => handleOpenModal(false)} // Abre el modal con información
+              onClick={() => handleOpenModal(false)}
             >
               Más info
             </motion.button>
-            <motion.button 
+            <motion.button
               className="bg-gray-700 text-white px-4 py-2 rounded"
               whileHover={{ backgroundColor: '#636363' }}
-              onClick={() => handleOpenModal(true)} // Abre el modal para gestionar
+              onClick={() => setShowDashboard(true)}
             >
               Gestionar
             </motion.button>
@@ -70,30 +66,36 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
         </div>
       </motion.div>
 
-      {/* Ventana emergente */}
+      {showDashboard && (
+        <div className="relative">
+          <TeacherDashboard />
+          <motion.button
+            className="bg-red-600 text-white px-4 py-2 rounded mt-4 transition duration-300 hover:bg-red-500 font-bold shadow-md block mx-auto"
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setShowDashboard(false)} // Función para cerrar el dashboard
+          >
+            Cerrar
+          </motion.button>
+        </div>
+      )}
+
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"  
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            {/* Contenido de la ventana emergente */}
-            <motion.div 
+            <motion.div
               className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-lg w-full"
-              initial={{ y: "-100vh" }} 
+              initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
               <h2 className="text-white text-3xl font-bold mb-4">{title}</h2>
-              {isDashboard ? (
-                <TeacherDashboard /> // Muestra el componente StudentDashboard en el modal
-              ) : (
-                <p className="text-gray-600">{description}</p> // Descripción completa
-              )}
-              {/* Botón para cerrar la ventana */}
-              <motion.button 
+              <p className="text-gray-600">{description}</p>
+              <motion.button
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                 whileHover={{ backgroundColor: '#4A90E2' }}
                 onClick={handleCloseModal}
@@ -108,27 +110,33 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   );
 };
 
-const MisProgramasVol  = () => {
+// Componente principal para mostrar los programas
+const MisProgramasVol = () => {
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/programas');
+        const response = await axios.get('http://localhost:5000/programas', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Token de autenticación
+          }
+        });
+
         const programData = await Promise.all(
-          response.data
-          .filter(program => program.status === 'active')
-          .map(async (program) => {
-            const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`);
-            const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`);
+          response.data.map(async (program) => {
+            const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`).catch(() => ({ data: { count: 0 } }));
+            const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`).catch(() => ({ data: { total: 0 } }));
+
             return {
               ...program,
               participants: participantsRes.data.count,
               donations: donationsRes.data.total,
-              imageUrl: program.program_image, // Añadido para manejar la imagen del programa
+              imageUrl: program.program_image,
             };
           })
-        );        
+        );
+
         setPrograms(programData);
       } catch (error) {
         console.error('Error fetching programs:', error);
@@ -139,13 +147,12 @@ const MisProgramasVol  = () => {
   }, []);
 
   return (
-    <div className="mt-4"> {/* Ajusta el margen superior */}
-      {/* Título de la sección */}
+    <div className="mt-4">
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Mis Programas
       </Typography>
 
-      <div className="flex justify-center flex-wrap mt-2">  {/* Reducido el margen superior */}
+      <div className="flex justify-center flex-wrap mt-2">
         {programs.map((program) => (
           <ProgramCard
             key={program.id}
@@ -153,8 +160,7 @@ const MisProgramasVol  = () => {
             description={program.description}
             participants={program.participants}
             donations={program.donations}
-            status={program.status} 
-            imageUrl={program.imageUrl} // Pasar la URL de la imagen al componente
+            imageUrl={program.imageUrl}
           />
         ))}
       </div>
