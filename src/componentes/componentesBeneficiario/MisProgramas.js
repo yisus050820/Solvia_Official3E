@@ -55,7 +55,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl }) 
             </motion.button>
             <motion.button
               className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
-              onClick={() => setShowDashboard(true)}
+              onClick={() => handleOpenModal(true)}
             >
               Tareas
             </motion.button>
@@ -63,23 +63,44 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl }) 
         </div>
       </motion.div>
 
-      {showDashboard && (
-        <div className="flex flex-col items-center mt-4">
-          <motion.div className="bg-gray-900 p-4 rounded-xl shadow-lg w-full max-w-lg">
-            <StudentDashboard />
-          </motion.div>
+      <AnimatePresence>
+      {showDashboard && isModalOpen && (
+        <motion.div
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{ paddingTop:'5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }} // Ajusta dinámicamente según el ancho del `aside`
+        
+      >
+      <motion.div
+      className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-4xl w-full"
+      initial={{ y: "-100vh" }}
+      animate={{ y: "0" }}
+      exit={{ y: "-100vh" }}
+      style={{
+        maxHeight: '90vh',  // Limita el alto máximo para que el modal no se salga de la pantalla
+        overflowY: 'auto',  // Agrega scroll si el contenido es muy largo
+        zIndex: 1000, // Asegura que el modal esté por encima del header
+
+      }}
+
+    >
+       <StudentDashboard />
           <motion.button
             className="bg-red-600 text-white px-4 py-2 rounded mt-4 transition duration-300 hover:bg-red-500 font-bold shadow-md"
             whileHover={{ scale: 1.05 }}
-            onClick={() => setShowDashboard(false)} // Función para cerrar el dashboard
-          >
+            onClick={handleCloseModal} // Cerrar el modal
+            >
             Cerrar
           </motion.button>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       <AnimatePresence>
-        {isModalOpen && (
+        {isModalOpen && !showDashboard &&(
           <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
             initial={{ opacity: 0 }}

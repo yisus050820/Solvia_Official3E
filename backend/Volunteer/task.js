@@ -1,7 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const authenticateToken = require('../middlewares/authenticateToken');
+const jwt = require('jsonwebtoken');
+const secretKey = 'yourSecretKey'; // Cambiar por process.env.SECRET_KEY en producción
+
+function decodeToken(token) {
+    try {
+        const decoded = jwt.verify(token, secretKey);
+        const userId = decoded.id; // Suponiendo que el token contiene el 'id' del usuario
+        console.log('ID del usuario:', userId);
+        return userId;
+    } catch (err) {
+        console.error('Error al verificar el token:', err.message);
+        return null;
+    }
+}
+
+// Obtener programas específicos del usuario
+router.get('/:id', authenticateToken, (req, res) => {
+    const userId = req.params.id;
+
+    let query = `
+        SELECT p.*, u.name AS coordinator_name
+        FROM programs p
+        JOIN users u ON p.coordinator_charge = u.id
+        WHERE p.coordinator_charge = ?
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching programs:', err);
+            return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
+        }
+        res.json(results);
+    });
+});
 
 // Obtener todas las tareas para un programa
 router.get('/tasks/:programId', authenticateToken, (req, res) => {
