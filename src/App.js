@@ -65,7 +65,7 @@ function App() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<TeacherDashboard />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Registro />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/Admin" element={<DashboardAdmin />} />

@@ -21,7 +21,7 @@ import { Feedback } from '@mui/icons-material';
 
 
 import OtrosVoluntarios from './componentesVol/OtrosVol';
-import MisProgramas from './componentesBeneficiario/MisProgramas';
+import MisProgramasVol from './componentesVol/MisProgramasVol';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
@@ -133,7 +133,7 @@ function DemoPageContent({ pathname }) {
       }}
     >
       {pathname === '/voluntarios/otros-voluntarios' && <OtrosVoluntarios />}
-      {pathname === '/programas/programas-inscritos' && <MisProgramas />}
+      {pathname === '/programas/programas-inscritos' && <MisProgramasVol />}
       {pathname === '/programas/programas-disponibles' && <ProgramasDisp />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}
       {pathname === '/comunicacion/contacto' && <Comunicacion />}

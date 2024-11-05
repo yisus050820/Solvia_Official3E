@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
-import StudentDashboard from './InterfazBeneficiario';
+import TeacherDashboard from './InterfazVoluntario';
 
 // Componente para mostrar una tarjeta de programa
 const ProgramCard = ({ title, description, participants, donations, imageUrl }) => {
@@ -43,33 +43,34 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl }) 
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
-              className="bg-red-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-red-600"
+              className="bg-red-700 text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#b22222' }}
             >
               Salir
             </motion.button>
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
+              className="bg-gray-700 text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#636363' }}
               onClick={() => handleOpenModal(false)}
             >
               Más info
             </motion.button>
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
+              className="bg-gray-700 text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#636363' }}
               onClick={() => setShowDashboard(true)}
             >
-              Tareas
+              Gestionar
             </motion.button>
           </div>
         </div>
       </motion.div>
 
       {showDashboard && (
-        <div className="flex flex-col items-center mt-4">
-          <motion.div className="bg-gray-900 p-4 rounded-xl shadow-lg w-full max-w-lg">
-            <StudentDashboard />
-          </motion.div>
+        <div className="relative">
+          <TeacherDashboard />
           <motion.button
-            className="bg-red-600 text-white px-4 py-2 rounded mt-4 transition duration-300 hover:bg-red-500 font-bold shadow-md"
+            className="bg-red-600 text-white px-4 py-2 rounded mt-4 transition duration-300 hover:bg-red-500 font-bold shadow-md block mx-auto"
             whileHover={{ scale: 1.05 }}
             onClick={() => setShowDashboard(false)} // Función para cerrar el dashboard
           >
@@ -95,7 +96,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl }) 
               <h2 className="text-white text-3xl font-bold mb-4">{title}</h2>
               <p className="text-gray-600">{description}</p>
               <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded transition duration-300 hover:bg-blue-400"
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                 whileHover={{ backgroundColor: '#4A90E2' }}
                 onClick={handleCloseModal}
               >
@@ -110,7 +111,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl }) 
 };
 
 // Componente principal para mostrar los programas
-const MisProgramas = () => {
+const MisProgramasVol = () => {
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
@@ -167,4 +168,4 @@ const MisProgramas = () => {
   );
 };
 
-export default MisProgramas;
+export default MisProgramasVol;

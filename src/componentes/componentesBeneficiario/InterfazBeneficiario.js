@@ -54,7 +54,7 @@ function StudentDashboard() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" className="text-white-900 mb-4 font-semibold" gutterBottom >
         Tareas Asignadas
       </Typography>
       <List>
