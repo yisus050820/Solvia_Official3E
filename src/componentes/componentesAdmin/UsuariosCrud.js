@@ -261,8 +261,9 @@ const CrudUsuarios = () => {
         <Typography variant="h3" align="center" color="primary" gutterBottom>
           Usuarios
         </Typography>
-        <div className="flex justify-between mb-4 space-x-4">
+        <div className="flex justify-between items-center mb-4">
           <motion.div
+            className="flex items-center"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -287,6 +288,7 @@ const CrudUsuarios = () => {
               <option value="beneficiary">Beneficiario</option>
             </motion.select>
           </motion.div>
+          <div className="flex items-center space-x-4">
           <div className="flex items-center">
             <Typography variant="body1" color="primary" className="mr-2">
               Ver en tarjetas
@@ -297,7 +299,6 @@ const CrudUsuarios = () => {
               color="primary"
             />
           </div>
-          <div className="flex justify-end mb-4 space-x-4">
 
             <motion.button
               className="bg-green-500 text-white p-2 rounded-full"
@@ -323,9 +324,9 @@ const CrudUsuarios = () => {
               >
                 <div className="flex justify-center items-center">
                   <img
-                    src={item.profile_picture || defaultProfilePicture}
+                    src={`http://localhost:5000${item.profile_picture}` || defaultProfilePicture}
                     alt={item.name}
-                    className="flex h-32 object-cover rounded-full mb-4 justify-center"
+                    className="h-32 w-32 object-cover rounded-full mb-4"
                   />
                 </div>
                 <Typography variant="h5" gutterBottom className="flex justify-center">
@@ -341,7 +342,7 @@ const CrudUsuarios = () => {
                   {item.birth_date}
                 </Typography>
                 <Typography variant="body2" className="flex justify-center">
-                  {truncateDescription(item.description)}
+                  {item.description}
                 </Typography>
               </motion.div>
             ))}

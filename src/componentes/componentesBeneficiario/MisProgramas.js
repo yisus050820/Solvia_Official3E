@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
@@ -19,8 +20,27 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
     setShowDashboard(false);
   };
 
+  // Función para determinar el color del estado
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-500';  // Verde para activo
+      case 'pause':
+        return 'bg-yellow-500'; // Amarillo para pausado
+      case 'unactive':
+        return 'bg-red-500';    // Rojo para inactivo
+      default:
+        return 'bg-gray-500';   // Gris por defecto
+    }
+  };
+
   return (
     <>
+      {/* Tarjeta del programa */}
+      <motion.div 
+        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        whileHover={{ scale: 1.05 }} 
+        whileTap={{ scale: 0.95 }}   
       <motion.div
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
@@ -32,8 +52,16 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
           alt={title}
         />
         <div className="p-4">
+          <h2 className="text-white text-xl font-bold">{name}</h2>
+          {/* Estado del programa con un círculo de color */}
+          <div className="flex items-center mt-2">
+            <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
+            <span className="ml-2 text-gray-400 capitalize">{status}</span>
+          </div>
+          {/* Limitar la descripción a un máximo de 100 caracteres */}
           <h2 className="text-white text-xl font-bold">{title}</h2>
           <p className="text-gray-400 mt-2">
+            {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
@@ -146,7 +174,7 @@ const MisProgramas = () => {
   return (
     <div className="mt-4">
       <Typography variant="h3" align="center" color="primary" gutterBottom>
-        Mis Programas
+        Programas Disponibles
       </Typography>
 
       <div className="flex justify-center flex-wrap mt-2">

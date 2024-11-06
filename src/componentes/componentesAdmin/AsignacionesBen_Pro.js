@@ -67,10 +67,20 @@ const AsignacionesBen_Pro = () => {
   }, [successMessage]);
 
   const handleAsignar = () => {
-    if (!beneficiarioSeleccionado || !programaSeleccionado) {
-      console.error('Error: Campos incompletos.');
-      return;
+    let isValid = true;
+    setErrorBeneficiario('');
+    setErrorPrograma('');
+    
+    if (!beneficiarioSeleccionado) {
+      setErrorBeneficiario('Debes seleccionar un beneficiario.');
+      isValid = false;
     }
+    if (!programaSeleccionado) {
+      setErrorPrograma('Debes seleccionar un programa.');
+      isValid = false;
+    }
+    if (!isValid) return;
+
   
     const nuevaAsignacion = {
       user_id: beneficiarioSeleccionado,

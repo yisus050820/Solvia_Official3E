@@ -572,39 +572,41 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {selectedProgram && (
-          <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-              initial={{ y: "-100vh" }}
-              animate={{ y: "0" }}
-              exit={{ y: "-100vh" }}
-            >
-              <h2 className="text-black text-2xl font-bold mb-4">{selectedProgram.name}</h2>
-              <p className="text-gray-600">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
-              <div className="mt-4">
-                <span className="text-green-400">Coordinador: {selectedProgram.coordinator_name}</span>
-              </div>
-              <div className="mt-2">
-                <span className="text-green-600">Presupuesto: {selectedProgram.donations ? `$${selectedProgram.donations}` : "No asignado"}</span>
-              </div>
-              {/* Botón para cerrar la ventana */}
-              <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2' }}
-                onClick={() => setSelectedProgram(null)}  // Cierra el modal
-              >
-                Cerrar
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  {selectedProgram && (
+    <motion.div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+        initial={{ y: "-100vh" }}
+        animate={{ y: "0" }}
+        exit={{ y: "-100vh" }}
+      >
+        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+        <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
+        <img 
+          className="w-full h-48 object-cover shadow-md rounded"
+          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+        />
+        <p className="text-gray-400 mt-4">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+        <div className="mt-2">
+          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
+        </div>
+        {/* Botón para cerrar la ventana */}
+        <motion.button 
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          whileHover={{ backgroundColor: '#4A90E2' }}
+          onClick={() => setSelectedProgram(null)}  // Cierra el modal
+        >
+          Cerrar
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
 
       {/* Ventana emergente para editar un registro existente */}
