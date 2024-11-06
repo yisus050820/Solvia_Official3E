@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Typography } from '@mui/material';
 
 const ProgramCard = ({ title, description, participants, donations }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,17 +43,15 @@ const ProgramCard = ({ title, description, participants, donations }) => {
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button 
-              className="bg-red-500 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#DC2626',scale:1.1 }}
-              whileTap={{scale:0.9}}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#4A90E2' }}
             >
-              Salir del Programa
+              Unirse
             </motion.button>
             {/* Botón para abrir la ventana emergente */}
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363', scale:1.1 }}
-              whileTap={{scale:0.9}}
+              whileHover={{ backgroundColor: '#636363' }}
               onClick={handleOpenModal}
             >
               Más info
@@ -98,7 +95,7 @@ const ProgramCard = ({ title, description, participants, donations }) => {
 };
 
 // Componente principal que genera las tarjetas
-const MisProgramas = () => {
+const TarjetasProgramas = () => {
   const programs = [
     {
       title: 'Community Food Drive',
@@ -121,26 +118,19 @@ const MisProgramas = () => {
   ];
 
   return (
-    <div className="mt-2"> {/* Ajusta el margen superior */}
-      {/* Título de la sección */}
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
-        Mis Programas
-      </Typography>
-
-      {/* Flex para centrar y distribuir las tarjetas */}
-      <div className="flex justify-center flex-wrap">
-        {programs.map((program, index) => (
-          <ProgramCard
-            key={index}
-            title={program.title}
-            description={program.description}
-            participants={program.participants}
-            donations={program.donations}
-          />
-        ))}
-      </div>
+    // Flex para centrar y distribuir las tarjetas
+    <div className="flex justify-center flex-wrap">
+      {programs.map((program, index) => (
+        <ProgramCard
+          key={index}
+          title={program.title}
+          description={program.description}
+          participants={program.participants}
+          donations={program.donations}
+        />
+      ))}
     </div>
   );
 };
 
-export default MisProgramas;
+export default TarjetasProgramas;

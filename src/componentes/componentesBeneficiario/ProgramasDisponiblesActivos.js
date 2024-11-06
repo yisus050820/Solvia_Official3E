@@ -109,7 +109,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   );
 };
 
-const TarjetasProgramas = () => {
+const ProgramasActivos = () => {
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
@@ -117,7 +117,9 @@ const TarjetasProgramas = () => {
       try {
         const response = await axios.get('http://localhost:5000/programas');
         const programData = await Promise.all(
-          response.data.map(async (program) => {
+          response.data
+          .filter(program => program.status === 'active')
+          .map(async (program) => {
             const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`);
             const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`);
             return {
@@ -161,4 +163,4 @@ const TarjetasProgramas = () => {
   );
 };
 
-export default TarjetasProgramas;
+export default ProgramasActivos;

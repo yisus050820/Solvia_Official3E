@@ -74,7 +74,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
             {/* Botón para abrir la ventana emergente */}
             <motion.button 
               className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
+              whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+              whileTap={{scale: 0.9}}
               onClick={handleOpenModal}
             >
               Ver Feedback
@@ -115,7 +116,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
               {/* Botón para cerrar la ventana */}
               <motion.button 
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2' }}
+                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                whileTap={{scale: 0.9}}
                 onClick={handleCloseModal}
               >
                 Cerrar

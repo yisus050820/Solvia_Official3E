@@ -4,16 +4,10 @@ const db = require('../db');
 const { body, param, validationResult } = require('express-validator');
 
 // Función para verificar si ya existe la asignación
-const verifyAssignmentExists = (user_id, program_id, exclude_id = null, callback) => {
-    let query = 'SELECT COUNT(*) AS count FROM beneficiaries WHERE user_id = ? AND program_id = ?';
-    const params = [user_id, program_id];
-
-    // Si es una edición, excluye la asignación actual de la verificación
-    if (exclude_id) {
-        query += ' AND id != ?';
-        params.push(exclude_id);
-    }
-
+const verifyAssignmentExists = (user_id, program_id, id, callback) => {
+    const query = 'SELECT COUNT(*) AS count FROM beneficiaries WHERE user_id = ? AND program_id = ?';
+    
+    const params = id ? [user_id, program_id, id] : [user_id, program_id];
     db.query(query, params, (err, result) => {
         if (err) return callback(err);
         callback(null, result[0].count > 0);
@@ -67,7 +61,11 @@ router.post('/beneficiarios', [
 
     const { user_id, program_id } = req.body;
 
-    // Verificar si ya existe una asignación con ese usuario y programa
+    // Asegúrate de que sean números
+    if (isNaN(user_id) || isNaN(program_id)) {
+        return res.status(400).json({ message: 'Los valores de user_id y program_id deben ser numéricos.' });
+    }
+
     verifyAssignmentExists(user_id, program_id, null, (err, exists) => {
         if (err) {
             console.error('Error during verification:', err);
@@ -79,6 +77,7 @@ router.post('/beneficiarios', [
         }
 
         const insertQuery = `INSERT INTO beneficiaries (user_id, program_id) VALUES (?, ?)`;
+
         db.query(insertQuery, [user_id, program_id], (err, result) => {
             if (err) {
                 console.error('Error assigning beneficiary:', err);
@@ -141,10 +140,9 @@ router.put('/beneficiarios/:id', [
                     return res.status(500).json({ message: 'Error al obtener los datos actualizados.' });
                 }
 
-                // Devolver los datos actualizados al cliente
                 res.json({
                     message: 'Asignación actualizada con éxito.',
-                    updatedData: updatedResult[0]  // Enviamos los datos actualizados
+                    updatedData: updatedResult[0]  
                 });
             });
         });

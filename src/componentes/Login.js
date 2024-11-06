@@ -138,8 +138,8 @@ const Login = () => {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: `url('URL_DE_TU_IMAGEN_DE_FONDO')`,
+        justifyContent: 'flex-end',
+        backgroundImage: `url('https://img.freepik.com/foto-gratis/superficie-azul-herramientas-estudio_23-2147864592.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         p: 2,
@@ -158,6 +158,7 @@ const Login = () => {
             backgroundColor: '#2b2b2b',
             borderRadius: '16px',
             width: { xs: '100%', sm: '400px', md: '450px' },
+            marginRight: { xs: 0, sm: 3, md: 35 }, 
           }}
         >
           <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ color: '#ffffff' }}>

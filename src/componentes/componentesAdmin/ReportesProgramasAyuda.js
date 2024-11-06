@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { FaHandsHelping, FaUserFriends, FaUsers, FaDollarSign, FaChartPie } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6384', '#36A2EB'];
 
@@ -14,7 +16,9 @@ const ReportesProgramasAyuda = () => {
   const [crecimientoProgramas, setCrecimientoProgramas] = useState([]);
   const [totalDonaciones, setTotalDonaciones] = useState([]);
   const [beneficiariosPorPrograma, setBeneficiariosPorPrograma] = useState([]);
-  
+  const pdfRef = useRef();
+  const [error, setError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);  
 
   // Obtener datos desde el backend
   useEffect(() => {
@@ -53,14 +57,56 @@ const ReportesProgramasAyuda = () => {
         setBeneficiariosPorPrograma(beneficiariosPorProgramaRes.data);
       } catch (error) {
         console.error('Error fetching report data:', error);
+        setError('Hubo un error al obtener los datos de donaciones.');
+        setSnackbarOpen(true);
       }
     };
 
     fetchData();
   }, []);
 
+  const exportarPDF = () => {
+    const input = pdfRef.current;
+
+    if (input) {
+      html2canvas(input, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgWidth = 190;
+        const pageHeight = pdf.internal.pageSize.height;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        pdf.save('reporteProgramasAyuda.pdf');
+      }).catch((error) => {
+        console.error('Error capturing the image:', error);
+      });
+    } else {
+      console.error('Element not found for PDF export');
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
-    <div className="max-w-6xl mx-auto mt-2">
+    <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
       {/* Título encima del contenido */}
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Reporte Programas
@@ -88,7 +134,7 @@ const ReportesProgramasAyuda = () => {
                 <FaUserFriends className="text-green-500 mr-2" size={40} />
                 <div>
                   <Typography variant="h4">{beneficiariosTotales}</Typography>
-                  <Typography variant="subtitle1">Beneficiarios Totales</Typography>
+                  <Typography variant="subtitle1">Beneficiarios Activos</Typography>
                 </div>
               </div>
             </CardContent>
@@ -102,7 +148,7 @@ const ReportesProgramasAyuda = () => {
                 <FaUsers className="text-purple-500 mr-2" size={40} />
                 <div>
                   <Typography variant="h4">{voluntariosTotales}</Typography>
-                  <Typography variant="subtitle1">Voluntarios Totales</Typography>
+                  <Typography variant="subtitle1">Voluntarios Activos</Typography>
                 </div>
               </div>
             </CardContent>
@@ -165,22 +211,32 @@ const ReportesProgramasAyuda = () => {
                 data={beneficiariosPorPrograma}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={({ program_name, total_beneficiaries }) =>
-                  `${program_name}: ${((total_beneficiaries / beneficiariosTotales) * 100).toFixed(2)}%`
-                }
-                outerRadius={120}
+                outerRadius={100}
                 fill="#8884d8"
                 dataKey="total_beneficiaries"
+                label={(entry) => entry.name}
               >
                 {beneficiariosPorPrograma.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>
+      </div>
+
+      {/* Botón para exportar en PDF */}
+      <div className="flex justify-center mt-8">
+        <button
+          className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600"
+          onClick={exportarPDF}
+        >
+          Exportar en PDF
+        </button>
       </div>
     </div>
   );

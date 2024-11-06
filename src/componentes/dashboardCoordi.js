@@ -20,8 +20,7 @@ import { Feedback } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import CrudProgramas from './componentesAdmin/ProgramasCrud';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
+import CrudPrograms from './componentesCoordi/ProgramasCrud';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
@@ -51,18 +50,6 @@ const NAVIGATION = [
     segment: 'programas',
     title: 'Programas',
     icon: <Event />,
-    children: [
-      {
-        segment: 'gestionar-programas',
-        title: 'Gestionar programas',
-        icon: <SettingsIcon />,
-      },
-      {
-        segment: 'todos-programas',
-        title: 'Todos los programas',
-        icon: <Event />,
-      }
-    ],
   },  
   
   {
@@ -164,8 +151,7 @@ function DemoPageContent({ pathname }) {
     >
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}
         {pathname === '/users' && <CrudUsuariosCoordi />}
-        {pathname === '/programas/gestionar-programas' && <CrudProgramas />}
-        {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
+        {pathname === '/programas' && <CrudPrograms />}
         {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
         {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
         {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}
@@ -205,6 +191,10 @@ function DashboardCoordi(props) {
     // preview-start
     <AppProvider
       navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        title: 'SOLVIA',
+      }}
       router={router}
       theme={demoTheme}
       window={demoWindow}

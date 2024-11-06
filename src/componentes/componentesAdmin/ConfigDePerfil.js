@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 import { Card, CardContent, Avatar, Grid, Typography, TextField, Button, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
 
@@ -16,6 +16,8 @@ const PerfilUsuario = () => {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -49,6 +51,15 @@ const PerfilUsuario = () => {
     };
     fetchProfile();
   }, []);  
+
+  //Aniamcion de exito al actualizar datos de perfil
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // El mensaje desaparecerá después de 1 segundos, se mide en ms
+      }
+  }, [successMessage]);
 
   // Controlar los cambios en los campos de edición
   const handleChange = (e) => {
@@ -93,6 +104,8 @@ const PerfilUsuario = () => {
       setIsEditing(false);
       setPassword('');  // Limpiar la contraseña después de guardar
       setErrors({ email: '', password: '' }); // Limpiar los errores si se guardó con éxito
+      setSuccessMessage('Datos actualizados exitosamente.'); // Establecer el mensaje de éxito
+
     } catch (error) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
@@ -247,19 +260,35 @@ const PerfilUsuario = () => {
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
                 <>
-                  <motion.button className="bg-blue-500 text-white px-4 py-2 rounded-full" onClick={toggleEdit}>
+                  <motion.button 
+                  className="bg-blue-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{scale: 1.1}}
+                  whileTap={{scale: 0.9}}
+                  onClick={toggleEdit}>
                     <FaEdit />
                   </motion.button>
-                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={handleLogout}>
+                  <motion.button 
+                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{scale: 1.1}}
+                  whileTap={{scale: 0.9}}
+                  onClick={handleLogout}>
                     <FaDoorOpen />
                   </motion.button>
                 </>
               ) : (
                 <div className="flex space-x-4">
-                  <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" onClick={handleSave}>
+                  <motion.button 
+                  className="bg-green-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{scale: 1.1}}
+                  whileTap={{scale: 0.9}}
+                  onClick={handleSave}>
                     Guardar
                   </motion.button>
-                  <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" onClick={() => setIsEditing(false)}>
+                  <motion.button 
+                  className="bg-red-500 text-white px-4 py-2 rounded-full" 
+                  whileHover={{scale: 1.1}}
+                  whileTap={{scale: 0.9}}
+                  onClick={() => setIsEditing(false)}>
                     Cancelar
                   </motion.button>
                 </div>
@@ -278,6 +307,52 @@ const PerfilUsuario = () => {
             {message}
           </Alert>
         </Snackbar>
+      {/* Modal para mensajes de éxito */}
+<AnimatePresence>
+  {successMessage && (
+    <motion.div 
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 0.8 }}
+    transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <motion.div 
+      initial={{ y: -50 }}
+      animate={{ y: 0 }}
+      exit={{ y: 50 }}
+      transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+      className="bg-gray-800 p-6 rounded-xl shadow-lg">
+        {/* Icono de palomita */}
+        <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+        <div className='flex justify-center items-center'>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={{
+              hidden: { opacity: 0, pathLength: 0 },
+              visible: { opacity: 1, pathLength: 1 },
+            }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            className='flex justify-center items-center'
+            style={{
+              borderRadius: '50%',        // Hace que sea un círculo
+              backgroundColor: '#4CAF50', // Color de fondo verde
+              width: '80px',              // Tamaño del círculo
+              height: '80px',             // Tamaño del círculo
+              display: 'flex',            // Para alinear el contenido
+              justifyContent: 'center',   // Centra horizontalmente
+              alignItems: 'center'        // Centra verticalmente
+            }}
+          >
+            <FaCheck size={50} className="text-white"/>
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
     </motion.div>
   );
 };

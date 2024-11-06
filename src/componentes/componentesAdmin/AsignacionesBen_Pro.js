@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, IconButton, InputAdornment } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt, FaEdit } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaEdit, FaCheck } from 'react-icons/fa';
 
 const AsignacionesBen_Pro = () => {
   const [beneficiarioSeleccionado, setBeneficiarioSeleccionado] = useState('');
@@ -17,10 +17,19 @@ const AsignacionesBen_Pro = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [message, setMessage] = useState('');
+  const [errorBeneficiario, setErrorBeneficiario] = useState('');
+  const [errorPrograma, setErrorPrograma] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+
+    // Variantes de animación para la palomita
+    const checkmarkVariants = {
+      hidden: { opacity: 0, pathLength: 0 },
+      visible: { opacity: 1, pathLength: 1 },
+    };
 
   useEffect(() => {
     axios.get('http://localhost:5000/asigBenProg/beneficiarios')
@@ -42,11 +51,24 @@ const AsignacionesBen_Pro = () => {
       .catch(err => console.error('Error fetching assignments:', err));
   }, []);
 
+  const truncateDescription = (description) => {
+    if (!description) return '';
+    return description.length > 50 ? description.slice(0, 50) + '...' : description;
+  };
+
+   //Alerta se cierra automaticamente despues de 5 segundos
+   useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
+
   const handleAsignar = () => {
     if (!beneficiarioSeleccionado || !programaSeleccionado) {
-      setMessage('Error: Campos incompletos.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+      console.error('Error: Campos incompletos.');
       return;
     }
   
@@ -71,7 +93,8 @@ const AsignacionesBen_Pro = () => {
   
         // Limpiar campos después de una asignación exitosa
         setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado('');
+        setProgramaSeleccionado(''); 
+        setSuccessMessage('Asignacion realizada exitosamente.')
       })
       .catch(error => {
         if (error.response) {
@@ -81,11 +104,8 @@ const AsignacionesBen_Pro = () => {
             setMessage('Error al asignar beneficiario.');
           }
         } else {
-          setMessage('Error de red. Inténtalo de nuevo.');
+          setMessage('Error del servidor. Inténtalo de nuevo.');
         }
-  
-        setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado('');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
@@ -107,7 +127,6 @@ const AsignacionesBen_Pro = () => {
   
     axios.put(`http://localhost:5000/asigBenProg/beneficiarios/${currentId}`, datosEditados)
       .then((res) => {
-        // Suponiendo que el backend devuelve los datos actualizados como "updatedData"
         const updatedData = res.data.updatedData;
   
         // Actualizamos la asignación en el estado con los datos retornados
@@ -127,6 +146,7 @@ const AsignacionesBen_Pro = () => {
         setBeneficiarioSeleccionado('');
         setProgramaSeleccionado('');
         setIsEditModalOpen(false); // Cerramos el modal de edición
+        setSuccessMessage('Asignacion actualizada exitosamente.')
       })
       .catch(error => {
         if (error.response) {
@@ -139,8 +159,6 @@ const AsignacionesBen_Pro = () => {
           setMessage('Error de red. Inténtalo de nuevo.');
         }
   
-        setBeneficiarioSeleccionado('');
-        setProgramaSeleccionado('');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
@@ -157,13 +175,14 @@ const AsignacionesBen_Pro = () => {
         setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null); 
+        setSuccessMessage('Asignacion eliminada exitosamente.')
       })
       .catch(err => console.error('Error deleting assignment:', err));
   };  
 
   const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-    tap: { scale: 0.95, transition: { duration: 0.2 } },
+    hover: { scale: 1.1, transition: { duration: 0.3 } },
+    tap: { scale: 0.9, transition: { duration: 0.2 } },
   };
 
   return (
@@ -179,7 +198,7 @@ const AsignacionesBen_Pro = () => {
       </Typography>
       <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
-          <Typography variant="h4" color="white" gutterBottom>
+          <Typography variant="h4" align="center" color="white" gutterBottom>
             Asignar Beneficiario a Programa
           </Typography>
           <Grid container spacing={4}>
@@ -204,6 +223,8 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorBeneficiario && <span style={{ color: 'red' }}>{errorBeneficiario}</span>}
+
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
@@ -226,10 +247,16 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
+              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
-            <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleAsignar}>
+            <motion.button 
+            className="bg-green-500 text-white px-4 py-2 rounded-full" 
+            variants={buttonVariants} 
+            whileHover="hover"
+            whileTap="tap"
+            onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
           </div>
@@ -250,10 +277,22 @@ const AsignacionesBen_Pro = () => {
                     <TableCell sx={{ color: '#fff' }}>{asignacion.beneficiario}</TableCell>
                     <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
                     <TableCell sx={{ color: '#fff' }}>
-                      <motion.button className="bg-blue-500 text-white px-2 py-1 rounded-full" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={() => handleEditar(asignacion)}>
+                      <motion.button 
+                      className="bg-blue-500 text-white px-2 py-1 rounded-full" 
+                      variants={buttonVariants} 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={() => handleEditar(asignacion)}
+                      >
                         <FaEdit />
                       </motion.button>
-                      <motion.button className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={() => handleEliminar(asignacion.id)}>
+                      <motion.button 
+                      className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" 
+                      variants={buttonVariants} 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{scale: 0.9}}
+                      onClick={() => handleEliminar(asignacion.id)}
+                      >
                         <FaTrashAlt />
                       </motion.button>
                     </TableCell>
@@ -290,11 +329,19 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </select>
               </div>
-              <div className="flex justify-between mt-4">
-                <motion.button className="bg-blue-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#4A90E2' }} onClick={confirmEdit}>
+              <div className="flex justify-between mt-4"> 
+                <motion.button 
+                className="bg-blue-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                whileTap={{scale: 0.9}}
+                onClick={confirmEdit}>
                   Guardar Cambios
                 </motion.button>
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" whileHover={{ backgroundColor: '#636363' }} onClick={() => setIsEditModalOpen(false)}>
+                <motion.button 
+                className="bg-gray-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                whileTap={{scale: 0.9}} 
+                onClick={() => setIsEditModalOpen(false)}>
                   Cerrar
                 </motion.button>
               </div>
@@ -310,17 +357,25 @@ const AsignacionesBen_Pro = () => {
           <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <motion.button className="bg-gray-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} onClick={() => setIsDeleteConfirmOpen(false)}>
+          <motion.button 
+          className="bg-gray-500 text-white px-4 py-2 rounded-full" 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{scale: 0.9}}
+          onClick={() => setIsDeleteConfirmOpen(false)}>
             Cancelar
           </motion.button>
-          <motion.button className="bg-red-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} onClick={confirmDelete}>
+          <motion.button 
+          className="bg-red-500 text-white px-4 py-2 rounded-full" 
+          whileHover={{ scale: 1.1 }} 
+          whileTap={{scale: 0.9}}
+          onClick={confirmDelete}>
             Eliminar
           </motion.button>
         </DialogActions>
       </Dialog>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
@@ -328,6 +383,50 @@ const AsignacionesBen_Pro = () => {
           {message}
         </Alert>
       </Snackbar>
+
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
     </motion.div>
   );
 };
