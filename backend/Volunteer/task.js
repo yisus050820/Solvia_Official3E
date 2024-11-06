@@ -2,32 +2,45 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const jwt = require('jsonwebtoken');
-const secretKey = 'yourSecretKey'; // Cambiar por process.env.SECRET_KEY en producción
+const secretKey = 'yourSecretKey';
 
 function decodeToken(token) {
     try {
         const decoded = jwt.verify(token, secretKey);
-        const userId = decoded.id; // Suponiendo que el token contiene el 'id' del usuario
-        console.log('ID del usuario:', userId);
-        return userId;
+        return decoded.id;
     } catch (err) {
         console.error('Error al verificar el token:', err.message);
         return null;
     }
 }
 
-// Obtener programas específicos del usuario
-router.get('/:id', authenticateToken, (req, res) => {
-    const userId = req.params.id;
+router.use((req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-    let query = `
-        SELECT p.*, u.name AS coordinator_name
+    if (!token) {
+        return res.status(401).json({ message: 'Token no proporcionado' });
+    }
+
+    const userId = decodeToken(token);
+    if (!userId) {
+        return res.status(403).json({ message: 'Token no válido' });
+    }
+
+    req.userId = userId;
+    next();
+});
+
+// Obtener programas específicos del usuario
+router.get('/programas', (req, res) => {
+    const query = `
+        SELECT p.*
         FROM programs p
-        JOIN users u ON p.coordinator_charge = u.id
-        WHERE p.coordinator_charge = ?
+        JOIN volunteers v ON p.id = v.program_id
+        WHERE v.user_id = ?
     `;
 
-    db.query(query, [userId], (err, results) => {
+    db.query(query, [req.userId], (err, results) => {
         if (err) {
             console.error('Error fetching programs:', err);
             return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
@@ -37,43 +50,49 @@ router.get('/:id', authenticateToken, (req, res) => {
 });
 
 // Obtener todas las tareas para un programa
-router.get('/tasks/:programId', authenticateToken, (req, res) => {
-    const programId = req.params.programId;
+router.get('/tasks/:programId', (req, res) => {
+    const { programId } = req.params;
     const query = `
-        SELECT t.id, t.title, t.description, t.end_date, 
-               COUNT(CASE WHEN b.task_status = 1 THEN 1 END) AS completed,
-               COUNT(b.id) AS total,
-               t.image, t.video
+        SELECT t.id, 
+            t.title, 
+            t.description, 
+            DATE_FORMAT(t.end_date, "%Y-%m-%d") AS end_date, 
+            COUNT(CASE WHEN b.task_status = 1 THEN 1 END) AS completed,
+            COUNT(b.id) AS total,
+            t.image, 
+            t.video
         FROM tasks t
         LEFT JOIN beneficiaries b ON b.task_id = t.id
         WHERE t.id_program = ?
-        GROUP BY t.id
+        GROUP BY t.id, t.title, t.description, t.end_date, t.image, t.video
     `;
 
     db.query(query, [programId], (err, results) => {
         if (err) {
             console.error('Error fetching tasks:', err);
-            return res.status(500).json({ message: 'Error fetching tasks' });
+            return res.status(500).json({ message: 'Error al obtener tareas.' });
         }
         res.json(results);
     });
 });
 
 // Crear una nueva tarea
-router.post('/tasks', authenticateToken, (req, res) => {
-    const { id_vol, id_program, title, description, end_date, image, video } = req.body;
-    const query = `
+router.post('/tasks', (req, res) => {
+    const token = req.headers['authorization'].split(' ')[1];
+    const id_vol = decodeToken(token);
+    const { id_program, title, description, end_date, image, video } = req.body;
+
+    const insertTaskQuery = `
         INSERT INTO tasks (id_vol, id_program, title, description, end_date, image, video)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(query, [id_vol, id_program, title, description, end_date, image, video], (err, result) => {
+    db.query(insertTaskQuery, [id_vol, id_program, title, description, end_date, image, video], (err, result) => {
         if (err) {
             console.error('Error inserting task:', err);
-            return res.status(500).json({ message: 'Error creating task' });
+            return res.status(500).json({ message: 'Error al crear la tarea.' });
         }
 
-        // Asignar la tarea a todos los beneficiarios del programa
         const taskId = result.insertId;
         const assignQuery = `
             INSERT INTO beneficiaries (user_id, program_id, task_id, task_status)
@@ -83,64 +102,71 @@ router.post('/tasks', authenticateToken, (req, res) => {
         db.query(assignQuery, [taskId, id_program], (err) => {
             if (err) {
                 console.error('Error assigning task to beneficiaries:', err);
-                return res.status(500).json({ message: 'Error assigning task' });
+                return res.status(500).json({ message: 'Error al asignar la tarea.' });
             }
-            res.status(201).json({ message: 'Task created and assigned', taskId });
+            res.status(201).json({ message: 'Tarea creada y asignada.', taskId });
         });
     });
 });
 
 // Editar una tarea
-router.put('/tasks/:taskId', authenticateToken, (req, res) => {
-    const taskId = req.params.taskId;
+router.put('/tasks/:taskId', (req, res) => {
+    const { taskId } = req.params;
     const { title, description, end_date, image, video } = req.body;
-    const query = `
-        UPDATE tasks
-        SET title = ?, description = ?, end_date = ?, image = ?, video = ?
-        WHERE id = ?
-    `;
 
-    db.query(query, [title, description, end_date, image, video, taskId], (err) => {
+    const selectQuery = `SELECT image, video FROM tasks WHERE id = ?`;
+
+    db.query(selectQuery, [taskId], (err, results) => {
         if (err) {
-            console.error('Error updating task:', err);
-            return res.status(500).json({ message: 'Error updating task' });
+            console.error('Error fetching current task:', err);
+            return res.status(500).json({ message: 'Error al obtener la tarea.' });
         }
-        res.json({ message: 'Task updated successfully' });
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Tarea no encontrada.' });
+        }
+
+        const currentTask = results[0];
+        const updatedImage = image || currentTask.image;
+        const updatedVideo = video || currentTask.video;
+
+        // Ejemplo de la consulta SQL en el backend
+        const query = `
+        SELECT t.id, 
+            t.title, 
+            t.description, 
+            DATE_FORMAT(t.end_date, "%Y-%m-%d") AS end_date, 
+            COUNT(CASE WHEN b.task_status = 1 THEN 1 END) AS completed,
+            COUNT(b.id) AS total,
+            t.image, 
+            t.video
+        FROM tasks t
+        LEFT JOIN beneficiaries b ON b.task_id = t.id
+        WHERE t.id_program = ?
+        GROUP BY t.id, t.title, t.description, t.end_date, t.image, t.video
+        `;
+
+        db.query(updateQuery, [title, description, end_date, updatedImage, updatedVideo, taskId], (err) => {
+            if (err) {
+                console.error('Error updating task:', err);
+                return res.status(500).json({ message: 'Error al actualizar la tarea.' });
+            }
+            res.json({ message: 'Tarea actualizada con éxito.' });
+        });
     });
 });
 
 // Eliminar una tarea
-router.delete('/tasks/:taskId', authenticateToken, (req, res) => {
-    const taskId = req.params.taskId;
-    const query = `
-        DELETE FROM tasks WHERE id = ?
-    `;
+router.delete('/tasks/:taskId', (req, res) => {
+    const { taskId } = req.params;
+    const query = `DELETE FROM tasks WHERE id = ?`;
 
     db.query(query, [taskId], (err) => {
         if (err) {
             console.error('Error deleting task:', err);
-            return res.status(500).json({ message: 'Error deleting task' });
+            return res.status(500).json({ message: 'Error al eliminar la tarea.' });
         }
-        res.json({ message: 'Task deleted successfully' });
-    });
-});
-
-// Obtener porcentaje de beneficiarios que completaron una tarea
-router.get('/tasks/:taskId/completion', authenticateToken, (req, res) => {
-    const taskId = req.params.taskId;
-    const query = `
-        SELECT 
-            COUNT(CASE WHEN task_status = 1 THEN 1 END) / COUNT(*) * 100 AS completion_rate
-        FROM beneficiaries
-        WHERE task_id = ?
-    `;
-
-    db.query(query, [taskId], (err, results) => {
-        if (err) {
-            console.error('Error fetching completion rate:', err);
-            return res.status(500).json({ message: 'Error fetching completion rate' });
-        }
-        res.json(results[0]);
+        res.json({ message: 'Tarea eliminada con éxito.' });
     });
 });
 

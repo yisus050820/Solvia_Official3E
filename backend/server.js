@@ -32,6 +32,8 @@ const asigVolProgRoutes = require('./Admin/asignacionesVol_Prog');
 const perfilRoutes = require('./Admin/perfil');
 const programsRoutes = require('./Coordi/programs');
 const feedbackRoutes = require('./Beneficiary/feedback');
+const taskVolRoutes = require('./Volunteer/task')
+const taskBenRoutes = require('./Beneficiary/tasks')
 
 // Usar las rutas
 app.use('/usuarios', userRoutes);
@@ -48,6 +50,8 @@ app.use('/asigVolProg', asigVolProgRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/programs', programsRoutes);
 app.use('/feedback', feedbackRoutes);
+app.use('/taskVol', taskVolRoutes);
+app.use('/task', taskBenRoutes);
 
 
 

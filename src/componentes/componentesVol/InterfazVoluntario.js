@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -16,15 +16,16 @@ import {
   Select,
   MenuItem,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Snackbar,
   Alert,
   Modal,
-  IconButton,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton
 } from "@mui/material";
+import { FaEdit, FaTrashAlt, FaPlus, FaChartBar } from "react-icons/fa";
+import { YouTube as YouTubeIcon, Image as ImageIcon } from "@mui/icons-material";
 import {
   ResponsiveContainer,
   BarChart,
@@ -35,61 +36,50 @@ import {
   Legend,
   Bar,
 } from 'recharts';
-
-import { FaEdit, FaTrashAlt, FaPlus, FaChartBar } from "react-icons/fa";
-import { YouTube as YouTubeIcon, Image as ImageIcon } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
-// Simulated data
-const initialTasks = [
-  {
-    id: 1,
-    name: "Tarea de Matemáticas",
-    description: "Resolver problemas del capítulo 5",
-    dueDate: "2023-06-15",
-    completedBy: [1, 3],
-    materials: [
-      { type: "video", url: "https://www.youtube.com/watch?v=ymG01zCW1Iw", title: "Explicación de álgebra" },
-      { type: "image", url: "https://example.com/math-formulas.jpg", title: "Fórmulas importantes" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Proyecto de Ciencias",
-    description: "Investigación sobre energías renovables",
-    dueDate: "2023-06-20",
-    completedBy: [2],
-    materials: [
-      { type: "image", url: "https://example.com/renewable-energy.jpg", title: "Infografía de energías renovables" },
-    ],
-  },
-];
-
-const users = [
-  { id: 1, name: "Ana García", role: "student"  },
-  { id: 2, name: "Carlos Rodríguez", role: "student" },
-  { id: 3, name: "María López", role: "student" },
-  { id: 4, name: "Juan Martínez", role: "student" },
-  { id: 5, name: "Prof. Pérez", role: "teacher" },
-];
-
-function TeacherDashboard() {
-  const [tasks, setTasks] = useState(initialTasks);
+function TeacherDashboard({ programId }) {
+  const [tasks, setTasks] = useState([]);
   const [view, setView] = useState("table");
   const [openDialog, setOpenDialog] = useState(false);
-  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-  const [sortBy, setSortBy] = useState("name");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
   const [openMaterial, setOpenMaterial] = useState(null);
+  const [sortBy, setSortBy] = useState("name");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
+  const showErrorMessage = (errors) => {
+    const firstError = Object.values(errors)[0];
+    setMessage(firstError);
+    setSnackbarSeverity('error');
+    setOpenSnackbar(true);
   };
+
+  // Fetch tasks
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setTasks(response.data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+        const errorMessage = error.response?.data?.message || "Error al cargar las tareas.";
+        setMessage(errorMessage);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      }
+    };
+
+    fetchTasks();
+  }, [programId]);
 
   const handleOpenDialog = (task = null) => {
     setCurrentTask(task);
@@ -102,92 +92,116 @@ function TeacherDashboard() {
     setCurrentTask(null);
   };
 
-  const handleSaveTask = (event) => {
+  const handleSaveTask = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const newTask = {
-      id: currentTask ? currentTask.id : tasks.length + 1,
-      name: formData.get("name"),
+      title: formData.get("name"),
       description: formData.get("description"),
-      dueDate: formData.get("dueDate"),
-      completedBy: currentTask ? currentTask.completedBy : [],
-      materials: currentTask ? currentTask.materials : [],
+      end_date: formData.get("dueDate"),
+      image: formData.get("imageUrl"),
+      video: formData.get("videoUrl"),
+      id_program: programId
     };
 
-    const videoUrl = formData.get("videoUrl");
-    const imageUrl = formData.get("imageUrl");
+    const { end_date } = newTask;
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
 
-    if (videoUrl) {
-      newTask.materials.push({ type: "video", url: videoUrl, title: "Video de apoyo" });
-    }
-    if (imageUrl) {
-      newTask.materials.push({ type: "image", url: imageUrl, title: "Imagen de apoyo" });
-    }
-
-    if (!newTask.name || !newTask.description || !newTask.dueDate) {
-      setMessage("Por favor, completa todos los campos obligatorios.");
+    if (new Date(end_date) < todayDate) {
+      setMessage('La fecha de entrega no puede ser anterior a la fecha actual.');
+      setSnackbarSeverity('error');
       setOpenSnackbar(true);
-      setErrors({
-        name: "Este campo es obligatorio.",
-        description: "Este campo es obligatorio.",
-        dueDate: "Este campo es obligatorio.",
-      });
       return;
     }
 
-    if (currentTask) {
-      setTasks(tasks.map((task) => (task.id === currentTask.id ? newTask : task)));
-    } else {
-      setTasks([...tasks, newTask]);
+    try {
+      if (currentTask) {
+        await axios.put(`http://localhost:5000/taskVol/tasks/${currentTask.id}`, newTask, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      } else {
+        await axios.post("http://localhost:5000/taskVol/tasks", newTask, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      }
+
+      const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setTasks(response.data);
+      handleCloseDialog();
+    } catch (error) {
+      console.error("Error saving task:", error);
+      const errorMessage = error.response?.data?.message || "Error al guardar la tarea.";
+      setMessage(errorMessage);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
     }
-    setSuccessMessage("Tarea guardada exitosamente.");
-    handleCloseDialog();
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-    setOpenDeleteConfirm(false);
-    setSuccessMessage("Tarea eliminada exitosamente.");
+  const handleDeleteTask = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/taskVol/tasks/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setTasks(tasks.filter((task) => task.id !== id));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      const errorMessage = error.response?.data?.message || "Error al eliminar la tarea.";
+      setMessage(errorMessage);
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
+  const handleOpenMaterial = (material) => {
+    if (material.type === "video" && material.url.includes("youtube.com/watch?v=")) {
+      let videoId = material.url.split("v=")[1];
+      const ampersandPosition = videoId.indexOf("&");
+      if (ampersandPosition !== -1) {
+        videoId = videoId.substring(0, ampersandPosition);
+      }
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      setOpenMaterial({ ...material, url: embedUrl });
+    } else {
+      setOpenMaterial(material);
+    }
   };
 
   const sortedTasks = [...tasks].sort((a, b) => {
-    if (sortBy === "name") return a.name.localeCompare(b.name);
-    if (sortBy === "dueDate") return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-    return (
-      b.completedBy.length / users.filter((u) => u.role === "student").length -
-      a.completedBy.length / users.filter((u) => u.role === "student").length
-    );
+    if (sortBy === "name") return a.title.localeCompare(b.title);
+    if (sortBy === "dueDate") return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+    return 0;
   });
 
   const filteredTasks = sortedTasks.filter(
     (task) =>
-      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.materials.some((material) => material.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getCompletionPercentage = (task) => {
-    const totalStudents = users.filter((u) => u.role === "student").length;
-    return (task.completedBy.length / totalStudents) * 100;
+    if (!task.total || task.total === 0) return 0;  
+    return (task.completed / task.total) * 100;  
   };
 
-  const handleOpenMaterial = (material) => {
-    setOpenMaterial(material);
-  };
-
-  const handleCloseMaterial = () => {
-    setOpenMaterial(null);
-  };
-
-  const handleOpenDeleteConfirm = (task) => {
-    setCurrentTask(task);
-    setOpenDeleteConfirm(true);
-  };
-
-  const handleCloseDeleteConfirm = () => {
-    setOpenDeleteConfirm(false);
-    setCurrentTask(null);
-  };
+  const chartData = tasks.map(task => ({
+    name: task.title,
+    completionPercentage: getCompletionPercentage(task),
+  }));
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -210,7 +224,6 @@ function TeacherDashboard() {
           >
             <MenuItem value="name">Nombre</MenuItem>
             <MenuItem value="dueDate">Fecha de entrega</MenuItem>
-            <MenuItem value="progress">Progreso</MenuItem>
           </Select>
         </FormControl>
 
@@ -218,7 +231,7 @@ function TeacherDashboard() {
           <Button
             variant={view === "table" ? "contained" : "outlined"}
             onClick={() => setView("table")}
-            startIcon={<FaChartBar />}
+            startIcon={<FaEdit />}
           >
             Tabla
           </Button>
@@ -263,21 +276,26 @@ function TeacherDashboard() {
                   <TableBody>
                     {filteredTasks.map((task) => (
                       <TableRow key={task.id}>
-                        <TableCell>{task.name}</TableCell>
+                        <TableCell>{task.title}</TableCell>
                         <TableCell>{task.description}</TableCell>
-                        <TableCell>{task.dueDate}</TableCell>
+                        <TableCell>{task.end_date}</TableCell>
                         <TableCell>
                           <LinearProgress variant="determinate" value={getCompletionPercentage(task)} />
-                          <Typography variant="body2">{`${task.completedBy.length} de ${
-                            users.filter((u) => u.role === "student").length
-                          } (${getCompletionPercentage(task).toFixed(1)}%)`}</Typography>
+                          <Typography variant="body2">
+                            {`${getCompletionPercentage(task).toFixed(1)}%`}
+                          </Typography>
                         </TableCell>
                         <TableCell>
-                          {task.materials.map((material, index) => (
-                            <IconButton key={index} onClick={() => handleOpenMaterial(material)}>
-                              {material.type === "video" ? <YouTubeIcon /> : <ImageIcon />}
+                          {task.image && (
+                            <IconButton onClick={() => handleOpenMaterial({ type: "image", url: task.image })}>
+                              <ImageIcon />
                             </IconButton>
-                          ))}
+                          )}
+                          {task.video && (
+                            <IconButton onClick={() => handleOpenMaterial({ type: "video", url: task.video })}>
+                              <YouTubeIcon />
+                            </IconButton>
+                          )}
                         </TableCell>
                         <TableCell>
                           <motion.button
@@ -292,7 +310,7 @@ function TeacherDashboard() {
                             className="bg-red-500 text-white p-2 rounded-full"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => handleOpenDeleteConfirm(task)}
+                            onClick={() => handleDeleteTask(task.id)}
                           >
                             <FaTrashAlt />
                           </motion.button>
@@ -312,13 +330,13 @@ function TeacherDashboard() {
               transition={{ duration: 0.5 }}
             >
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={filteredTasks}>
+                <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey={(task) => getCompletionPercentage(task)} name="Estudiantes Completados (%)" fill="#8884d8" />
+                  <Bar dataKey="completionPercentage" name="Porcentaje Completado (%)" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
             </motion.div>
@@ -336,29 +354,6 @@ function TeacherDashboard() {
           {message}
         </Alert>
       </Snackbar>
-
-      {/* Success Message Modal */}
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          >
-            <motion.div
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="bg-gray-800 p-6 rounded-xl shadow-lg"
-            >
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <Modal open={openDialog} onClose={handleCloseDialog}>
         <Box
@@ -385,7 +380,7 @@ function TeacherDashboard() {
               type="text"
               fullWidth
               variant="outlined"
-              defaultValue={currentTask?.name || ""}
+              defaultValue={currentTask?.title || ""}
               error={!!errors.name}
               helperText={errors.name}
             />
@@ -407,7 +402,7 @@ function TeacherDashboard() {
               type="date"
               fullWidth
               variant="outlined"
-              defaultValue={currentTask?.dueDate || ""}
+              defaultValue={currentTask?.end_date || ""}
               InputLabelProps={{ shrink: true }}
               error={!!errors.dueDate}
               helperText={errors.dueDate}
@@ -438,19 +433,7 @@ function TeacherDashboard() {
         </Box>
       </Modal>
 
-      {/* Confirm Delete Modal */}
-      <Dialog open={openDeleteConfirm} onClose={handleCloseDeleteConfirm}>
-        <DialogTitle>¿Estás seguro de eliminar esta tarea?</DialogTitle>
-        <DialogContent>Esta acción no se puede deshacer.</DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteConfirm}>Cancelar</Button>
-          <Button onClick={() => handleDeleteTask(currentTask?.id)} color="error" variant="contained">
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Modal open={!!openMaterial} onClose={handleCloseMaterial}>
+      <Modal open={!!openMaterial} onClose={() => setOpenMaterial(null)}>
         <Box
           sx={{
             position: "absolute",
@@ -463,34 +446,19 @@ function TeacherDashboard() {
             p: 4,
           }}
         >
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseMaterial}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <FaTrashAlt />
-          </IconButton>
           {openMaterial?.type === "video" ? (
             <iframe
               width="100%"
               height="400"
               src={openMaterial.url}
-              title={openMaterial.title}
+              title="Material de apoyo"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
           ) : (
-            <img src={openMaterial?.url} alt={openMaterial?.title} style={{ width: "100%" }} />
+            <img src={openMaterial?.url} alt="Material de apoyo" style={{ width: "100%" }} />
           )}
-          <Typography variant="h6" component="h2" mt={2}>
-            {openMaterial?.title}
-          </Typography>
         </Box>
       </Modal>
     </Box>

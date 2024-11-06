@@ -34,14 +34,11 @@ const PerfilUsuario = () => {
     }
   
     const fetchProfile = async () => {
-      console.log('Se inicia la peticion del fetch')
       try {
         const response = await axios.get('http://localhost:5000/perfil/', {
           headers: { Authorization: `Bearer ${token}` }
         });
-  
-        console.log('Respuesta del servidor:', response.data);
-  
+    
         setUserInfo(response.data);
         setLoading(false);
       } catch (error) {
