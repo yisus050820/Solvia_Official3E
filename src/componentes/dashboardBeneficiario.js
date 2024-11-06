@@ -19,7 +19,8 @@ import MisProgramas from './componentesBeneficiario/MisProgramas';
 import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
-import VerFeedback from './componentesAdmin/VerFeedback';
+import VerFeedback from './componentesDonador/VerFeedback';
+import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
 
 
@@ -55,7 +56,7 @@ const NAVIGATION = [
  
   {
     segment: 'ayuda',
-    title: 'Ayuda recibida',
+    title: 'Donaciones',
     icon: <VolunteerActivism />,
     
   },
@@ -119,7 +120,7 @@ function DemoPageContent({ pathname }) {
     {pathname === '/configuracion-perfil' && <PerfilUsuario />}
     {pathname === '/programas/disponibles' && <ProgramasActivos />}
     {pathname === '/programas/actuales' && <MisProgramas />}
-    {pathname === '/ayuda' && <AyudaRecibida />}
+    {pathname === '/ayuda' && <ReportesDonaciones />}
     {pathname === '/comunicacion/feedback' && <Calificar />}
     {pathname === '/comunicacion/contacto' && <Comunicacion />}
     {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}

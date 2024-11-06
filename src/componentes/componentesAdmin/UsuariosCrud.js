@@ -60,7 +60,7 @@ const CrudUsuarios = () => {
       }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
     }
   }, [successMessage]);
-
+  
   const handleOpenModal = () => {
     setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
