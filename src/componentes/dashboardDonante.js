@@ -24,7 +24,7 @@ import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
-import VerFeedback from './componentesDonador/VerFeedback';
+import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasDisp from './componentesDonador/VerProgramasDisp';
 
 

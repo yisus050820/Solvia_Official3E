@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
 import StudentDashboard from './InterfazBeneficiario';
 
 // Componente para mostrar una tarjeta de programa
-const ProgramCard = ({ title, description, participants, donations, imageUrl, programId }) => {
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
@@ -41,6 +40,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }} 
         whileTap={{ scale: 0.95 }}   
+        ></motion.div>
       <motion.div
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
@@ -180,13 +180,14 @@ const MisProgramas = () => {
       <div className="flex justify-center flex-wrap mt-2">
         {programs.map((program) => (
           <ProgramCard
-            key={program.id}
-            title={program.name}
-            description={program.description}
-            participants={program.participants}
-            donations={program.donations}
-            imageUrl={program.imageUrl}
-            programId={program.id}
+          key={program.id}
+          title={program.name}
+          description={program.description}
+          participants={program.participants}
+          donations={program.donations}
+          status={program.status}
+          imageUrl={program.imageUrl}
+          programId={program.id}
           />
         ))}
       </div>

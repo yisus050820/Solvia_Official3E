@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
@@ -104,13 +104,10 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
               <ul className="text-gray-600">
                 {feedbacks.length > 0 ? (
                   feedbacks.map((fb, index) => (
-                    <li key={index} className="mb-4">
-                      <div className="mb-4">
-                        <p>{fb.username}:</p>
-                      </div>
-                      <div className="flex mt-1">{renderStars(fb.rating)}</div>
-                      <div className="mb-4">{fb.message}</div>
-                      
+                    <li key={index} className="mb-6">
+                      <div className="font-bold text-gray-800">{fb.username}:</div>
+                      <div className="flex items-center mt-1">{renderStars(fb.rating)}</div>
+                      <p className="text-gray-700 mt-2">{fb.message}</p>
                     </li>
                   ))
                 ) : (
@@ -174,7 +171,7 @@ const VerFeedback = () => {
             description={program.description}
             participants={program.participants}
             donations={program.donations}
-            status={program.status}
+            status={program.status}    
             imageUrl={program.imageUrl}
             programId={program.id}
           />

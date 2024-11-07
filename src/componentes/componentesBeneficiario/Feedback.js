@@ -28,7 +28,7 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   const handleOpenViewModal = () => {
     setIsViewModalOpen(true);
     setIsEditModalOpen(false);
-  }; 
+  };
 
   const handleDeleteClick = () => setIsDeleteConfirmOpen(true);
 
@@ -197,7 +197,12 @@ const Calificar = () => {
           };
         })
       );
-      setPrograms(programData);
+
+      // Filtrar duplicados por id de programa
+      const uniquePrograms = Array.from(new Set(programData.map(p => p.id)))
+        .map(id => programData.find(p => p.id === id));
+
+      setPrograms(uniquePrograms);
     } catch (error) {
       console.error('Error fetching programs:', error);
       setError('Error al pedir los programas.');

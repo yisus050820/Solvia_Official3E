@@ -19,20 +19,40 @@ function authenticateToken(req, res, next) {
 }
 
 // Obtener programas en los que el usuario está inscrito
+// Obtener programas en los que el usuario está inscrito
 router.get('/', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
     db.query(`
-      SELECT p.id, p.name, p.description, p.program_image, b.feedback, b.score 
+      SELECT DISTINCT p.id, p.name, p.description, p.program_image, b.feedback, b.score 
       FROM programs p
       JOIN beneficiaries b ON p.id = b.program_id
-      WHERE b.user_id = ?
+      WHERE b.user_id = ? 
     `, [userId], (err, programs) => {
         if (err) {
             console.error('Error al obtener programas:', err);
             return res.status(500).json({ error: 'Error al obtener programas' });
         }
         res.status(200).json(programs);
+    });
+});
+
+router.get('/programas', authenticateToken, (req, res) => {
+    const userId = req.user.id; 
+
+    const query = `
+        SELECT DISTINCT p.*
+        FROM programs p
+        JOIN beneficiaries b ON p.id = b.program_id
+        WHERE b.user_id = ?
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching programs:', err);
+            return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
+        }
+        res.json(results);
     });
 });
 
