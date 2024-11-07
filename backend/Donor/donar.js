@@ -34,7 +34,7 @@ router.get('/', authenticateToken, (req, res) => {
     });
 });
 
-// I
+// Insetar las donaciones
 router.post('/', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { amount } = req.body;  

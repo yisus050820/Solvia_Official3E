@@ -35,6 +35,7 @@ const feedbackRoutes = require('./Beneficiary/feedback');
 const taskVolRoutes = require('./Volunteer/task');
 const taskBenRoutes = require('./Beneficiary/tasks');
 const donarRoutes = require('./Donor/donar');
+const indexRoutes = require('./index/index')
 
 // Usar las rutas
 app.use('/usuarios', userRoutes);
@@ -54,6 +55,7 @@ app.use('/feedback', feedbackRoutes);
 app.use('/taskVol', taskVolRoutes);
 app.use('/task', taskBenRoutes);
 app.use('/donar', donarRoutes);
+app.use('/index', indexRoutes)
 
 
 

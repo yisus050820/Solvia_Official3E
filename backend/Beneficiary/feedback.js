@@ -19,23 +19,6 @@ function authenticateToken(req, res, next) {
 }
 
 // Obtener programas en los que el usuario está inscrito
-router.get('/', authenticateToken, (req, res) => {
-    const userId = req.user.id;
-
-    db.query(`
-      SELECT DISTINCT p.id, p.name, p.description, p.program_image, b.feedback, b.score 
-      FROM programs p
-      JOIN beneficiaries b ON p.id = b.program_id
-      WHERE b.user_id = ? 
-    `, [userId], (err, programs) => {
-        if (err) {
-            console.error('Error al obtener programas:', err);
-            return res.status(500).json({ error: 'Error al obtener programas' });
-        }
-        res.status(200).json(programs);
-    });
-});
-
 router.get('/programas', authenticateToken, (req, res) => {
     const userId = req.user.id; 
 
