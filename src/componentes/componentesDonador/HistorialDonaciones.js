@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Typography } from '@mui/material'; // Importa Typography de Material-UI
+import { Typography } from '@mui/material';
+import axios from 'axios';
 
 const HistorialDonaciones = () => {
-  const [donaciones, setDonaciones] = useState([
-    { id: 1, cantidad: 500, fecha: '2023-09-15' },
-    { id: 2, cantidad: 1000, fecha: '2023-10-01' },
-    { id: 3, cantidad: 250, fecha: '2023-10-05' }
-  ]);
+  const [donaciones, setDonaciones] = useState([]);
+
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/donar', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        setDonaciones(response.data);
+      } catch (error) {
+        console.error('Error fetching donations:', error);
+      }
+    };
+
+    fetchDonations();
+  }, []);
 
   return (
     <>
       <div className="w-full px-6 py-4 mx-auto mt-2">
-        {/* Título usando Typography */}
         <Typography 
           variant="h3" 
           align="center" 
@@ -30,15 +44,14 @@ const HistorialDonaciones = () => {
         >
           <thead className="bg-gray-700">
             <tr>
-              <th className="p-4 text-left">ID</th>
               <th className="p-4 text-left">Cantidad (MXN)</th>
               <th className="p-4 text-left">Fecha</th>
             </tr>
           </thead>
           <motion.tbody layout>
-            {donaciones.map((donacion) => (
+            {donaciones.map((donacion, index) => (
               <motion.tr
-                key={donacion.id}
+                key={index}
                 layout
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -46,14 +59,13 @@ const HistorialDonaciones = () => {
                 transition={{ duration: 0.3 }}
                 className="border-b border-gray-700"
               >
-                <td className="p-4">{donacion.id}</td>
                 <td className="p-4">
-                  {Number(donacion.cantidad).toLocaleString('es-MX', {
+                  {Number(donacion.amount).toLocaleString('es-MX', {
                     style: 'currency',
                     currency: 'MXN',
                   })}
                 </td>
-                <td className="p-4">{donacion.fecha}</td>
+                <td className="p-4">{donacion.date}</td>
               </motion.tr>
             ))}
           </motion.tbody>

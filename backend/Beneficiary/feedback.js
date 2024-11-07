@@ -19,7 +19,6 @@ function authenticateToken(req, res, next) {
 }
 
 // Obtener programas en los que el usuario está inscrito
-// Obtener programas en los que el usuario está inscrito
 router.get('/', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
