@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import axios from 'axios'
+import { Avatar } from '@mui/material';
+
 
 const carouselImages = [
   "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
@@ -23,50 +26,55 @@ const testimonials = [
 ]
 
 export default function LandingPage() {
-  const [currentImage, setCurrentImage] = useState(0)
-  const controls = useAnimation()
-  const containerRef = useRef(null)
+  const [testimonials, setTestimonials] = useState([]);
+  const [currentImage, setCurrentImage] = useState(0);
+  const controls = useAnimation();
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    let isMounted = true
+    axios.get('http://localhost:5000/feed')
+      .then(response => setTestimonials(response.data))
+      .catch(error => console.error('Error al obtener testimonios:', error));
+  }, []);
 
+  useEffect(() => {
+    let isMounted = true;
     const imageTimer = setInterval(() => {
       if (isMounted) {
-        setCurrentImage((prev) => (prev + 1) % carouselImages.length)
+        setCurrentImage((prev) => (prev + 1) % testimonials.length);
       }
-    }, 5000)
-
+    }, 5000);
     return () => {
-      isMounted = false
-      clearInterval(imageTimer)
-    }
-  }, [])
+      isMounted = false;
+      clearInterval(imageTimer);
+    };
+  }, [testimonials]);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const animateCarousel = async () => {
       if (isMounted) {
-        await controls.start({ x: `-${100 / 3}%`, transition: { duration: 10, ease: 'linear' } })
-        controls.set({ x: '0%' })
-        animateCarousel()
+        await controls.start({ x: `-${100 / 3}%`, transition: { duration: 10, ease: 'linear' } });
+        if (isMounted) controls.set({ x: '0%' });  // Asegurarse de que controls.set() solo se ejecute cuando esté montado
+        animateCarousel();
       }
-    }
+    };
 
     if (isMounted) {
-      animateCarousel()
+      animateCarousel();
     }
 
     return () => {
-      isMounted = false
-    }
-  }, [controls])
+      isMounted = false;
+    };
+  }, [controls]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 p-4">
         <nav className="container mx-auto flex justify-between items-center">
-          <motion.h1 
+          <motion.h1
             className="text-2xl font-bold"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,13 +107,13 @@ export default function LandingPage() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         />
-        <button 
+        <button
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
           onClick={() => setCurrentImage((prev) => (prev - 1 + carouselImages.length) % carouselImages.length)}
         >
           <ChevronLeft className="text-white" />
         </button>
-        <button 
+        <button
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
           onClick={() => setCurrentImage((prev) => (prev + 1) % carouselImages.length)}
         >
@@ -115,7 +123,7 @@ export default function LandingPage() {
 
       <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl font-bold mb-8 text-center"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -125,7 +133,7 @@ export default function LandingPage() {
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {infoCards.map((card, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 className="bg-gray-700 rounded-lg shadow-lg overflow-hidden"
                 initial={{ opacity: 0, y: 20 }}
@@ -146,7 +154,7 @@ export default function LandingPage() {
 
       <section className="py-16 bg-gray-900 overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl font-bold mb-8 text-center"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -171,7 +179,11 @@ export default function LandingPage() {
                     transition={{ duration: 1 }}
                   >
                     <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center h-full">
-                      <img src={testimonial.image} alt={testimonial.name} className="w-20 h-20 object-cover rounded-full mb-4" />
+                      <Avatar
+                        src={`http://localhost:5000${testimonial.image}`}
+                        alt={testimonial.name}
+                        className="w-20 h-20 object-cover rounded-full mb-4"
+                      />
                       <p className="text-center mb-2 flex-grow">{testimonial.comment}</p>
                       <p className="font-semibold">{testimonial.name}</p>
                       <div className="flex mt-2">
@@ -190,7 +202,7 @@ export default function LandingPage() {
 
       <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl font-bold mb-8 text-center"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,7 +210,7 @@ export default function LandingPage() {
           >
             Sobre Solvia
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-center max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -212,7 +224,7 @@ export default function LandingPage() {
       <footer className="bg-gray-900 py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <motion.p 
+            <motion.p
               className="text-sm"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -220,7 +232,7 @@ export default function LandingPage() {
             >
               © 2024 Solvia. Todos los derechos reservados.
             </motion.p>
-            <motion.div 
+            <motion.div
               className="flex space-x-4 mt-4 md:mt-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

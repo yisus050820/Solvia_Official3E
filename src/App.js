@@ -11,6 +11,7 @@ import LandingPage from './componentes/index';
 import ResetPassword from './componentes/ResetPassword';
 import DashboardVoluntario from './componentes/dashboardVoluntario';
 import TeacherDashboard from './componentes/componentesVol/InterfazVoluntario';
+import ChatGlobal from './componentes/ChatGlobal';
 
 
 

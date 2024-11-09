@@ -95,7 +95,7 @@ const CrudUsuarios = () => {
 
     if ( !isEditing && (user.role === 'beneficiary' && age < 9)) {
       validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
-    } else if (user.role !== 'beneficiary' && age < 18) {
+    } else if (!isEditing && user.role !== 'beneficiary' && age < 18) {
       validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
     }
 
@@ -164,7 +164,7 @@ const CrudUsuarios = () => {
   };
 
   const handleEditUser = () => {
-    const validationErrors = validateUser(newUser, {}, false);
+    const validationErrors = validateUser(newUser, {}, true);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
