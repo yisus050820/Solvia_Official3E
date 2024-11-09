@@ -27,6 +27,7 @@ import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasDisp from './componentesDonador/VerProgramasDisp';
+import ChatGlobal from './ChatGlobal';
 
 
 
@@ -88,11 +89,6 @@ const NAVIGATION = [
         icon: <MessageIcon />,
       },
       {
-        segment: 'feedback', // Nuevo hijo "Feedback"
-        title: 'Feedback',
-        icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
-      },
-      {
         segment: 'ver-feedback',
         title: 'Ver feedback de programas',
         icon: <Feedback />,
@@ -136,7 +132,7 @@ function DemoPageContent({ pathname }) {
       {pathname === '/programas/programas-inscritos' && <MisProgramasVol />}
       {pathname === '/programas/programas-disponibles' && <ProgramasDisp />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}
-      {pathname === '/comunicacion/contacto' && <Comunicacion />}
+      {pathname === '/comunicacion/contacto' && <ChatGlobal />}
       {pathname === '/comunicacion/feedback' && <Calificar />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
     </Box>

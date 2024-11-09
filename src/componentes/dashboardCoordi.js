@@ -30,6 +30,7 @@ import AsignacionesPresupuesto_Pro from './componentesAdmin/AsignacionesPresupue
 import CrudUsuariosCoordi from './componentesCoordi/Usuarios';
 import Comunicacion from './componentesAdmin/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
+import ChatGlobal from './ChatGlobal';
 
 const NAVIGATION = [
   {
@@ -158,7 +159,7 @@ function DemoPageContent({ pathname }) {
         {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
         {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
         {pathname === '/asignaciones/presupuesto-programa' && <AsignacionesPresupuesto_Pro />}
-        {pathname === '/comunicacion/contacto' && <Comunicacion />}
+        {pathname === '/comunicacion/contacto' && <ChatGlobal />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
         
     </Box>

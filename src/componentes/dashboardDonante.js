@@ -26,6 +26,7 @@ import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasDisp from './componentesDonador/VerProgramasDisp';
+import ChatGlobal from './ChatGlobal';
 
 
   const NAVIGATION = [
@@ -145,7 +146,7 @@ import ProgramasDisp from './componentesDonador/VerProgramasDisp';
         {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
         {pathname === '/beneficiarios-programas/ver-programas' && <ProgramasDisp />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
-        {pathname === '/comunicacion/contacto' && <Comunicacion />}
+        {pathname === '/comunicacion/contacto' && <ChatGlobal />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
       </Box>
     );

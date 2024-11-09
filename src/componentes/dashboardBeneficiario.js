@@ -22,6 +22,7 @@ import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
+import ChatGlobal from './ChatGlobal';
 
 
 
@@ -122,7 +123,7 @@ function DemoPageContent({ pathname }) {
     {pathname === '/programas/actuales' && <MisProgramas />}
     {pathname === '/ayuda' && <ReportesDonaciones />}
     {pathname === '/comunicacion/feedback' && <Calificar />}
-    {pathname === '/comunicacion/contacto' && <Comunicacion />}
+    {pathname === '/comunicacion/contacto' && <ChatGlobal />}
     {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
 
     

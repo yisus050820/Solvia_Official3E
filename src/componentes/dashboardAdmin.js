@@ -33,6 +33,7 @@ import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuest
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import Mensajes from './componentesAdmin/Mensajes';
+import ChatGlobal from './ChatGlobal';
 
 
 const NAVIGATION = [
@@ -162,7 +163,7 @@ function DemoPageContent({ pathname }) {
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
-      {pathname === '/comunicacion/mensajes' && <Mensajes />}
+      {pathname === '/comunicacion/mensajes' && <ChatGlobal />}
     </Box>
   );
 }
