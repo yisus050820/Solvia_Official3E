@@ -77,7 +77,9 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
-              className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-4xl w-full"
+              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
+                showDashboard ? 'max-w-3xl' : 'max-w-lg'
+              }`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -91,8 +93,15 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                 <TeacherDashboard programId={programId} />
               ) : (
                 <>
-                  <h2 className="text-white text-3xl font-bold mb-4">{title}</h2>
-                  <p className="text-gray-600">{description}</p>
+                  <h2 className="text-white text-3xl font-bold">{title}</h2>
+                  <h4 className="text-white-900 mb-4 font-semibold">
+                  </h4>
+                  <img
+                    className="w-full h-48 object-cover shadow-md rounded"
+                    src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
+                    alt={title}
+                  />
+                  <p className="text-gray-400 mt-4">{description}</p>
                 </>
               )}
               <motion.button
