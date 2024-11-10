@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -26,6 +26,8 @@ const CrudUsuarios = () => {
   const [errors, setErrors] = useState({});
   const [mostrarCards, setMostrarCards] = useState(false); // Estado para el switch de tarjetas
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -253,7 +255,15 @@ const CrudUsuarios = () => {
     setShowPassword(!showPassword);
   };
 
-  const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredData = data.filter((user) => {
+    const matchesRole = filtroRol ? user.role === filtroRol : true;
+    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesRole && matchesSearchTerm;
+  });
 
   return (
     <>
@@ -261,9 +271,10 @@ const CrudUsuarios = () => {
         <Typography variant="h3" align="center" color="primary" gutterBottom>
           Usuarios
         </Typography>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between mb-4 space-x-4">
+        {/* Filtro por rol */}
+          <div className="flex space-x-4">
           <motion.div
-            className="flex items-center"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -288,18 +299,52 @@ const CrudUsuarios = () => {
               <option value="beneficiary">Beneficiario</option>
             </motion.select>
           </motion.div>
-          <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <Typography variant="body1" color="primary" className="mr-2">
-              Ver en tarjetas
-            </Typography>
-            <Switch
-              checked={mostrarCards}
-              onChange={() => setMostrarCards(!mostrarCards)}
-              color="primary"
-            />
+  
+          <TextField
+            label="Buscar..."
+            variant="outlined"
+            sx={{
+              mb: 2,
+              backgroundColor: 'white',          // Fondo blanco
+              color: 'black',                     // Color del texto
+              borderRadius: '5px',                // Bordes redondeados
+              '& .MuiOutlinedInput-root': {
+                height: '36px',                   // Altura total del input
+                fontSize: '0.9rem',               // Tamaño del texto
+                '& input': {
+                  color: 'black',                 // Color del texto en el campo de entrada
+                  padding: '8px 14px',            // Ajusta el padding interno
+                },
+                '& fieldset': {
+                  borderColor: '#ccc',            // Color del borde
+                },
+                '&:hover fieldset': {
+                  borderColor: '#888',            // Color de borde al pasar el cursor
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#888',                    // Color del texto de la etiqueta
+                fontSize: '0.9rem',
+                top: '-6px',                      // Ajusta la posición de la etiqueta
+              },
+            }}
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
           </div>
-
+          
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Typography variant="body1" color="primary" className="mr-2">
+                Ver en tarjetas
+              </Typography>
+              <Switch
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                color="primary"
+              />
+            </div>
+  
             <motion.button
               className="bg-green-500 text-white p-2 rounded-full"
               whileHover={{ scale: 1.1 }}
@@ -310,7 +355,7 @@ const CrudUsuarios = () => {
             </motion.button>
           </div>
         </div>
-
+  
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -353,7 +398,7 @@ const CrudUsuarios = () => {
               <tr>
                 <th className="p-4">Nombre</th>
                 <th className="p-4">Correo</th>
-                <th className="p-4">Fechad de nacimiento</th>
+                <th className="p-4">Fecha de nacimiento</th>
                 <th className="p-4">Rol</th>
                 <th className="p-4">Descripción</th>
                 <th className="p-4">Fecha Creación</th>
@@ -393,6 +438,7 @@ const CrudUsuarios = () => {
           </motion.table>
         )}
       </div>
+  
 
       {/* Modal para añadir usuario */}
       <AnimatePresence>

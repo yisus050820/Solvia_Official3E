@@ -407,39 +407,48 @@ const generarFacturaPDF = () => {
       </Card>
 
       <AnimatePresence>
-        {successMessage && (
+      {successMessage && (
+    <motion.div 
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 0.8 }}
+    transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <motion.div 
+      initial={{ y: -50 }}
+      animate={{ y: 0 }}
+      exit={{ y: 50 }}
+      transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+      className="bg-gray-800 p-6 rounded-xl shadow-lg">
+        {/* Icono de palomita */}
+        <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+        <div className='flex justify-center items-center'>
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: 'easeIn' }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={{
+              hidden: { opacity: 0, pathLength: 0 },
+              visible: { opacity: 1, pathLength: 1 },
+            }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            className='flex justify-center items-center'
+            style={{
+              borderRadius: '50%',        // Hace que sea un círculo
+              backgroundColor: '#4CAF50', // Color de fondo verde
+              width: '80px',              // Tamaño del círculo
+              height: '80px',             // Tamaño del círculo
+              display: 'flex',            // Para alinear el contenido
+              justifyContent: 'center',   // Centra horizontalmente
+              alignItems: 'center'        // Centra verticalmente
+            }}
           >
-            <motion.div
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              exit={{ y: 50 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
-              className="bg-gray-800 p-6 rounded-xl shadow-lg"
-            >
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <motion.div
-                className="flex justify-center items-center"
-                style={{
-                  borderRadius: '50%',
-                  backgroundColor: '#4CAF50',
-                  width: '80px',
-                  height: '80px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <FaCheck size={50} className="text-white" />
-              </motion.div>
-            </motion.div>
+            <FaCheck size={50} className="text-white"/>
           </motion.div>
-        )}
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
       </AnimatePresence>
 
       {/* Snackbar para mostrar mensajes de error */}

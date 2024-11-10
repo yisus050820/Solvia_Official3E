@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaCheck } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch } from '@mui/material';
+import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField } from '@mui/material';
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
@@ -26,6 +26,8 @@ const CrudProgramas = () => {
   const [originalProgram, setOriginalProgram] = useState(null);
   const [usuarioActualId, setUsuarioActualId] = useState(null);
   const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -46,6 +48,13 @@ const CrudProgramas = () => {
       setUsuarioActualNombre(decodedToken.nombre);
     }
   }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  const filteredPrograms = data.filter(program => 
+    program.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     fetchPrograms();
@@ -333,6 +342,38 @@ const CrudProgramas = () => {
               onChange={() => setMostrarCards(!mostrarCards)}
               color="primary"
             />
+            <TextField
+    fullWidth
+    label="Buscar..."
+    variant="outlined"
+    sx={{
+      mb: 2,
+      backgroundColor: 'white',          // Fondo blanco
+      color: 'black',                     // Color del texto
+      borderRadius: '5px',                // Bordes redondeados
+      '& .MuiOutlinedInput-root': {
+        height: '36px',                   // Altura total del input
+        fontSize: '0.9rem',               // Tamaño del texto
+        '& input': {
+          color: 'black',                 // Color del texto en el campo de entrada
+          padding: '8px 14px',            // Ajusta el padding interno
+        },
+        '& fieldset': {
+          borderColor: '#ccc',            // Color del borde
+        },
+        '&:hover fieldset': {
+          borderColor: '#888',            // Color de borde al pasar el cursor
+        },
+      },
+      '& .MuiInputLabel-root': {
+        color: '#888',                    // Color del texto de la etiqueta
+        fontSize: '0.9rem',
+        top: '-6px',                      // Ajusta la posición de la etiqueta
+      },
+    }}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
 
           {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
@@ -350,7 +391,7 @@ const CrudProgramas = () => {
 
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
-            {data.map((program) => (
+              {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
                 className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
@@ -429,7 +470,7 @@ const CrudProgramas = () => {
               </tr>
             </thead>
             <motion.tbody layout className="bg-gray-900">
-              {data.map((item) => (
+            {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
