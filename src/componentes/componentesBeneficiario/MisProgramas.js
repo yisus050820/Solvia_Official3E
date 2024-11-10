@@ -178,7 +178,7 @@ const MisProgramas = () => {
   return (
     <div className="mt-4">
       <Typography variant="h3" align="center" color="primary" gutterBottom>
-        Programas Disponibles
+        Mis Programas
       </Typography>
 
       <div className="flex justify-center flex-wrap mt-2">
