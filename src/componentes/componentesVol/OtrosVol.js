@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Typography } from '@mui/material';
+import { Typography, TextField } from '@mui/material';
 
 const UsuariosTarjeta = () => {
   const [data, setData] = useState([]);
   const [filtroRol, setFiltroRol] = useState('');
-  const [mostrarCards, setMostrarCards] = useState(false);
   const [programasInscritos, setProgramasInscritos] = useState({}); // Almacenamos los programas inscritos por usuario.
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
 
   // Obtener usuarios y sus programas inscritos al cargar la página
   useEffect(() => {
@@ -40,13 +40,20 @@ const UsuariosTarjeta = () => {
   // Filtrar datos según el rol seleccionado
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
+  // Filtrar usuarios por el término de búsqueda
+  const filteredAndSearchedData = filteredData.filter((user) => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
         <Typography variant="h3" align="center" color="primary" gutterBottom>
           Usuarios
         </Typography>
+        
         <div className="flex justify-between mb-4 space-x-4">
+          {/* Filtro por Rol */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,40 +80,75 @@ const UsuariosTarjeta = () => {
             </motion.select>
           </motion.div>
 
+          {/* Campo de búsqueda */}
+          <div className="flex items-center space-x-2">
+            <TextField
+              fullWidth
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white', // Fondo blanco
+                color: 'black', // Color del texto
+                borderRadius: '5px', // Bordes redondeados
+                '& .MuiOutlinedInput-root': {
+                  height: '36px', // Altura total del input
+                  fontSize: '0.9rem', // Tamaño del texto
+                  '& input': {
+                    color: 'black', // Color del texto en el campo de entrada
+                    padding: '8px 14px', // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc', // Color del borde
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888', // Color de borde al pasar el cursor
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#888', // Color del texto de la etiqueta
+                  fontSize: '0.9rem',
+                  top: '-6px', // Ajusta la posición de la etiqueta
+                },
+              }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* Mostrar contenido dependiendo del estado del switch */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredData.map((item) => (
-              <motion.div
-                key={item.id}
-                className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="flex justify-center items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredAndSearchedData.map((item) => (
+            <motion.div
+              key={item.id}
+              className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex justify-center items-center">
                 <img
-                    src={`http://localhost:5000${item.profile_picture}`}
-                    alt={item.name}
-                    className="h-32 w-32 object-cover rounded-full mb-4"
-                  />
-                </div>
-                <Typography variant="h5" gutterBottom className="flex justify-center">
-                  {item.name}
-                </Typography>
-                <Typography variant="body1" gutterBottom className="flex justify-center">
-                  {item.role}
-                </Typography>
-                <Typography variant="body2" gutterBottom className="flex justify-center">
-                  {item.email}
-                </Typography>
-                <Typography variant="body2" className="flex justify-center">
-                  {item.description}
-                </Typography>
-              </motion.div>
-            ))}
-          </div>
+                  src={`http://localhost:5000${item.profile_picture}`}
+                  alt={item.name}
+                  className="h-32 w-32 object-cover rounded-full mb-4"
+                />
+              </div>
+              <Typography variant="h5" gutterBottom className="flex justify-center">
+                {item.name}
+              </Typography>
+              <Typography variant="body1" gutterBottom className="flex justify-center">
+                {item.role}
+              </Typography>
+              <Typography variant="body2" gutterBottom className="flex justify-center">
+                {item.email}
+              </Typography>
+              <Typography variant="body2" className="flex justify-center">
+                {item.description}
+              </Typography>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </>
   );
