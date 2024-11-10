@@ -212,6 +212,11 @@ const Calificar = () => {
   useEffect(() => {
     fetchPrograms();
   }, []);
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 1000); // Cierra después de 1000 ms
+    }
+  }, [successMessage]);
 
   return (
     <div className="mt-2">

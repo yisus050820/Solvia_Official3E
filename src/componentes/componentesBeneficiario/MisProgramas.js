@@ -5,7 +5,7 @@ import { Typography } from '@mui/material';
 import StudentDashboard from './InterfazBeneficiario';
 
 // Componente para mostrar una tarjeta de programa
-const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name }) => {
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
@@ -36,11 +36,6 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
   return (
     <>
       {/* Tarjeta del programa */}
-      <motion.div 
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
-        whileHover={{ scale: 1.05 }} 
-        whileTap={{ scale: 0.95 }}   
-        ></motion.div>
       <motion.div
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
@@ -61,7 +56,6 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
           {/* Limitar la descripción a un máximo de 100 caracteres */}
           <h2 className="text-white text-xl font-bold">{title}</h2>
           <p className="text-gray-400 mt-2">
-            {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
@@ -102,7 +96,9 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
-              className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-4xl w-full"
+              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
+                showDashboard ? 'max-w-3xl' : 'max-w-lg'
+              }`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -116,8 +112,15 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                 <StudentDashboard programId={programId} />
               ) : (
                 <>
-                  <h2 className="text-white text-3xl font-bold mb-4">{title}</h2>
-                  <p className="text-gray-600">{description}</p>
+                  <h2 className="text-white text-3xl font-bold">{title}</h2>
+                  <h4 className="text-white-900 mb-4 font-semibold">
+                  </h4>
+                  <img
+                    className="w-full h-48 object-cover shadow-md rounded"
+                    src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
+                    alt={name}
+                  />
+                  <p className="text-gray-400 mt-4">{description}</p>
                 </>
               )}
               <motion.button
@@ -158,6 +161,7 @@ const MisProgramas = () => {
               participants: participantsRes.data.count,
               donations: donationsRes.data.total,
               imageUrl: program.program_image,
+              coordinator_name: program.coordinator_name || 'No disponible'
             };
           })
         );
@@ -180,14 +184,15 @@ const MisProgramas = () => {
       <div className="flex justify-center flex-wrap mt-2">
         {programs.map((program) => (
           <ProgramCard
-          key={program.id}
-          title={program.name}
-          description={program.description}
-          participants={program.participants}
-          donations={program.donations}
-          status={program.status}
-          imageUrl={program.imageUrl}
-          programId={program.id}
+            key={program.id}
+            title={program.name}
+            coordinator_name={program.coordinator_name || 'No disponible'}
+            description={program.description}
+            participants={program.participants}
+            donations={program.donations}
+            status={program.status}
+            imageUrl={program.imageUrl}
+            programId={program.id} 
           />
         ))}
       </div>
