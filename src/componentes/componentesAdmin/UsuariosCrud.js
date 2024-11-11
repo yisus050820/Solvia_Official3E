@@ -6,6 +6,7 @@ import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Dial
 import { ReceiptEuroIcon } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
@@ -60,9 +61,9 @@ const CrudUsuarios = () => {
       }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
     }
   }, [successMessage]);
-  
+
   const handleOpenModal = () => {
-    setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
+    setNewUser({ name: '', email: '', birthdate: null, role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
     setErrors({});
   };
@@ -93,7 +94,7 @@ const CrudUsuarios = () => {
       }
     }
 
-    if ( !isEditing && (user.role === 'beneficiary' && age < 9)) {
+    if (!isEditing && (user.role === 'beneficiary' && age < 9)) {
       validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
     } else if (!isEditing && user.role !== 'beneficiary' && age < 18) {
       validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
@@ -113,7 +114,7 @@ const CrudUsuarios = () => {
   };
 
   const handleAddUser = () => {
-    const { name, email, password, description, role, birth_date, profile_picture } = newUser;
+    const { name, email, birth_date, password, description, role, profile_picture } = newUser;
 
     const missingFields = [];
     if (!name) missingFields.push('Nombre');
@@ -164,50 +165,43 @@ const CrudUsuarios = () => {
   };
 
   const handleEditUser = () => {
-    const validationErrors = validateUser(newUser, {}, true);
-
+    const validationErrors = validateUser(editUser, originalUser, true);
+  
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
-
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-
+  
     const updatedUser = {
       name: editUser.name,
       email: editUser.email,
+      birth_date: editUser.birth_date ? format(editUser.birth_date, 'yyyy-MM-dd') : null, 
       role: editUser.role,
       description: editUser.description,
       ...(editUser.password ? { password: editUser.password } : {})
     };
-
+  
     axios.put(`http://localhost:5000/usuarios/${editUser.id}`, updatedUser)
       .then(response => {
-        axios.get('http://localhost:5000/usuarios')
-          .then(response => {
-            setData(response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching users:', error);
-          });
+        setData(data.map(user => user.id === editUser.id ? response.data : user));
         handleCloseEditModal();
-        setSuccessMessage('Usuario editado exitosamente.'); // Mostrar mensaje de éxito
+        setSuccessMessage('Usuario editado exitosamente.');
       })
       .catch(error => {
-        setMessage(`Error al actualizar usuario, intente más tarde.`);
+        setMessage('Error al actualizar usuario, intente más tarde.');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
-        return;
       });
-  };
+  };  
 
   const handleOpenEditModal = (user) => {
     setEditUser({
       ...user,
+      birth_date: user.birth_date ? new Date(user.birth_date) : null,
       password: ''
     });
     setOriginalUser({ ...user });
@@ -289,16 +283,16 @@ const CrudUsuarios = () => {
             </motion.select>
           </motion.div>
           <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <Typography variant="body1" color="primary" className="mr-2">
-              Ver en tarjetas
-            </Typography>
-            <Switch
-              checked={mostrarCards}
-              onChange={() => setMostrarCards(!mostrarCards)}
-              color="primary"
-            />
-          </div>
+            <div className="flex items-center">
+              <Typography variant="body1" color="primary" className="mr-2">
+                Ver en tarjetas
+              </Typography>
+              <Switch
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                color="primary"
+              />
+            </div>
 
             <motion.button
               className="bg-green-500 text-white p-2 rounded-full"
@@ -518,6 +512,13 @@ const CrudUsuarios = () => {
                   placeholder="Correo"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                />
+                <DatePicker
+                  selected={editUser.birth_date ? new Date(editUser.birth_date) : null}
+                  onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Fecha de nacimiento"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"

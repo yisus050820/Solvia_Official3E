@@ -18,12 +18,12 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// Obtener programas en los que el usuario está inscrito
+// Obtener programas en los que el usuario está inscrito junto con el feedback
 router.get('/programas', authenticateToken, (req, res) => {
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     const query = `
-        SELECT DISTINCT p.*
+        SELECT DISTINCT p.*, b.feedback, b.score
         FROM programs p
         JOIN beneficiaries b ON p.id = b.program_id
         WHERE b.user_id = ?
@@ -31,7 +31,7 @@ router.get('/programas', authenticateToken, (req, res) => {
 
     db.query(query, [userId], (err, results) => {
         if (err) {
-            console.error('Error fetching programs:', err);
+            console.error('Error fetching programs with feedback:', err);
             return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
         }
         res.json(results);
@@ -57,7 +57,8 @@ router.get('/:programId/feed', (req, res) => {
 });
 
 // Crear o actualizar feedback para un programa específico
-router.post('/:programId', authenticateToken, (req, res) => {
+// Crear o actualizar feedback para un programa específico
+router.put('/:programId', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { programId } = req.params;
     const { feedback, score } = req.body;
@@ -75,6 +76,7 @@ router.post('/:programId', authenticateToken, (req, res) => {
         }
 
         if (results.length > 0) {
+            // Actualizar el feedback y score
             db.query(`
               UPDATE beneficiaries
               SET feedback = ?, score = ?
@@ -87,17 +89,7 @@ router.post('/:programId', authenticateToken, (req, res) => {
                 res.status(200).json({ message: 'Feedback actualizado correctamente' });
             });
         } else {
-            // Insertar nuevo feedback
-            db.query(`
-              INSERT INTO beneficiaries (user_id, program_id, feedback, score)
-              VALUES (?, ?, ?, ?)
-            `, [userId, programId, feedback, score], (insertErr) => {
-                if (insertErr) {
-                    console.error('Error al insertar feedback:', insertErr);
-                    return res.status(500).json({ error: 'Error en el servidor al insertar feedback' });
-                }
-                res.status(201).json({ message: 'Feedback creado correctamente' });
-            });
+            res.status(404).json({ message: 'No existe una asignación para este usuario y programa.' });
         }
     });
 });

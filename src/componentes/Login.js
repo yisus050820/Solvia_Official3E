@@ -61,16 +61,16 @@ const Login = () => {
           navigate('/Admin');
           break;
         case 'donor':
-          navigate('/DonadorCrud'); 
+          navigate('/DonadorCrud');
           break;
         case 'volunteer':
-          navigate('/VoluntarioCrud'); 
+          navigate('/VoluntarioCrud');
           break;
         case 'beneficiary':
-          navigate('/BeneficiarioCrud'); 
+          navigate('/BeneficiarioCrud');
           break;
         case 'coordinator':
-          navigate('/CoordiCrud'); 
+          navigate('/CoordiCrud');
           break;
         default:
           navigate('/'); // Redirigir a una ruta por defecto
@@ -155,7 +155,7 @@ const Login = () => {
             backgroundColor: '#2b2b2b',
             borderRadius: '16px',
             width: { xs: '100%', sm: '400px', md: '450px' },
-            marginRight: { xs: 0, sm: 3, md: 35 }, 
+            marginRight: { xs: 0, sm: 3, md: 35 },
           }}
         >
           <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ color: '#ffffff' }}>
@@ -241,6 +241,11 @@ const Login = () => {
               <Link to="/register" style={{ color: '#1a73e8', textDecoration: 'none' }}>
                 Regístrate aquí
               </Link>
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
+              <Button onClick={() => navigate('/')} sx={{ color: '#1a73e8' }}>
+                Regresar
+              </Button>
             </Typography>
           </Box>
         </Paper>

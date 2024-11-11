@@ -12,12 +12,17 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
     setIsModalOpen(true);
     try {
       const response = await axios.get(`http://localhost:5000/feedback/${programId}/feed`);
-      setFeedbacks(response.data);
+      const uniqueFeedbacks = Object.values(response.data.reduce((acc, curr) => {
+        acc[curr.username] = curr;  
+        return acc;
+      }, {}));
+      setFeedbacks(uniqueFeedbacks);  
     } catch (error) {
       console.error('Error fetching feedback:', error);
-      setFeedbacks([]); // Si hay error, dejamos feedback vacío
+      setFeedbacks([]); 
     }
   };
+  
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
