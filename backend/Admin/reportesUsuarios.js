@@ -58,14 +58,14 @@ router.get('/nuevosUsuarios', (req, res) => {
 // Ruta para obtener el crecimiento de usuarios a lo largo del tiempo
 router.get('/crecimientoUsuarios', (req, res) => {
     const query = `
-        SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS Usuarios
+        SELECT MONTHNAME(created_at) AS month, COUNT(*) AS Usuarios
         FROM users
-        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-        ORDER BY MIN(created_at)
+        GROUP BY MONTH(created_at)
+        ORDER BY MONTH(created_at)
     `;
     db.query(query, (err, results) => {
         if (err) {
-            console.error('Error en /crecimientoUsuarios:', err.message);
+            console.error('Error en crecimientoUsuarios:', err.message);
             return res.status(500).json({ error: 'Error al obtener el crecimiento de usuarios' });
         }
         res.json(results);

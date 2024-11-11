@@ -38,6 +38,7 @@ const ReportesProgramasAyuda = () => {
 
         // Obtener crecimiento de programas
         const crecimientoProgramasRes = await axios.get('http://localhost:5000/programReports/crecimientoProgramas');
+        console.log('Datos de crecimiento de programas:', crecimientoProgramasRes.data);
         setCrecimientoProgramas(crecimientoProgramasRes.data);
 
         // Obtener total de donaciones
@@ -172,23 +173,27 @@ const ReportesProgramasAyuda = () => {
               Crecimiento de Programas a lo largo del tiempo
             </Typography>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={crecimientoProgramas}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="month" stroke="#FFFFFF" />
-              <YAxis stroke="#FFFFFF" />
-              <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="program_count"
-                stroke="#FFBB28"
-                activeDot={{ r: 8 }}
-                strokeWidth={3}
-                dot={{ stroke: '#FF8042', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {crecimientoProgramas.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={crecimientoProgramas}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="month" stroke="#FFFFFF" />
+                <YAxis stroke="#FFFFFF" />
+                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="Programas"  // Cambiado de "program_count" a "Programas"
+                  stroke="#FFBB28"
+                  activeDot={{ r: 8 }}
+                  strokeWidth={3}
+                  dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <Typography color="white">Cargando datos de crecimiento...</Typography>
+          )}
         </motion.div>
 
         {/* Gráfica de pastel - Proporción de beneficiarios por programa */}

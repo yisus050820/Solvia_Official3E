@@ -14,7 +14,7 @@ const ReportesUsuarios = () => {
   const [nuevosUsuarios, setNuevosUsuarios] = useState(0);
   const [usuariosPorRoles, setUsuariosPorRoles] = useState([]);
   const [crecimientoUsuarios, setCrecimientoUsuarios] = useState([]);
-  const [coordinadores, setCoordinadores] = useState(0);  
+  const [coordinadores, setCoordinadores] = useState(0);
   const pdfRef = useRef(); // Ref para el PDF
 
   useEffect(() => {
@@ -26,6 +26,7 @@ const ReportesUsuarios = () => {
 
         // Obtener crecimiento de usuarios a lo largo del tiempo
         const crecimientoUsuariosRes = await axios.get('http://localhost:5000/userReports/crecimientoUsuarios');
+        console.log('Datos de crecimiento de usuarios:', crecimientoUsuariosRes.data);
         setCrecimientoUsuarios(crecimientoUsuariosRes.data);
 
         // Obtener distribución por roles
@@ -46,7 +47,7 @@ const ReportesUsuarios = () => {
     };
 
     fetchData();
-  }, []);  
+  }, []);
 
   const formatMonth = (monthString) => {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -156,23 +157,27 @@ const ReportesUsuarios = () => {
               Crecimiento de Usuarios a lo largo del tiempo
             </Typography>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={crecimientoUsuarios}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="month" stroke="#FFFFFF" tickFormatter={formatMonth} />
-              <YAxis stroke="#FFFFFF" />
-              <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="usuarios"
-                stroke="#FFBB28"
-                activeDot={{ r: 8 }}
-                strokeWidth={3}
-                dot={{ stroke: '#FF8042', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {crecimientoUsuarios.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={crecimientoUsuarios}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="month" stroke="#FFFFFF" tickFormatter={formatMonth} />
+                <YAxis stroke="#FFFFFF" />
+                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="usuarios"
+                  stroke="#FFBB28"
+                  activeDot={{ r: 8 }}
+                  strokeWidth={3}
+                  dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <Typography color="white">Cargando datos de crecimiento...</Typography>
+          )}
         </motion.div>
 
         {/* Gráfica de pastel - Distribución de roles */}
@@ -196,7 +201,7 @@ const ReportesUsuarios = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, value }) => totalUsuarios > 0 ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%` : `${name}: 0%`} 
+                label={({ name, value }) => totalUsuarios > 0 ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%` : `${name}: 0%`}
                 outerRadius={120}
                 fill="#8884d8"
                 dataKey="value"

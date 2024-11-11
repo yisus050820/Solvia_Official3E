@@ -36,6 +36,7 @@ const ReportesDonaciones = () => {
         setPromedioPorUsuario(totalDonaciones / totalUsuarios);
 
         const evolucionRes = await axios.get('http://localhost:5000/donationsReports/evolucionDonaciones');
+        console.log('Datos de la evolucion;', evolucionRes.data)
         setEvolucionDonaciones(evolucionRes.data);
       } catch (error) {
         console.error('Error fetching donation data:', error);
@@ -162,23 +163,27 @@ const ReportesDonaciones = () => {
                 Evolución de Donaciones a lo largo del tiempo
               </Typography>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={evolucionDonaciones}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="month" stroke="#FFFFFF" />
-                <YAxis stroke="#FFFFFF" />
-                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="donaciones"
-                  stroke="#FFBB28"
-                  activeDot={{ r: 8 }}
-                  strokeWidth={3}
-                  dot={{ stroke: '#FF8042', strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {evolucionDonaciones.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={evolucionDonaciones}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                  <XAxis dataKey="month" stroke="#FFFFFF" />
+                  <YAxis stroke="#FFFFFF" />
+                  <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="Donaciones"  // Asegúrate de que coincida con la clave exacta en los datos de evolución
+                    stroke="#FFBB28"
+                    activeDot={{ r: 8 }}
+                    strokeWidth={3}
+                    dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <Typography color="white">Cargando datos de evolucion...</Typography>
+            )}
           </motion.div>
 
           <motion.div

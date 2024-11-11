@@ -56,11 +56,9 @@ router.get('/crecimientoProgramas', (req, res) => {
       return res.status(500).json({ message: 'Error fetching data.' });
     }
     res.json(results);
+    console.log(results);
   });
 });
-
-module.exports = router;
-
 
 // Obtener total de donaciones recaudadas agrupadas por mes
 router.get('/totalDonaciones', (req, res) => {
