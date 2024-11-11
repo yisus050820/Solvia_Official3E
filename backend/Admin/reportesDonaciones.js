@@ -49,7 +49,7 @@ router.get('/evolucionDonaciones', (req, res) => {
     const query = `
       SELECT 
         MONTHNAME(d.date) AS month, 
-        SUM(d.amount) AS donaciones 
+        SUM(d.amount) AS Donaciones 
       FROM donations d
       GROUP BY month
       ORDER BY MONTH(d.date)

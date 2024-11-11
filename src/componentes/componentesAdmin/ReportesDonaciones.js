@@ -163,9 +163,9 @@ const ReportesDonaciones = () => {
               </Typography>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={evolucionDonaciones}> 
+              <LineChart data={evolucionDonaciones}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="month" stroke="#FFFFFF" /> 
+                <XAxis dataKey="month" stroke="#FFFFFF" />
                 <YAxis stroke="#FFFFFF" />
                 <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
                 <Legend />
@@ -201,7 +201,7 @@ const ReportesDonaciones = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ donor_name, total_donations }) => `${donor_name}: ${((totalDonaciones / totalDonaciones) * 100).toFixed(2)}%`}
+                  label={({ donor_name, total_donations }) => `${donor_name}: ${total_donations}`}
                   outerRadius={120}
                   fill="#8884d8"
                   dataKey="total_donations"
@@ -210,7 +210,13 @@ const ReportesDonaciones = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value, name, entry) => {
+                    const { donor_name } = entry.payload;
+                    return [`${value}`, `${donor_name} `];
+                  }}
+                  contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </motion.div>

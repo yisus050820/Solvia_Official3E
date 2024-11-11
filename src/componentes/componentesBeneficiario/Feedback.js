@@ -43,7 +43,7 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/feedback/${programId}`, { feedback, score: rating }, {
+      await axios.put(`http://localhost:5000/feedback/${programId}`, { feedback, score: rating }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       handleCloseModal();
@@ -176,10 +176,19 @@ const Calificar = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+      }, 2000);
+      return () => clearTimeout(timer); 
+    }
+  }, [successMessage]);
+
   const fetchPrograms = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/feedback', {
+      const response = await axios.get('http://localhost:5000/feedback/programas', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -193,16 +202,14 @@ const Calificar = () => {
             participants: participantsRes.data.count,
             donations: donationsRes.data.total,
             imageUrl: program.program_image,
-            hasFeedback: program.feedback ? true : false,
+            feedback: program.feedback || '',  // Asegúrate de asignar feedback
+            score: program.score || 0,         // Asegúrate de asignar score
+            hasFeedback: !!program.feedback,  // Verifica si tiene feedback
           };
         })
       );
 
-      // Filtrar duplicados por id de programa
-      const uniquePrograms = Array.from(new Set(programData.map(p => p.id)))
-        .map(id => programData.find(p => p.id === id));
-
-      setPrograms(uniquePrograms);
+      setPrograms(programData);
     } catch (error) {
       console.error('Error fetching programs:', error);
       setError('Error al pedir los programas.');
@@ -238,7 +245,6 @@ const Calificar = () => {
             initialFeedback={{
               comment: program.feedback,
               score: program.score,
-              hasFeedback: program.hasFeedback
             }}
           />
         ))}

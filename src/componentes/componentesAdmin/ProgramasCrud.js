@@ -143,7 +143,7 @@ const CrudProgramas = () => {
 
   const handleAddProgram = () => {
     const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
-
+  
     // Verificación de campos vacíos
     const missingFields = [];
     if (!nombre) missingFields.push('Nombre');
@@ -152,53 +152,59 @@ const CrudProgramas = () => {
     if (!fechaFin) missingFields.push('Fecha de fin');
     if (!objetivos) missingFields.push('Objetivos');
     if (!coordinador) missingFields.push('Coordinador');
-
+  
     if (missingFields.length > 0) {
       setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-
+  
     // Validación de los datos
     const validationErrors = validateProgram(newProgram, null, false);
-
+  
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
+  
       const firstError = Object.values(validationErrors)[0];
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-
-    // Formateo de los datos para el envío
-    const programData = {
-      name: nombre,
-      description: descripcion,
-      start_date: formatDateForMySQL(fechaInicio),
-      end_date: formatDateForMySQL(fechaFin),
-      objectives: objetivos,
-      coordinator_charge: coordinador,
-      program_image: program_image || defaultProgramPicture,
-      status: newProgram.status || 'active',
-    };
-
-    axios.post('http://localhost:5000/programas', programData)
-      .then(() => {
-        fetchPrograms();
-        handleCloseModal();
-        setSuccessMessage('Programa agregado exitosamente.');
-        originalProgram = programData;
-      })
-      .catch(error => {
-        console.error('Error al añadir programa:', error);
-        setMessage('Error al añadir el programa, intente más tarde.');
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
-      });
-  };
+  
+    // Crear FormData para enviar el archivo y otros datos
+    const formData = new FormData();
+    formData.append('name', nombre);
+    formData.append('description', descripcion);
+    formData.append('start_date', formatDateForMySQL(fechaInicio));
+    formData.append('end_date', formatDateForMySQL(fechaFin));
+    formData.append('objectives', objetivos);
+    formData.append('coordinator_charge', coordinador);
+    formData.append('status', newProgram.status || 'active');
+  
+    // Adjuntar el archivo solo si existe
+    if (newProgram.program_image instanceof File) {
+      formData.append('program_image', newProgram.program_image);
+    }
+  
+    axios.post('http://localhost:5000/programas', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    })
+    .then(() => {
+      fetchPrograms();
+      handleCloseModal();
+      setSuccessMessage('Programa agregado exitosamente.');
+    })
+    .catch(error => {
+      console.error('Error al añadir programa:', error);
+      setMessage('Error al añadir el programa, intente más tarde.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    });
+  };  
 
   const handleEditProgram = (program) => {
     console.log(editProgram)

@@ -18,7 +18,7 @@ const ReportesProgramasAyuda = () => {
   const [beneficiariosPorPrograma, setBeneficiariosPorPrograma] = useState([]);
   const pdfRef = useRef();
   const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);  
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   // Obtener datos desde el backend
   useEffect(() => {
@@ -46,13 +46,13 @@ const ReportesProgramasAyuda = () => {
 
         // Obtener beneficiarios por programa
         const beneficiariosPorProgramaRes = await axios.get('http://localhost:5000/programReports/beneficiariosPorPrograma');
-        
+
         // Calcular el total de beneficiarios sumando todos los beneficiarios de los programas
         const totalBeneficiarios = beneficiariosPorProgramaRes.data.reduce(
           (acc, program) => acc + program.total_beneficiaries,
           0
         );
-        
+
         setBeneficiariosTotales(totalBeneficiarios);
         setBeneficiariosPorPrograma(beneficiariosPorProgramaRes.data);
       } catch (error) {
@@ -214,7 +214,11 @@ const ReportesProgramasAyuda = () => {
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="total_beneficiaries"
-                label={(entry) => entry.name}
+                nameKey="program_name"
+                label={({ program_name }) =>
+                  program_name.length > 10 ? `${program_name.slice(0, 10)}...` : program_name
+                }
+                labelLine={false}  // Esto elimina las líneas blancas
               >
                 {beneficiariosPorPrograma.map((entry, index) => (
                   <Cell
@@ -223,7 +227,13 @@ const ReportesProgramasAyuda = () => {
                   />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value, name, props) => {
+                  const { program_name } = props.payload;
+                  return [`${value}`, `${program_name}`];
+                }}
+                contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>

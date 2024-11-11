@@ -82,16 +82,16 @@ router.post('/', (req, res) => {
 
 // Actualizar usuario
 router.put('/:id', (req, res) => {
-  const { name, email, role, description, password } = req.body;
+  const { name, email, birth_date, role, description, password } = req.body;
   const userId = req.params.id;
 
-  let query = 'UPDATE users SET name = ?, email = ?, role = ?, description = ? WHERE id = ?';
-  let params = [name, email, role, description, userId];
+  let query = 'UPDATE users SET name = ?, email = ?, birth_date = ?, role = ?, description = ? WHERE id = ?';
+  let params = [name, email, birth_date, role, description, userId];
 
   if (password && password.length >= 8) {
     const hashedPassword = bcrypt.hashSync(password, 8);
-    query = 'UPDATE users SET name = ?, email = ?, role = ?, description = ?, password = ? WHERE id = ?';
-    params = [name, email, role, description, hashedPassword, userId];
+    query = 'UPDATE users SET name = ?, email = ?, birth_date = ?, role = ?, description = ?, password = ? WHERE id = ?';
+    params = [name, email, birth_date, role, description, hashedPassword, userId];
   }
 
   db.query(query, params, (err, result) => {
@@ -101,7 +101,7 @@ router.put('/:id', (req, res) => {
     }
 
     // Consulta para obtener la fecha de creación
-    db.query('SELECT id, name, email, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users WHERE id = ?', [userId], (err, updatedResults) => {
+    db.query('SELECT id, name, email, DATE_FORMAT(birth_date, "%Y-%m-%d") AS birth_date, role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users WHERE id = ?', [userId], (err, updatedResults) => {
       if (err) {
         console.error('Error fetching updated user:', err);
         return res.status(500).json({ message: 'Error al obtener los detalles actualizados del usuario.' });
@@ -179,27 +179,30 @@ router.delete('/:id', (req, res) => {
 });
 
 // Ruta protegida para editar el perfil del usuario actual
-router.put('/user', authenticateToken, async (req, res) => {
-  const { name, email, role, profile_picture, description } = req.body;
-  const userId = req.user.id; // Obtener el ID del usuario del token
+// Ruta protegida para editar el perfil del usuario actual
+router.put('/usuarios/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, email, birth_date, role, description, password } = req.body;
 
-  let query = 'UPDATE users SET name = ?, email = ?, role = ?, profile_picture = ?, description = ? WHERE id = ?';
-  let params = [name, email, role, profile_picture, description, userId];
+  // Construcción de la consulta SQL
+  let query = 'UPDATE users SET name = ?, email = ?, birth_date = ?, role = ?, description = ?';
+  const params = [name, email, birth_date, role, description];
+
+  if (password && password.length >= 8) {
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    query += ', password = ?';
+    params.push(hashedPassword);
+  }
+
+  query += ' WHERE id = ?';
+  params.push(id);
 
   db.query(query, params, (err, result) => {
     if (err) {
-      console.error('Error updating user profile:', err);
-      return res.status(500).json({ message: 'Error al actualizar la información del usuario.' });
+      console.error('Error updating user:', err);
+      return res.status(500).json({ message: 'Error actualizando el usuario.' });
     }
-
-    // Obtener los datos actualizados del usuario
-    db.query('SELECT id, name, email, role, profile_picture, description FROM users WHERE id = ?', [userId], (err, updatedUser) => {
-      if (err) {
-        console.error('Error fetching updated user:', err);
-        return res.status(500).json({ message: 'Error al obtener los detalles actualizados del usuario.' });
-      }
-      res.status(200).json({ message: 'Información del usuario actualizada', user: updatedUser[0] });
-    });
+    res.json({ message: 'Usuario actualizado correctamente.' });
   });
 });
 
