@@ -1,27 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Typography, Switch, TextField } from '@mui/material';
+import { Typography, Switch, TextField, Avatar } from '@mui/material';
 
 const CrudUsuariosCoordi = () => {
-  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
   const [filtroRol, setFiltroRol] = useState('');
   const [mostrarCards, setMostrarCards] = useState(false);
   const [programasInscritos, setProgramasInscritos] = useState({}); // Almacenamos los programas inscritos por usuario.
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   // Obtener usuarios y sus programas inscritos al cargar la página
   useEffect(() => {
     // Obtener información de usuarios
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
-    
+
     // Obtener información de los programas a los que están inscritos los beneficiarios
     const fetchProgramasInscritos = axios.get('http://localhost:5000/asigBenProg/asignaciones');
 
     Promise.all([fetchUsuarios, fetchProgramasInscritos])
       .then(([usuariosResponse, programasResponse]) => {
-        setData(usuariosResponse.data);
-        
+        setUser(usuariosResponse.data);
+
         // Estructurar los programas inscritos por cada beneficiario
         const programasMap = {};
         programasResponse.data.forEach((asignacion) => {
@@ -44,14 +45,28 @@ const CrudUsuariosCoordi = () => {
   };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchQuery(e.target.value.toLowerCase());
   };
 
-  // Filtrar datos por rol y término de búsqueda
-  const filteredData = data.filter((user) => {
-    const matchesRole = filtroRol ? user.role === filtroRol : true;
-    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesRole && matchesSearchTerm;
+  const sortedUser = [...user].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return a.email.localeCompare(b.email);
+    if (sortBy === "birth_date") return new Date(a.birth_date).getTime() - new Date(b.birth_date).getTime();
+    if (sortBy === "role") return a.role.localeCompare(b.role);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "created_at") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    return 0;
+  });
+
+  const filteredUser = sortedUser.filter((user) => {
+    return (
+      user.name.toLowerCase().includes(searchQuery) ||
+      user.email.toLowerCase().includes(searchQuery) ||
+      (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
+      user.role.toLowerCase().includes(searchQuery) ||
+      (user.description && user.description.toLowerCase().includes(searchQuery)) ||
+      (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
+    );
   });
 
   return (
@@ -116,7 +131,7 @@ const CrudUsuariosCoordi = () => {
                 top: '-6px',                      // Ajusta la posición de la etiqueta
               },
             }}
-            value={searchTerm}
+            value={searchQuery}
             onChange={handleSearchChange}
           />
         </div>
@@ -136,7 +151,7 @@ const CrudUsuariosCoordi = () => {
       {/* Mostrar contenido dependiendo del estado del switch */}
       {mostrarCards ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredData.map((item) => (
+          {filteredUser.map((item) => (
             <motion.div
               key={item.id}
               className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
@@ -144,13 +159,17 @@ const CrudUsuariosCoordi = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex justify-center items-center">
-                <img
-                  src={`http://localhost:5000${item.profile_picture}`}
-                  alt={item.name}
-                  className="h-32 w-32 object-cover rounded-full mb-4"
-                />
-              </div>
+              <Avatar
+                src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
+                alt={item.name}
+                sx={{
+                  width: 128,
+                  height: 128,
+                  marginBottom: 2,
+                  objectFit: 'cover',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }}
+              />
               <Typography variant="h5" gutterBottom className="flex justify-center">
                 {item.name}
               </Typography>
@@ -179,7 +198,7 @@ const CrudUsuariosCoordi = () => {
             </tr>
           </thead>
           <motion.tbody layout>
-            {filteredData.map((item) => (
+            {filteredUser.map((item) => (
               <motion.tr key={item.id} className="border-b border-gray-700">
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{item.email}</td>

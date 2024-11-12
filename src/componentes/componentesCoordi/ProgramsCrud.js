@@ -11,7 +11,7 @@ import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, Dial
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
-  const [data, setData] = useState([]);
+  const [program, setProgram] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -24,6 +24,8 @@ const CrudProgramas = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
   const [originalProgram, setOriginalProgram] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   const [usuarioActualId, setUsuarioActualId] = useState(null);
   const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
@@ -48,7 +50,7 @@ const CrudProgramas = () => {
   const fetchPrograms = () => {
     axios.get('http://localhost:5000/programs')
       .then(response => {
-        setData(response.data);
+        setProgram(response.data);
       })
       .catch(error => {
         console.error('Error fetching programs:', error);
@@ -244,7 +246,7 @@ const CrudProgramas = () => {
   const handleDelete = () => {
     axios.delete(`http://localhost:5000/programas/${currentId}`)
       .then(() => {
-        setData(data.filter(program => program.id !== currentId));
+        setProgram(program.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
       })
@@ -269,6 +271,33 @@ const CrudProgramas = () => {
       }
     }
   };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };  
+
+  const sortedProgram = [...program].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "start_date") return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+    if (sortBy === "end_date") return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+    if (sortBy === "objectives") return a.description.localeCompare(b.objectives);
+    if (sortBy === "coordinator_name") return a.name.localeCompare(b.coordinator_name);
+    if (sortBy === "status") return a.status.localeCompare(b.status);
+    return 0;
+  });
+
+  const filteredPrograms = sortedProgram.filter((program) => {
+    return (
+      (program.name && program.name.toLowerCase().includes(searchQuery)) ||
+      (program.description && program.description.toLowerCase().includes(searchQuery)) ||
+      (program.objectives && program.objectives.toLowerCase().includes(searchQuery)) ||
+      (program.coordinator_name && program.coordinator_name.toLowerCase().includes(searchQuery)) ||
+      (program.start_date && program.start_date.toLowerCase().includes(searchQuery)) ||
+      (program.end_date && program.end_date.toLowerCase().includes(searchQuery)) ||
+      (program.status && program.status.toLowerCase().includes(searchQuery))
+    );
+  });  
 
   return (
     <>
@@ -302,7 +331,7 @@ const CrudProgramas = () => {
             </tr>
           </thead>
           <motion.tbody layout className="bg-gray-900">
-            {data.map((item) => (
+            {filteredPrograms.map((item) => (
               <motion.tr key={item.id} className="border-b border-gray-700">
                 <td className="p-4">{item.name}</td>
                 <td className="p-4">{truncateDescription(item.description)}</td>

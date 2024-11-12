@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField, Avatar } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
 const CrudUsuarios = () => {
-  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -27,7 +27,9 @@ const CrudUsuarios = () => {
   const [errors, setErrors] = useState({});
   const [mostrarCards, setMostrarCards] = useState(false); // Estado para el switch de tarjetas
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda}
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
 
   const handleCloseSnackbar = () => {
@@ -43,7 +45,7 @@ const CrudUsuarios = () => {
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
-        setData(response.data);
+        setUser(response.data);
       })
       .catch(error => {
         console.error('Error fetching users:', error);
@@ -148,8 +150,7 @@ const CrudUsuarios = () => {
 
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
-        const createdUser = response.data;
-        setData([...data, createdUser]);
+        setUser(response.date);
         handleCloseModal();
         setSuccessMessage('Usuario agregado exitosamente.');
       })
@@ -168,7 +169,7 @@ const CrudUsuarios = () => {
 
   const handleEditUser = () => {
     const validationErrors = validateUser(editUser, originalUser, true);
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const firstError = Object.values(validationErrors)[0];
@@ -177,19 +178,19 @@ const CrudUsuarios = () => {
       setOpenSnackbar(true);
       return;
     }
-  
+
     const updatedUser = {
       name: editUser.name,
       email: editUser.email,
-      birth_date: editUser.birth_date ? format(editUser.birth_date, 'yyyy-MM-dd') : null, 
+      birth_date: editUser.birth_date ? format(editUser.birth_date, 'yyyy-MM-dd') : null,
       role: editUser.role,
       description: editUser.description,
       ...(editUser.password ? { password: editUser.password } : {})
     };
-  
+
     axios.put(`http://localhost:5000/usuarios/${editUser.id}`, updatedUser)
       .then(response => {
-        setData(data.map(user => user.id === editUser.id ? response.data : user));
+        setUser(user.map(user => user.id === editUser.id ? response.data : user));
         handleCloseEditModal();
         setSuccessMessage('Usuario editado exitosamente.');
       })
@@ -198,7 +199,7 @@ const CrudUsuarios = () => {
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
-  };  
+  };
 
   const handleOpenEditModal = (user) => {
     setEditUser({
@@ -219,7 +220,7 @@ const CrudUsuarios = () => {
   const handleDelete = (id) => {
     axios.delete(`http://localhost:5000/usuarios/${id}`)
       .then(() => {
-        setData(data.filter(user => user.id !== id));
+        setUser(user.filter(user => user.id !== id));
         setSuccessMessage('Usuario eliminado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
@@ -250,13 +251,28 @@ const CrudUsuarios = () => {
   };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchQuery(e.target.value.toLowerCase());
   };
 
-  const filteredData = data.filter((user) => {
-    const matchesRole = filtroRol ? user.role === filtroRol : true;
-    const matchesSearchTerm = user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesRole && matchesSearchTerm;
+  const sortedUser = [...user].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return a.email.localeCompare(b.email);
+    if (sortBy === "birth_date") return new Date(a.birth_date).getTime() - new Date(b.birth_date).getTime();
+    if (sortBy === "role") return a.role.localeCompare(b.role);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "created_at") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    return 0;
+  });
+
+  const filteredUser = sortedUser.filter((user) => {
+    return (
+      user.name.toLowerCase().includes(searchQuery) ||
+      user.email.toLowerCase().includes(searchQuery) ||
+      (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
+      user.role.toLowerCase().includes(searchQuery) ||
+      (user.description && user.description.toLowerCase().includes(searchQuery)) ||
+      (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
+    );
   });
 
   return (
@@ -266,67 +282,67 @@ const CrudUsuarios = () => {
           Usuarios
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
-        {/* Filtro por rol */}
+          {/* Filtro por rol */}
           <div className="flex space-x-4">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <label htmlFor="filtroRol" className="text-white mr-2">
-              Filtrar por Rol:
-            </label>
-            <motion.select
-              id="filtroRol"
-              className="p-2 rounded bg-gray-800 text-white border border-gray-700"
-              value={filtroRol}
-              onChange={(e) => setFiltroRol(e.target.value)}
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.2 }}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <option value="">Todos</option>
-              <option value="admin">Administrador</option>
-              <option value="coordinator">Coordinador</option>
-              <option value="volunteer">Voluntario</option>
-              <option value="donor">Donante</option>
-              <option value="beneficiary">Beneficiario</option>
-            </motion.select>
-          </motion.div>
-  
-          <TextField
-            label="Buscar..."
-            variant="outlined"
-            sx={{
-              mb: 2,
-              backgroundColor: 'white',          // Fondo blanco
-              color: 'black',                     // Color del texto
-              borderRadius: '5px',                // Bordes redondeados
-              '& .MuiOutlinedInput-root': {
-                height: '36px',                   // Altura total del input
-                fontSize: '0.9rem',               // Tamaño del texto
-                '& input': {
-                  color: 'black',                 // Color del texto en el campo de entrada
-                  padding: '8px 14px',            // Ajusta el padding interno
+              <label htmlFor="filtroRol" className="text-white mr-2">
+                Filtrar por Rol:
+              </label>
+              <motion.select
+                id="filtroRol"
+                className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+                value={filtroRol}
+                onChange={(e) => setFiltroRol(e.target.value)}
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <option value="">Todos</option>
+                <option value="admin">Administrador</option>
+                <option value="coordinator">Coordinador</option>
+                <option value="volunteer">Voluntario</option>
+                <option value="donor">Donante</option>
+                <option value="beneficiary">Beneficiario</option>
+              </motion.select>
+            </motion.div>
+
+            <TextField
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',          // Fondo blanco
+                color: 'black',                     // Color del texto
+                borderRadius: '5px',                // Bordes redondeados
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',                   // Altura total del input
+                  fontSize: '0.9rem',               // Tamaño del texto
+                  '& input': {
+                    color: 'black',                 // Color del texto en el campo de entrada
+                    padding: '8px 14px',            // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',            // Color del borde
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',            // Color de borde al pasar el cursor
+                  },
                 },
-                '& fieldset': {
-                  borderColor: '#ccc',            // Color del borde
+                '& .MuiInputLabel-root': {
+                  color: '#888',                    // Color del texto de la etiqueta
+                  fontSize: '0.9rem',
+                  top: '-6px',                      // Ajusta la posición de la etiqueta
                 },
-                '&:hover fieldset': {
-                  borderColor: '#888',            // Color de borde al pasar el cursor
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: '#888',                    // Color del texto de la etiqueta
-                fontSize: '0.9rem',
-                top: '-6px',                      // Ajusta la posición de la etiqueta
-              },
-            }}
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
+              }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <Typography variant="body1" color="primary" className="mr-2">
@@ -349,11 +365,11 @@ const CrudUsuarios = () => {
             </motion.button>
           </div>
         </div>
-  
+
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredData.map((item) => (
+            {filteredUser.map((item) => (
               <motion.div
                 key={item.id}
                 className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
@@ -362,10 +378,16 @@ const CrudUsuarios = () => {
                 transition={{ duration: 0.5 }}
               >
                 <div className="flex justify-center items-center">
-                  <img
-                    src={`http://localhost:5000${item.profile_picture}` || defaultProfilePicture}
+                  <Avatar
+                    src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
                     alt={item.name}
-                    className="h-32 w-32 object-cover rounded-full mb-4"
+                    sx={{
+                      width: 128,
+                      height: 128,
+                      marginBottom: 2,
+                      objectFit: 'cover',
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}
                   />
                 </div>
                 <Typography variant="h5" gutterBottom className="flex justify-center">
@@ -400,7 +422,7 @@ const CrudUsuarios = () => {
               </tr>
             </thead>
             <motion.tbody layout>
-              {filteredData.map((item) => (
+              {filteredUser.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{item.email}</td>
@@ -432,7 +454,7 @@ const CrudUsuarios = () => {
           </motion.table>
         )}
       </div>
-  
+
 
       {/* Modal para añadir usuario */}
       <AnimatePresence>

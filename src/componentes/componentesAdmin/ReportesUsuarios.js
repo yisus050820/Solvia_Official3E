@@ -164,8 +164,7 @@ const ReportesUsuarios = () => {
                 <XAxis dataKey="month" stroke="#FFFFFF" tickFormatter={formatMonth} />
                 <YAxis stroke="#FFFFFF" />
                 <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
-                <Legend />
-                <Line
+                <Legend /><Line
                   type="monotone"
                   dataKey="usuarios"
                   stroke="#FFBB28"

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus, FaCheck} from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaPlus, FaCheck } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField } from '@mui/material';
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
-  const [data, setData] = useState([]);
+  const [program, setProgram] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -24,16 +24,16 @@ const CrudProgramas = () => {
   const [errors, setErrors] = useState({});
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [originalProgram, setOriginalProgram] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
-   // Variantes de animación para la palomita
-   const checkmarkVariants = {
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
     hidden: { opacity: 0, pathLength: 0 },
     visible: { opacity: 1, pathLength: 1 },
   };
@@ -45,23 +45,27 @@ const CrudProgramas = () => {
   const fetchPrograms = () => {
     axios.get('http://localhost:5000/programas')
       .then(response => {
-        setData(response.data);
+        setProgram(response.data);
       })
       .catch(error => {
         console.error('Error fetching programs:', error);
       });
   };
 
-    //Alerta se cierra automaticamente despues de 5 segundos
-    useEffect(() => {
-      if (successMessage) {
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-  
-      }
-    }, [successMessage]);
-  
+  useEffect(() => {
+    console.log(program); // Esto mostrará el contenido del array `program`
+  }, [program]);  
+
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
+
   useEffect(() => {
     if (isModalOpen || isEditModalOpen) {
       axios.get('http://localhost:5000/usuarios/coordinadores')
@@ -93,47 +97,77 @@ const CrudProgramas = () => {
     setIsModalOpen(false);
     setErrors({});
   };
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-  const filteredPrograms = data.filter(program => 
-    program.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };  
+
+  const sortedProgram = [...program].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "start_date") return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+    if (sortBy === "end_date") return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+    if (sortBy === "objectives") return a.description.localeCompare(b.objectives);
+    if (sortBy === "coordinator_name") return a.name.localeCompare(b.coordinator_name);
+    if (sortBy === "status") return a.status.localeCompare(b.status);
+    return 0;
+  });
+
+  const statusTranslation = {
+    active: 'activo',
+    pause: 'pausado',
+    unactive: 'inactivo'
+  };
+  
+  const filteredPrograms = sortedProgram.filter((program) => {
+    const translatedStatus = statusTranslation[program.status] || program.status; // Traducir status
+  
+    return (
+      (program.name && program.name.toLowerCase().includes(searchQuery)) ||
+      (program.description && program.description.toLowerCase().includes(searchQuery)) ||
+      (program.objectives && program.objectives.toLowerCase().includes(searchQuery)) ||
+      (program.coordinator_name && program.coordinator_name.toLowerCase().includes(searchQuery)) ||
+      (program.start_date && program.start_date.toString().toLowerCase().includes(searchQuery)) ||
+      (program.end_date && program.end_date.toString().toLowerCase().includes(searchQuery)) ||
+      (translatedStatus && translatedStatus.toLowerCase().includes(searchQuery))
+    );
+  });
+  
+  
   const validateProgram = (program, originalProgram, isEditing) => {
     const validationErrors = {};
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
-  
+
     if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
       if (!program.descripcion || program.descripcion.length < 10) {
         validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
       }
-    }    
+    }
 
     if (!isEditing && !program.fechaInicio) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
     } else if (new Date(program.fechaInicio) < todayDate && !isEditing) {
       validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
-  
+
     if (!program.fechaFin || new Date(program.fechaFin) < new Date(program.fechaInicio)) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }
-  
+
     if (!isEditing || (isEditing && program.objetivos !== originalProgram.objetivos)) {
       if (program.objetivos.length < 10) {
         validationErrors.objetivos = 'Los objetivos no pueden estar vacíos y deben tener al menos 10 caracteres.';
       }
     }
-  
+
     if (!program.coordinador || isNaN(Number(program.coordinador))) {
       validationErrors.coordinador = 'El coordinador es obligatorio y debe seleccionarse de la lista.';
     }
-  
+
     return validationErrors;
   };
-  
+
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
     setMessage(firstError);
@@ -143,7 +177,7 @@ const CrudProgramas = () => {
 
   const handleAddProgram = () => {
     const { nombre, descripcion, fechaInicio, fechaFin, objetivos, coordinador, program_image } = newProgram;
-  
+
     // Verificación de campos vacíos
     const missingFields = [];
     if (!nombre) missingFields.push('Nombre');
@@ -152,27 +186,27 @@ const CrudProgramas = () => {
     if (!fechaFin) missingFields.push('Fecha de fin');
     if (!objetivos) missingFields.push('Objetivos');
     if (!coordinador) missingFields.push('Coordinador');
-  
+
     if (missingFields.length > 0) {
       setMessage(`Por favor, completa los siguientes campos: ${missingFields.join(', ')}`);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-  
+
     // Validación de los datos
     const validationErrors = validateProgram(newProgram, null, false);
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-  
+
       const firstError = Object.values(validationErrors)[0];
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
-  
+
     // Crear FormData para enviar el archivo y otros datos
     const formData = new FormData();
     formData.append('name', nombre);
@@ -182,29 +216,29 @@ const CrudProgramas = () => {
     formData.append('objectives', objetivos);
     formData.append('coordinator_charge', coordinador);
     formData.append('status', newProgram.status || 'active');
-  
+
     // Adjuntar el archivo solo si existe
     if (newProgram.program_image instanceof File) {
       formData.append('program_image', newProgram.program_image);
     }
-  
+
     axios.post('http://localhost:5000/programas', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
     })
-    .then(() => {
-      fetchPrograms();
-      handleCloseModal();
-      setSuccessMessage('Programa agregado exitosamente.');
-    })
-    .catch(error => {
-      console.error('Error al añadir programa:', error);
-      setMessage('Error al añadir el programa, intente más tarde.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
-    });
-  };  
+      .then(() => {
+        fetchPrograms();
+        handleCloseModal();
+        setSuccessMessage('Programa agregado exitosamente.');
+      })
+      .catch(error => {
+        console.error('Error al añadir programa:', error);
+        setMessage('Error al añadir el programa, intente más tarde.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+      });
+  };
 
   const handleEditProgram = (program) => {
     console.log(editProgram)
@@ -281,7 +315,7 @@ const CrudProgramas = () => {
   const handleDelete = () => {
     axios.delete(`http://localhost:5000/programas/${currentId}`)
       .then(() => {
-        setData(data.filter(program => program.id !== currentId));
+        setProgram(program.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
         setSuccessMessage('Programa eliminado exitosamente.')
@@ -310,7 +344,7 @@ const CrudProgramas = () => {
 
   // Función para determinar el color del estado
   const getStatusColor = (status) => {
-    switch (status) { 
+    switch (status) {
       case 'active':
         return 'bg-green-500';  // Verde para activo
       case 'pause':
@@ -330,7 +364,7 @@ const CrudProgramas = () => {
           Gestionar Programas
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
-        <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
 
             <Typography variant="body1" color="primary" className="mr-2">
               Ver en tarjetas
@@ -341,41 +375,41 @@ const CrudProgramas = () => {
               color="primary"
             />
             <TextField
-    fullWidth
-    label="Buscar..."
-    variant="outlined"
-    sx={{
-      mb: 2,
-      backgroundColor: 'white',          // Fondo blanco
-      color: 'black',                     // Color del texto
-      borderRadius: '5px',                // Bordes redondeados
-      '& .MuiOutlinedInput-root': {
-        height: '36px',                   // Altura total del input
-        fontSize: '0.9rem',               // Tamaño del texto
-        '& input': {
-          color: 'black',                 // Color del texto en el campo de entrada
-          padding: '8px 14px',            // Ajusta el padding interno
-        },
-        '& fieldset': {
-          borderColor: '#ccc',            // Color del borde
-        },
-        '&:hover fieldset': {
-          borderColor: '#888',            // Color de borde al pasar el cursor
-        },
-      },
-      '& .MuiInputLabel-root': {
-        color: '#888',                    // Color del texto de la etiqueta
-        fontSize: '0.9rem',
-        top: '-6px',                      // Ajusta la posición de la etiqueta
-      },
-    }}
-              value={searchTerm}
+              fullWidth
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',          // Fondo blanco
+                color: 'black',                     // Color del texto
+                borderRadius: '5px',                // Bordes redondeados
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',                   // Altura total del input
+                  fontSize: '0.9rem',               // Tamaño del texto
+                  '& input': {
+                    color: 'black',                 // Color del texto en el campo de entrada
+                    padding: '8px 14px',            // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',            // Color del borde
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',            // Color de borde al pasar el cursor
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#888',                    // Color del texto de la etiqueta
+                  fontSize: '0.9rem',
+                  top: '-6px',                      // Ajusta la posición de la etiqueta
+                },
+              }}
+              value={searchQuery}
               onChange={handleSearchChange}
             />
-            </div>
+          </div>
 
-                {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
-            
+          {/* mostrar el boton de agregar cuando el switch este desactivado (false) */}
+
           <motion.button
             className="bg-green-500 text-white p-2 rounded-full"
             whileHover={{ scale: 1.1 }}
@@ -384,16 +418,16 @@ const CrudProgramas = () => {
           >
             <FaPlus />
           </motion.button>
-          
+
         </div>
 
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
             {filteredPrograms.map((program) => (
-              <motion.div 
+              <motion.div
                 key={program.id}
                 className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
-                whileHover={{ scale: 1.05 }} 
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <img
@@ -410,48 +444,48 @@ const CrudProgramas = () => {
                   <p className="text-gray-400 mt-2">
                     {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
                   </p>
-                 
+
                   <div className="mt-2">
                     <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
                   </div>
                   <div className="flex mt-4 justify-between">
-                    <motion.button 
+                    <motion.button
                       className="bg-gray-700 text-white px-4 py-2 rounded"
                       whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                      whileTap={{scale: 0.9}}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => setSelectedProgram(program)}
                     >
                       Más info
                     </motion.button>
 
                     <div className='flex space-x-2'>
-                     {/* Botón de editar */}
-                    <motion.button 
-                      className="bg-blue-500 text-white p-2 rounded-full"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleOpenEditModal(program)}
+                      {/* Botón de editar */}
+                      <motion.button
+                        className="bg-blue-500 text-white p-2 rounded-full"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleOpenEditModal(program)}
                       >
                         <FaEdit />
-                    </motion.button>
-                    
-                    {/* Botón de eliminar */}
-                    <motion.button 
-                      className="bg-red-500 text-white p-2 rounded-full"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDeleteConfirm(program.id)}
-                    >
-                      <FaTrashAlt />
                       </motion.button>
-                      </div>
+
+                      {/* Botón de eliminar */}
+                      <motion.button
+                        className="bg-red-500 text-white p-2 rounded-full"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDeleteConfirm(program.id)}
+                      >
+                        <FaTrashAlt />
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        ):(
-          
+        ) : (
+
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
             <thead className="bg-gray-700">
               <tr>
@@ -466,23 +500,22 @@ const CrudProgramas = () => {
               </tr>
             </thead>
             <motion.tbody layout className="bg-gray-900">
-            {filteredPrograms.map((item) => (
+              {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
-                  <td className="p-4">{item.start_date.split('T')[0]}</td> 
-                  <td className="p-4">{item.end_date.split('T')[0]}</td>   
+                  <td className="p-4">{item.start_date.split('T')[0]}</td>
+                  <td className="p-4">{item.end_date.split('T')[0]}</td>
                   <td className="p-4">{truncateDescription(truncateDescription(item.objectives))}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
-                      className={`text-lg font-bold ${
-                        item.status === 'active'
+                      className={`text-lg font-bold ${item.status === 'active'
                           ? 'text-green-500'
                           : item.status === 'pause'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                      }`}
+                            ? 'text-yellow-500'
+                            : 'text-red-500'
+                        }`}
                     >
                       {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
                     </span>
@@ -491,7 +524,7 @@ const CrudProgramas = () => {
                     <motion.button
                       className="bg-blue-500 text-white p-2 rounded-full"
                       whileHover={{ scale: 1.1 }}
-                      whileTap={{scale: 0.9}}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => handleOpenEditModal(item)}
                     >
                       <FaEdit />
@@ -511,7 +544,7 @@ const CrudProgramas = () => {
           </motion.table>
         )}
       </div>
-      
+
 
       {/* Ventana emergente para agregar un nuevo registro */}
       <AnimatePresence>
@@ -621,41 +654,41 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-  {selectedProgram && (
-    <motion.div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-        initial={{ y: "-100vh" }}
-        animate={{ y: "0" }}
-        exit={{ y: "-100vh" }}
-      >
-        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
-        <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
-        <img 
-          className="w-full h-48 object-cover shadow-md rounded"
-          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
-        />
-        <p className="text-gray-400 mt-4 ">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
-        <div className="mt-2">
-          <span className="text-green-700">Donaciones: ${selectedProgram.donations || 0}</span>
-        </div>
-        {/* Botón para cerrar la ventana */}
-        <motion.button 
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-          whileHover={{ backgroundColor: '#4A90E2' }}
-          onClick={() => setSelectedProgram(null)}  // Cierra el modal
-        >
-          Cerrar
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
+              <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+              <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
+              <img
+                className="w-full h-48 object-cover shadow-md rounded"
+                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+              />
+              <p className="text-gray-400 mt-4 ">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+              <div className="mt-2">
+                <span className="text-green-700">Donaciones: ${selectedProgram.donations || 0}</span>
+              </div>
+              {/* Botón para cerrar la ventana */}
+              <motion.button
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                whileHover={{ backgroundColor: '#4A90E2' }}
+                onClick={() => setSelectedProgram(null)}  // Cierra el modal
+              >
+                Cerrar
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
 
       {/* Ventana emergente para editar un registro existente */}
@@ -747,7 +780,7 @@ const CrudProgramas = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale:1.1 }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditProgram}
                 >
@@ -755,7 +788,7 @@ const CrudProgramas = () => {
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363',scale:1.1 }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
@@ -783,7 +816,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-gray-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9}}
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsDeleteConfirmOpen(false)}
           >
             Cancelar
@@ -791,7 +824,7 @@ const CrudProgramas = () => {
           <motion.button
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9}}
+            whileTap={{ scale: 0.9 }}
             onClick={handleDelete}
           >
             Eliminar
@@ -809,47 +842,47 @@ const CrudProgramas = () => {
       </Snackbar>
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
+        )}
+      </AnimatePresence>
 
     </>
   );

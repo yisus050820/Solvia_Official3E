@@ -66,11 +66,6 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
-              className="bg-red-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-red-600"
-            >
-              Salir
-            </motion.button>
-            <motion.button
               className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
               onClick={() => handleOpenModal(false)}
             >

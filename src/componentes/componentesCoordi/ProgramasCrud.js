@@ -9,7 +9,7 @@ import { Dialog, Typography, DialogTitle, DialogContent, DialogContentText, Dial
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const CrudProgramas = () => {
-  const [data, setData] = useState([]);
+  const [program, setProgram] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -27,7 +27,8 @@ const CrudProgramas = () => {
   const [usuarioActualId, setUsuarioActualId] = useState(null);
   const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
   const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -50,11 +51,40 @@ const CrudProgramas = () => {
   }, []);
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchQuery(e.target.value.toLowerCase());
+  };  
+
+  const sortedProgram = [...program].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "start_date") return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+    if (sortBy === "end_date") return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+    if (sortBy === "objectives") return a.description.localeCompare(b.objectives);
+    if (sortBy === "coordinator_name") return a.name.localeCompare(b.coordinator_name);
+    if (sortBy === "status") return a.status.localeCompare(b.status);
+    return 0;
+  });
+
+  const statusTranslation = {
+    active: 'activo',
+    pause: 'pausado',
+    unactive: 'inactivo'
   };
-  const filteredPrograms = data.filter(program => 
-    program.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
+  const filteredPrograms = sortedProgram.filter((program) => {
+    const translatedStatus = statusTranslation[program.status] || program.status; // Traducir status
+  
+    return (
+      (program.name && program.name.toLowerCase().includes(searchQuery)) ||
+      (program.description && program.description.toLowerCase().includes(searchQuery)) ||
+      (program.objectives && program.objectives.toLowerCase().includes(searchQuery)) ||
+      (program.coordinator_name && program.coordinator_name.toLowerCase().includes(searchQuery)) ||
+      (program.start_date && program.start_date.toString().toLowerCase().includes(searchQuery)) ||
+      (program.end_date && program.end_date.toString().toLowerCase().includes(searchQuery)) ||
+      (translatedStatus && translatedStatus.toLowerCase().includes(searchQuery))
+    );
+  });
+  
 
   useEffect(() => {
     fetchPrograms();
@@ -78,7 +108,7 @@ const CrudProgramas = () => {
         })
       );
 
-      setData(programsWithDonations);
+      setProgram(programsWithDonations);
     } catch (error) {
       console.error('Error fetching programs:', error);
     }
@@ -283,7 +313,7 @@ const CrudProgramas = () => {
   const handleDelete = () => {
     axios.delete(`http://localhost:5000/programas/${currentId}`)
       .then(() => {
-        setData(data.filter(program => program.id !== currentId));
+        setProgram(program.filter(program => program.id !== currentId));
         setIsDeleteConfirmOpen(false);
         setCurrentId(null);
         setSuccessMessage('Programa eliminado exitosamente.')
@@ -371,7 +401,7 @@ const CrudProgramas = () => {
         top: '-6px',                      // Ajusta la posición de la etiqueta
       },
     }}
-              value={searchTerm}
+              value={searchQuery}
               onChange={handleSearchChange}
             />
           </div>

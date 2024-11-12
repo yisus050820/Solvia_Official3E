@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
+import { FaEdit, FaEnvelope, FaUserTag, FaUserCircle, FaDoorOpen, FaEye, FaEyeSlash, FaCheck, FaCalendarAlt } from 'react-icons/fa';
 import axios from 'axios';
 import { Card, CardContent, Avatar, Grid, Typography, TextField, Button, Snackbar, Alert, InputAdornment, IconButton } from '@mui/material';
 
@@ -33,11 +33,11 @@ const PerfilUsuario = () => {
           setLoading(false);
           return;
         }
-  
+
         const response = await axios.get('http://localhost:5000/perfil/', {
           headers: { Authorization: `Bearer ${token}` }
         });
-  
+
         if (response.data) {
           setUserInfo(response.data);
         } else {
@@ -50,7 +50,7 @@ const PerfilUsuario = () => {
       }
     };
     fetchProfile();
-  }, []);  
+  }, []);
 
   //Aniamcion de exito al actualizar datos de perfil
   useEffect(() => {
@@ -76,17 +76,17 @@ const PerfilUsuario = () => {
   // Guardar los cambios en el perfil
   const handleSave = async () => {
     const validationErrors = {};
-  
+
     // Calcular la edad del usuario con la fecha de nacimiento proporcionada
     const age = editInfo.birthdate ? calculateAge(editInfo.birthdate) : 0;
-  
+
     // Validar la edad basada en el rol del usuario
     if (userInfo.role === 'beneficiary' && age < 9) {
       validationErrors.birthdate = 'El beneficiario debe tener al menos 9 años.';
     } else if (userInfo.role !== 'beneficiary' && age < 18) {
       validationErrors.birthdate = 'Los usuarios deben tener al menos 18 años.';
     }
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setSnackbarSeverity('error');
@@ -94,15 +94,15 @@ const PerfilUsuario = () => {
       setOpenSnackbar(true);
       return;
     }
-  
+
     const formData = new FormData();
-  
+
     // Agregar los campos modificados o los valores actuales al formData
     formData.append('name', editInfo.name || userInfo.name);
     formData.append('email', editInfo.email || userInfo.email);
     formData.append('description', editInfo.description || userInfo.description);
     formData.append('birth_date', editInfo.birthdate || userInfo.birth_date);
-  
+
     if (password) {
       if (password.length < 8) {
         setMessage('La contraseña debe tener al menos 8 caracteres.');
@@ -112,14 +112,14 @@ const PerfilUsuario = () => {
       }
       formData.append('password', password);
     }
-  
+
     // Agregar la imagen solo si el usuario seleccionó una nueva imagen
     if (newProfilePicture) {
       formData.append('profile_picture', newProfilePicture);
     }
-  
+
     const token = localStorage.getItem('token');
-  
+
     try {
       const response = await axios.put(`http://localhost:5000/perfil/usuarios`, formData, {
         headers: {
@@ -127,13 +127,13 @@ const PerfilUsuario = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-  
+
       setUserInfo(response.data);
       setIsEditing(false);
       setPassword('');
       setErrors({ email: '', password: '', birthdate: '' });
       setSuccessMessage('Datos actualizados exitosamente.');
-  
+
     } catch (error) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
@@ -144,8 +144,8 @@ const PerfilUsuario = () => {
         }
       }
     }
-  };  
-  
+  };
+
   // Validar el tamaño del archivo de imagen antes de subirlo
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -214,8 +214,9 @@ const PerfilUsuario = () => {
                     {userInfo.name}
                   </Typography>
                   {/* Mostrar la fecha de nacimiento en modo visualización */}
-                  <Typography variant="subtitle2" color="gray" sx={{ fontSize: '1rem', marginTop: '4px' }}>
-                    Fecha de nacimiento: {userInfo.birth_date || 'No disponible'}
+                  <Typography variant="subtitle2" color="gray" sx={{ fontSize: '1rem', marginTop: '4px', display: 'flex', alignItems: 'center' }}>
+                    <FaCalendarAlt className="inline-block text-red-500 mr-2" />
+                    {userInfo.birth_date || 'No disponible'}
                   </Typography>
                   <Typography variant="subtitle1" color="gray" sx={{ fontSize: '1.2rem' }}>
                     <FaUserTag className="inline-block text-green-500 mr-2" />

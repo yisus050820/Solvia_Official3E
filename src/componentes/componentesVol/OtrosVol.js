@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Typography, TextField } from '@mui/material';
+import { Typography, TextField, Avatar } from '@mui/material';
 
 const UsuariosTarjeta = () => {
   const [data, setData] = useState([]);
   const [filtroRol, setFiltroRol] = useState('');
-  const [programasInscritos, setProgramasInscritos] = useState({}); // Almacenamos los programas inscritos por usuario.
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [programasInscritos, setProgramasInscritos] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Obtener usuarios y sus programas inscritos al cargar la página
+  // Traducción de roles para la búsqueda en español
+  const roleTranslation = {
+    admin: 'administrador',
+    coordinator: 'coordinador',
+    volunteer: 'voluntario',
+    donor: 'donante',
+    beneficiary: 'beneficiario'
+  };
+
   useEffect(() => {
-    // Obtener información de usuarios
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
-    
-    // Obtener información de los programas a los que están inscritos los beneficiarios
     const fetchProgramasInscritos = axios.get('http://localhost:5000/asigBenProg/asignaciones');
 
     Promise.all([fetchUsuarios, fetchProgramasInscritos])
       .then(([usuariosResponse, programasResponse]) => {
         setData(usuariosResponse.data);
-        
-        // Estructurar los programas inscritos por cada beneficiario
+
         const programasMap = {};
         programasResponse.data.forEach((asignacion) => {
           const { user_id, program_name } = asignacion;
@@ -37,13 +41,18 @@ const UsuariosTarjeta = () => {
       });
   }, []);
 
-  // Filtrar datos según el rol seleccionado
   const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
 
-  // Filtrar usuarios por el término de búsqueda
-  const filteredAndSearchedData = filteredData.filter((user) => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtrar usuarios por el término de búsqueda en nombre, rol (traducido), email y descripción
+  const filteredAndSearchedData = filteredData.filter((user) => {
+    const translatedRole = roleTranslation[user.role] || user.role; // Traducir rol
+    return (
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      translatedRole.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.description && user.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  });
 
   return (
     <>
@@ -51,7 +60,7 @@ const UsuariosTarjeta = () => {
         <Typography variant="h3" align="center" color="primary" gutterBottom>
           Usuarios
         </Typography>
-        
+
         <div className="flex justify-between mb-4 space-x-4">
           {/* Filtro por Rol */}
           <motion.div
@@ -88,27 +97,27 @@ const UsuariosTarjeta = () => {
               variant="outlined"
               sx={{
                 mb: 2,
-                backgroundColor: 'white', // Fondo blanco
-                color: 'black', // Color del texto
-                borderRadius: '5px', // Bordes redondeados
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '5px',
                 '& .MuiOutlinedInput-root': {
-                  height: '36px', // Altura total del input
-                  fontSize: '0.9rem', // Tamaño del texto
+                  height: '36px',
+                  fontSize: '0.9rem',
                   '& input': {
-                    color: 'black', // Color del texto en el campo de entrada
-                    padding: '8px 14px', // Ajusta el padding interno
+                    color: 'black',
+                    padding: '8px 14px',
                   },
                   '& fieldset': {
-                    borderColor: '#ccc', // Color del borde
+                    borderColor: '#ccc',
                   },
                   '&:hover fieldset': {
-                    borderColor: '#888', // Color de borde al pasar el cursor
+                    borderColor: '#888',
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#888', // Color del texto de la etiqueta
+                  color: '#888',
                   fontSize: '0.9rem',
-                  top: '-6px', // Ajusta la posición de la etiqueta
+                  top: '-6px',
                 },
               }}
               value={searchTerm}
@@ -117,7 +126,7 @@ const UsuariosTarjeta = () => {
           </div>
         </div>
 
-        {/* Mostrar contenido dependiendo del estado del switch */}
+        {/* Mostrar contenido en tarjetas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAndSearchedData.map((item) => (
             <motion.div
@@ -128,17 +137,23 @@ const UsuariosTarjeta = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="flex justify-center items-center">
-                <img
-                  src={`http://localhost:5000${item.profile_picture}`}
+                <Avatar
+                  src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
                   alt={item.name}
-                  className="h-32 w-32 object-cover rounded-full mb-4"
+                  sx={{
+                    width: 128,
+                    height: 128,
+                    marginBottom: 2,
+                    objectFit: 'cover',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                  }}
                 />
               </div>
               <Typography variant="h5" gutterBottom className="flex justify-center">
                 {item.name}
               </Typography>
               <Typography variant="body1" gutterBottom className="flex justify-center">
-                {item.role}
+                {roleTranslation[item.role] || item.role} {/* Mostrar el rol en español */}
               </Typography>
               <Typography variant="body2" gutterBottom className="flex justify-center">
                 {item.email}

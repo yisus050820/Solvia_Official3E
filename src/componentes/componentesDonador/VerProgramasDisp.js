@@ -8,76 +8,76 @@ import { Snackbar, Alert, Switch, Typography, TextField } from '@mui/material';
 const defaultProgramPicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Programa';
 
 const ProgramasDisp = () => {
-  const [data, setData] = useState([]);
+  const [program, setProgram] = useState([]);
   const [mostrarCards, setMostrarCards] = useState(false);
   const [today] = useState(new Date());
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
-
-
-  // Variantes de animación para la palomita
-  const checkmarkVariants = {
-    hidden: { opacity: 0, pathLength: 0 },
-    visible: { opacity: 1, pathLength: 1 },
-  };
+  const [successMessage, setSuccessMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchPrograms();
   }, []);
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchTerm(e.target.value.toLowerCase());
   };
-  const filteredPrograms = data.filter(program => 
-    program.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const fetchPrograms = () => {
     axios.get('http://localhost:5000/programas')
       .then(response => {
-        setData(response.data);
+        setProgram(response.data);
       })
       .catch(error => {
         console.error('Error fetching programs:', error);
       });
   };
 
-  // Alerta se cierra automáticamente después de 5 segundos
-  useEffect(() => {
-    if (successMessage) {
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 1000); // definir en cuanto tiempo desaparecerá la alerta, se mide en ms (3 segundos)
-    }
-  }, [successMessage]);
-
   const truncateDescription = (description) => {
     if (!description) return '';
     return description.length > 50 ? description.slice(0, 50) + '...' : description;
   };
 
-  // Función para determinar el color del estado
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
-        return 'bg-green-500';  // Verde para activo
+        return 'bg-green-500';
       case 'pause':
-        return 'bg-yellow-500'; // Amarillo para pausado
+        return 'bg-yellow-500';
       case 'unactive':
-        return 'bg-red-500';    // Rojo para inactivo
+        return 'bg-red-500';
       default:
-        return 'bg-gray-500';   // Gris por defecto
+        return 'bg-gray-500';
     }
   };
+
+  const statusTranslation = {
+    active: 'activo',
+    pause: 'pausado',
+    unactive: 'inactivo'
+  };
+
+  const filteredPrograms = program.filter((program) => {
+    const search = searchTerm.toLowerCase();
+  
+    return (
+      (program.name && program.name.toLowerCase().includes(search)) ||
+      (program.description && program.description.toLowerCase().includes(search)) ||
+      (program.start_date && program.start_date.toLowerCase().includes(search)) ||
+      (program.end_date && program.end_date.toLowerCase().includes(search)) ||
+      (program.objectives && program.objectives.toLowerCase().includes(search)) ||
+      (program.coordinator_name && program.coordinator_name.toLowerCase().includes(search)) ||
+      (program.status && program.status.toLowerCase().includes(search)) ||
+      (program.donations && program.donations.toString().toLowerCase().includes(search))
+    );
+  });  
 
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
-        {/* Título encima del contenido */}
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
           Gestionar Programas
         </Typography>
@@ -91,55 +91,55 @@ const ProgramasDisp = () => {
               onChange={() => setMostrarCards(!mostrarCards)}
               color="primary"
             />
-            </div>
-            <div className="flex items-center space-x-2">
+          </div>
+          <div className="flex items-center space-x-2">
             <TextField
-    fullWidth
-    label="Buscar..."
-    variant="outlined"
-    sx={{
-      mb: 2,
-      backgroundColor: 'white',          // Fondo blanco
-      color: 'black',                     // Color del texto
-      borderRadius: '5px',                // Bordes redondeados
-      '& .MuiOutlinedInput-root': {
-        height: '36px',                   // Altura total del input
-        fontSize: '0.9rem',               // Tamaño del texto
-        '& input': {
-          color: 'black',                 // Color del texto en el campo de entrada
-          padding: '8px 14px',            // Ajusta el padding interno
-        },
-        '& fieldset': {
-          borderColor: '#ccc',            // Color del borde
-        },
-        '&:hover fieldset': {
-          borderColor: '#888',            // Color de borde al pasar el cursor
-        },
-      },
-      '& .MuiInputLabel-root': {
-        color: '#888',                    // Color del texto de la etiqueta
-        fontSize: '0.9rem',
-        top: '-6px',                      // Ajusta la posición de la etiqueta
-      },
-    }}
+              fullWidth
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '5px',
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.9rem',
+                  '& input': {
+                    color: 'black',
+                    padding: '8px 14px',
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#888',
+                  fontSize: '0.9rem',
+                  top: '-6px',
+                },
+              }}
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            </div>
+          </div>
         </div>
 
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
-              {filteredPrograms.map((program) => (
-              <motion.div 
+            {filteredPrograms.map((program) => (
+              <motion.div
                 key={program.id}
                 className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
-                whileHover={{ scale: 1.05 }} 
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <img
                   className="w-full h-48 object-cover"
-                  src={program.program_image ? `http://localhost:5000${program.program_image}` : "https://via.placeholder.com/150"}
+                  src={program.program_image ? `http://localhost:5000${program.program_image}` : defaultProgramPicture}
                   alt={program.name}
                 />
                 <div className="p-4">
@@ -149,13 +149,13 @@ const ProgramasDisp = () => {
                     <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
                   </div>
                   <p className="text-gray-400 mt-2">
-                    {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
+                    {truncateDescription(program.description)}
                   </p>
                   <div className="mt-2">
                     <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
                   </div>
                   <div className="flex mt-4 justify-between">
-                    <motion.button 
+                    <motion.button
                       className="bg-gray-700 text-white px-4 py-2 rounded"
                       whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -182,7 +182,7 @@ const ProgramasDisp = () => {
               </tr>
             </thead>
             <motion.tbody layout className="bg-gray-900">
-            {filteredPrograms.map((item) => (
+              {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
@@ -210,6 +210,7 @@ const ProgramasDisp = () => {
         )}
       </div>
 
+      {/* Modal para más información */}
       <AnimatePresence>
         {selectedProgram && (
           <motion.div
@@ -228,20 +229,19 @@ const ProgramasDisp = () => {
               <h4 className="text-white-900 mb-4 font-semibold">
                 Coordinador: {selectedProgram.coordinator_name}
               </h4>
-              <img 
+              <img
                 className="w-full h-48 object-cover shadow-md rounded"
-                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : defaultProgramPicture}
                 alt={selectedProgram.name}
               />
-              <p className="text-gray-400">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+              <p className="text-gray-400">{selectedProgram.description}</p>
               <div className="mt-2">
                 <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
               </div>
-              {/* Botón para cerrar la ventana */}
-              <motion.button 
+              <motion.button
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                 whileHover={{ backgroundColor: '#4A90E2' }}
-                onClick={() => setSelectedProgram(null)}  // Cierra el modal
+                onClick={() => setSelectedProgram(null)}
               >
                 Cerrar
               </motion.button>
@@ -252,57 +252,14 @@ const ProgramasDisp = () => {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000} onClose={() => setOpenSnackbar(false)}
+        autoHideDuration={3000}
+        onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
-
-      {/* Modal para mensajes de éxito */}
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          >
-            <motion.div 
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg"
-            >
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={checkmarkVariants}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
-                  style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
-                  }}
-                >
-                  <FaCheck size={50} className="text-white"/>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };
