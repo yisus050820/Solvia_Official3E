@@ -22,9 +22,10 @@ router.get('/', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
     db.query(`
-      SELECT id, amount, DATE_FORMAT(date, "%Y-%m-%d") AS date 
-      FROM donations
-      WHERE donor_id = ? 
+       SELECT id, amount, DATE_FORMAT(date, "%Y-%m-%d") AS date, DATE_FORMAT(date, "%Y-%m-%d %H:%i:%s") AS orden
+       FROM donations
+       WHERE donor_id = ?
+       ORDER BY orden DESC
     `, [userId], (err, programs) => {
         if (err) {
             console.error('Error al obtener donaciones:', err);
@@ -37,8 +38,8 @@ router.get('/', authenticateToken, (req, res) => {
 // Insetar las donaciones
 router.post('/', authenticateToken, (req, res) => {
     const userId = req.user.id;
-    const { amount } = req.body;  
-    
+    const { amount } = req.body;
+
     db.query(
         'INSERT INTO donations (donor_id, amount) VALUES (?, ?)',
         [userId, amount],

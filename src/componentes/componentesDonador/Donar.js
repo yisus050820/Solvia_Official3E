@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   TextField, Button, Snackbar, Alert
@@ -20,14 +20,24 @@ export default function Donar() {
   const [message, setMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [orderNumber, setOrderNumber] = useState(1);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
+
+  //Aniamcion de exito al actualizar datos de perfil
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // El mensaje desaparecerá después de 1 segundos, se mide en ms
+    }
+  }, [successMessage]);
 
   const handleCardChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };  
+  };
 
   const handleDonationChange = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, '');
@@ -173,9 +183,7 @@ export default function Donar() {
         headers: { Authorization: `Bearer ${token}` },
       });
       generarFacturaPDF();
-      setMessage('¡Donación realizada con éxito!');
-      setSnackbarSeverity('success');
-      setOpenSnackbar(true);
+      setSuccessMessage('¡Donación realizada con éxito!');
     } catch (error) {
       setMessage('Error procesando el pago.');
       setSnackbarSeverity('error');
@@ -313,7 +321,7 @@ export default function Donar() {
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 bg-primary text-white rounded-md shadow-sm hover:bg-primary-dark focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
               >
                 Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
               </button>
@@ -321,6 +329,51 @@ export default function Donar() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <motion.div
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, pathLength: 0 },
+                    visible: { opacity: 1, pathLength: 1 },
+                  }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {message && snackbarSeverity === 'success' && (

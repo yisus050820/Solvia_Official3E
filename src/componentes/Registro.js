@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Snackbar, Alert, FormControl, InputLabel, Select, MenuItem, InputAdornment, IconButton, FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,7 +12,7 @@ const Registro = () => {
   const [email, setEmail] = useState('');
   const [birthdate, setBirthDate] = useState(null);
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); 
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('volunteer');
   const [description, setDescription] = useState('');
@@ -91,7 +91,7 @@ const Registro = () => {
     }
 
     const age = birthdate ? calculateAge(birthdate) : 0;
-    
+
     if (role === 'beneficiary' && age < 9) {
       setMessage('El beneficiario debe tener al menos 9 años.');
       setSnackbarSeverity('error');
@@ -131,7 +131,7 @@ const Registro = () => {
       setMessage('Registro exitoso');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
-      
+
       // Redirigir al usuario a la página de login
       setTimeout(() => {
         navigate('/login'); // Redirección tras éxito
@@ -160,7 +160,7 @@ const Registro = () => {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', backgroundImage: 'url(https://img.freepik.com/foto-gratis/superficie-azul-herramientas-estudio_23-2147864592.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', p: 2 }}>
       <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} transition={{ duration: 0.5 }}>
-        <Paper elevation={10} sx={{ padding: { xs: 2, sm: 4 }, backgroundColor: '#2b2b2b', borderRadius: '16px', width: { xs: '100%', sm: '400px', md: '450px' },  marginRight: { xs: 0, sm: 3, md: 35 }, }}>
+        <Paper elevation={10} sx={{ padding: { xs: 2, sm: 4 }, backgroundColor: '#2b2b2b', borderRadius: '16px', width: { xs: '100%', sm: '400px', md: '450px' }, marginRight: { xs: 0, sm: 3, md: 35 }, }}>
           <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ color: '#ffffff' }}>Registro de Usuario</Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate>
             <TextField margin="normal" fullWidth label="Nombre" value={name} onChange={(e) => setName(e.target.value)} required InputLabelProps={{ style: { color: '#b0b0b0' } }} InputProps={{ style: { color: '#ffffff' }, sx: { '& .MuiOutlinedInput-root': { '& fieldset': { borderRadius: '12px', borderColor: '#1a73e8' }, '&:hover fieldset': { borderColor: '#1a73e8' } } } }} />
@@ -189,6 +189,9 @@ const Registro = () => {
           </Box>
           <Box mt={2} textAlign="center">
             <Typography variant="body2" sx={{ color: '#b0b0b0' }}>¿Ya tienes una cuenta?{' '}<Link to="/login" style={{ color: '#1a73e8', textDecoration: 'none' }}>Inicia sesión aquí</Link></Typography>
+            <Button onClick={() => navigate('/')} sx={{ color: '#1a73e8' }}>
+              Inicio
+            </Button>
           </Box>
         </Paper>
 
@@ -198,30 +201,31 @@ const Registro = () => {
 
         <Dialog open={openTermsDialog} keepMounted onClose={handleTermsDialogClose} aria-labelledby="terms-dialog-title" aria-describedby="terms-dialog-description" PaperProps={{ sx: { backgroundColor: '#2b2b2b', borderRadius: '16px', padding: '16px' } }}>
           <DialogTitle id="terms-dialog-title" sx={{ color: '#ffffff' }}>Términos y Condiciones</DialogTitle>
-          <DialogContent dividers><Typography id="terms-dialog-description" variant="body1" sx={{ color: '#b0b0b0' }}>
-            
-          1. Aceptación de los Términos
-          Al acceder y utilizar nuestra plataforma, aceptas cumplir con estos términos y condiciones. Si no estás de acuerdo con alguno de ellos, te recomendamos no utilizar nuestros servicios.
-          
-          2. Registro de Usuario
-          Para registrarte, debes proporcionar información precisa y veraz. Nos reservamos el derecho de suspender o cancelar tu cuenta si se detecta cualquier irregularidad o falsedad en los datos proporcionados.
-
-          3. Protección de Datos
-          Nos comprometemos a proteger tu privacidad y tus datos personales. La información que proporciones será utilizada únicamente para fines relacionados con el servicio, conforme a nuestra Política de Privacidad.
-
-          4. Uso Aceptable
-          Te comprometes a utilizar nuestra plataforma de manera responsable, sin realizar actividades ilegales, dañinas o que infrinjan los derechos de terceros. Nos reservamos el derecho de suspender cuentas que no cumplan con esta política.
-
-          5. Responsabilidad
-          Aunque nos esforzamos por ofrecer un servicio de calidad, no garantizamos la disponibilidad continua de la plataforma ni la ausencia de errores. No nos hacemos responsables por cualquier daño o pérdida derivada del uso de nuestros servicios.
-
-          6. Modificaciones de los Términos
-          Nos reservamos el derecho de actualizar o modificar estos términos en cualquier momento. Te notificaremos sobre cualquier cambio relevante. El uso continuado de nuestros servicios tras una modificación implica la aceptación de los nuevos términos.
-
-          7. Contacto
-          Si tienes alguna duda sobre estos términos, puedes contactarnos a través de los medios proporcionados en la plataforma.           
-            </Typography></DialogContent>
-          <DialogActions><Button onClick={handleTermsDialogClose} sx={{ color: '#1a73e8' }}>Cerrar</Button></DialogActions>
+          <DialogContent dividers>
+            <Typography
+              id="terms-dialog-description"
+              variant="body1"
+              sx={{ color: '#b0b0b0', textAlign: 'justify' }}
+            >
+              <ol style={{ paddingLeft: '1.5em' }}>
+                <li><p>1.- Aceptación de los Términos. Al acceder y utilizar nuestra plataforma, aceptas cumplir con estos términos y condiciones. Si no estás de acuerdo con alguno de ellos, te recomendamos no utilizar nuestros servicios.</p><p>
+                  </p></li>
+                <li><p>2.- Registro de Usuario. Para registrarte, debes proporcionar información precisa y veraz. Nos reservamos el derecho de suspender o cancelar tu cuenta si se detecta cualquier irregularidad o falsedad en los datos proporcionados.</p><p>
+                  </p></li>
+                <li><p>3.- Protección de Datos. Nos comprometemos a proteger tu privacidad y tus datos personales. La información que proporciones será utilizada únicamente para fines relacionados con el servicio, conforme a nuestra Política de Privacidad.</p><p>
+                  </p></li>
+                <li><p>4.- Uso Aceptable. Te comprometes a utilizar nuestra plataforma de manera responsable, sin realizar actividades ilegales, dañinas o que infrinjan los derechos de terceros. Nos reservamos el derecho de suspender cuentas que no cumplan con esta política.</p><p>
+                  </p></li>
+                <li><p>5.- Responsabilidad. Aunque nos esforzamos por ofrecer un servicio de calidad, no garantizamos la disponibilidad continua de la plataforma ni la ausencia de errores. No nos hacemos responsables por cualquier daño o pérdida derivada del uso de nuestros servicios.</p><p>
+                  </p></li>
+                <li><p>6.- Modificaciones de los Términos. Nos reservamos el derecho de actualizar o modificar estos términos en cualquier momento. Te notificaremos sobre cualquier cambio relevante. El uso continuado de nuestros servicios tras una modificación implica la aceptación de los nuevos términos.</p></li>
+                <li><p>7.- Contacto. Si tienes alguna duda sobre estos términos, puedes contactarnos a través de los medios proporcionados en la plataforma.</p></li>
+              </ol>
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleTermsDialogClose} sx={{ color: '#1a73e8' }}>Cerrar</Button>
+          </DialogActions>
         </Dialog>
       </motion.div>
     </Box>
