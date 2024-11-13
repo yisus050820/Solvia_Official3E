@@ -585,6 +585,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <DatePicker
@@ -593,6 +599,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <input
@@ -739,6 +751,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <input

@@ -271,13 +271,35 @@ export default function Donar() {
                   className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
                 />
                 <div className="grid grid-cols-2 gap-4">
-                  <input
+                <input
                     placeholder="MM / AA"
                     name="cardExpiry"
                     value={formData.cardExpiry || ''}
-                    onChange={handleCardChange}
+                    onChange={(e) => {
+                      let value = e.target.value;
+
+                      // 1. Permitir solo números
+                      value = value.replace(/\D/g, ''); // Remover cualquier cosa que no sea número
+
+                      // 2. Limitar a 4 caracteres
+                      if (value.length > 4) {
+                        value = value.slice(0, 4);
+                      }
+
+                      // 3. Agregar '/' automáticamente después de 2 dígitos
+                      if (value.length >= 2 && value.length <= 4) {
+                        value = value.slice(0, 2) + '/' + value.slice(2, 4); // Insertar '/' después de 2 dígitos
+                      }
+
+                      // 4. Actualizar el estado (aquí se mantiene en el mismo formData)
+                      setFormData({
+                        ...formData,
+                        cardExpiry: value
+                      });
+                    }}
                     className="px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
                   />
+
                   <input
                     placeholder="CVC"
                     className="px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"

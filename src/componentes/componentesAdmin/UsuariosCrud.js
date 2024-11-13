@@ -398,19 +398,19 @@ const CrudUsuarios = () => {
                     }}
                   />
                 </div>
-                <Typography variant="h5" gutterBottom className="flex justify-center">
+                <Typography variant="h5" gutterBottom className="text-center">
                   {item.name}
                 </Typography>
-                <Typography variant="body1" gutterBottom className="flex justify-center">
+                <Typography variant="body1" gutterBottom className="text-center">
                   {item.role}
                 </Typography>
-                <Typography variant="body2" gutterBottom className="flex justify-center">
+                <Typography variant="body2" gutterBottom className="text-center">
                   {item.email}
                 </Typography>
-                <Typography variant="body2" gutterBottom className="flex justify-center">
+                <Typography variant="body2" gutterBottom className="text-center">
                   {item.birth_date}
                 </Typography>
-                <Typography variant="body2" className="flex justify-center">
+                <Typography variant="body2" className="text-center">
                   {item.description}
                 </Typography>
               </motion.div>
@@ -501,6 +501,12 @@ const CrudUsuarios = () => {
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  onKeyDown={(e) => {
+                    // Permitir solo teclas numéricas (0-9) y el guion (-)
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                    }
+                  }}
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -590,11 +596,17 @@ const CrudUsuarios = () => {
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
                 <DatePicker
-                  selected={editUser.birth_date ? new Date(editUser.birth_date) : null}
-                  onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
+                  selected={newUser.birth_date}
+                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  onKeyDown={(e) => {
+                    // Permitir solo teclas numéricas (0-9) y el guion (-)
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                    }
+                  }}
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"

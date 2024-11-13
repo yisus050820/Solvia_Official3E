@@ -373,34 +373,34 @@ const CrudProgramas = () => {
               color="primary"
             />
             <TextField
-    fullWidth
-    label="Buscar..."
-    variant="outlined"
-    sx={{
-      mb: 2,
-      backgroundColor: 'white',          // Fondo blanco
-      color: 'black',                     // Color del texto
-      borderRadius: '5px',                // Bordes redondeados
-      '& .MuiOutlinedInput-root': {
-        height: '36px',                   // Altura total del input
-        fontSize: '0.9rem',               // Tamaño del texto
-        '& input': {
-          color: 'black',                 // Color del texto en el campo de entrada
-          padding: '8px 14px',            // Ajusta el padding interno
-        },
-        '& fieldset': {
-          borderColor: '#ccc',            // Color del borde
-        },
-        '&:hover fieldset': {
-          borderColor: '#888',            // Color de borde al pasar el cursor
-        },
-      },
-      '& .MuiInputLabel-root': {
-        color: '#888',                    // Color del texto de la etiqueta
-        fontSize: '0.9rem',
-        top: '-6px',                      // Ajusta la posición de la etiqueta
-      },
-    }}
+              fullWidth
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',          // Fondo blanco
+                color: 'black',                     // Color del texto
+                borderRadius: '5px',                // Bordes redondeados
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',                   // Altura total del input
+                  fontSize: '0.9rem',               // Tamaño del texto
+                  '& input': {
+                    color: 'black',                 // Color del texto en el campo de entrada
+                    padding: '8px 14px',            // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',            // Color del borde
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',            // Color de borde al pasar el cursor
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#888',                    // Color del texto de la etiqueta
+                  fontSize: '0.9rem',
+                  top: '-6px',                      // Ajusta la posición de la etiqueta
+                },
+              }}
               value={searchQuery}
               onChange={handleSearchChange}
             />
@@ -586,6 +586,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha de Inicio"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <DatePicker
@@ -594,6 +600,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <input
@@ -728,6 +740,12 @@ const CrudProgramas = () => {
                   dateFormat="yyyy-MM-dd"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   placeholderText="Fecha Final"
+                  onKeyDown={(e) => {
+                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                    }
+                  }}
                 />
 
                 <input

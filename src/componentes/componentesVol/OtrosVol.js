@@ -176,7 +176,7 @@ const UsuariosTarjeta = () => {
               <Typography variant="body2" gutterBottom className="flex justify-center">
                 {item.email}
               </Typography>
-              <Typography variant="body2" className="flex justify-center">
+              <Typography variant="body2" className="text-center">
                 {item.description}
               </Typography>
             </motion.div>
