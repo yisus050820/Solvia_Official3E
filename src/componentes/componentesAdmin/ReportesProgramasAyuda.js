@@ -67,39 +67,35 @@ const ReportesProgramasAyuda = () => {
 
   const exportarPDF = () => {
     const input = pdfRef.current;
-
+  
     if (input) {
       html2canvas(input, {
-        scale: 2,
+        scale: 3, // Incrementa la calidad de la captura
         useCORS: true,
         allowTaint: true,
       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const imgWidth = 190;
+        const pdf = new jsPDF('portrait'); // Orientación vertical
+  
+        // Dimensiones de la página en el PDF
+        const pageWidth = pdf.internal.pageSize.width;
         const pageHeight = pdf.internal.pageSize.height;
+  
+        // Ajusta la imagen para centrarla en la página
+        const imgWidth = pageWidth;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-
-        let position = 0;
-
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
+        const yPos = imgHeight < pageHeight ? (pageHeight - imgHeight) / 2 : 0;
+  
+        pdf.addImage(imgData, 'PNG', 0, yPos, imgWidth, imgHeight); // Centrar imagen verticalmente
         pdf.save('reporteProgramasAyuda.pdf');
       }).catch((error) => {
-        console.error('Error capturing the image:', error);
+        console.error('Error al capturar la imagen:', error);
       });
     } else {
-      console.error('Element not found for PDF export');
+      console.error('Elemento no encontrado para la exportación de PDF');
     }
   };
+  
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);

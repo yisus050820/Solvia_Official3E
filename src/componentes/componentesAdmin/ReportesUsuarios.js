@@ -56,7 +56,7 @@ const ReportesUsuarios = () => {
 
   const exportarPDF = () => {
     const input = pdfRef.current;
-
+  
     if (input) {
       html2canvas(input, {
         scale: 2,
@@ -64,31 +64,23 @@ const ReportesUsuarios = () => {
         allowTaint: true,
       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const imgWidth = 190;
+        const pdf = new jsPDF('landscape'); // Establece el PDF en orientación horizontal
+  
+        // Ajusta las dimensiones para llenar la hoja completa en horizontal
+        const pageWidth = pdf.internal.pageSize.width;
         const pageHeight = pdf.internal.pageSize.height;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-
-        let position = 0;
-
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
+  
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight); // Llenar toda la hoja
+  
         pdf.save('reporteUsuarios.pdf');
       }).catch((error) => {
-        console.error('Error capturing the image:', error);
+        console.error('Error al capturar la imagen:', error);
       });
     } else {
-      console.error('Element not found for PDF export');
+      console.error('Elemento no encontrado para la exportación de PDF');
     }
   };
+  
 
   return (
     <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
