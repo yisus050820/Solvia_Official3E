@@ -10,6 +10,9 @@ import { Avatar } from '@mui/material';
 const carouselImages = [
   "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
   "https://images.pexels.com/photos/4672720/pexels-photo-4672720.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+  "https://images.pexels.com/photos/4672717/pexels-photo-4672717.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+  "https://images.pexels.com/photos/4672720/pexels-photo-4672720.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
   "https://images.pexels.com/photos/4672717/pexels-photo-4672717.jpeg?auto=compress&cs=tinysrgb&w=600"
 ]
 

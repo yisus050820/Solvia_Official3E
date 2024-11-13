@@ -59,7 +59,7 @@ const CrudUsuariosCoordi = () => {
   });
 
   const filteredUser = sortedUser.filter((user) => {
-    return (
+    const matchesSearchQuery = (
       user.name.toLowerCase().includes(searchQuery) ||
       user.email.toLowerCase().includes(searchQuery) ||
       (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
@@ -67,7 +67,11 @@ const CrudUsuariosCoordi = () => {
       (user.description && user.description.toLowerCase().includes(searchQuery)) ||
       (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
     );
-  });
+    
+    const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
+    
+    return matchesSearchQuery && matchesRole;
+  });  
 
   return (
     <div className="w-full px-6 py-0.1 mx-auto mt-2">

@@ -45,16 +45,9 @@ const NAVIGATION = [
   },
     
   {
-    segment: 'voluntarios',
-    title: 'Voluntarios',
+    segment: 'usuarios',
+    title: 'Usuarios',
     icon: <People />,
-    children: [
-      {
-        segment: 'otros-voluntarios',
-        title: 'Otros Voluntarios',
-        icon: <EmojiPeople />,
-      },
-    ],
   },
 
   {
@@ -128,7 +121,7 @@ function DemoPageContent({ pathname }) {
         width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      {pathname === '/voluntarios/otros-voluntarios' && <OtrosVoluntarios />}
+      {pathname === '/usuarios' && <OtrosVoluntarios />}
       {pathname === '/programas/programas-inscritos' && <MisProgramasVol />}
       {pathname === '/programas/programas-disponibles' && <ProgramasDisp />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}

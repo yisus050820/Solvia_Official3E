@@ -1,35 +1,62 @@
-import React, { useState, useEffect, useRef } from 'react'
-
-const INITIAL_MESSAGES = [
-  { id: 1, text: "Hola! ¿Cómo estás?", user: "Alice", avatar: "/placeholder.svg?height=40&width=40", timestamp: "10:30" },
-  { id: 2, text: "¿Alguien sabe a qué hora es la reunión mañana?", user: "Bob", avatar: "/placeholder.svg?height=40&width=40", timestamp: "10:32" },
-]
+import React, { useState, useEffect, useRef } from 'react';
+import { Avatar } from '@mui/material';
+import axios from 'axios';
 
 export default function ChatGlobal() {
-  const [messages, setMessages] = useState(INITIAL_MESSAGES)
-  const [inputMessage, setInputMessage] = useState('')
-  const chatContainerRef = useRef(null)
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [userId, setUserId] = useState(null);
+  const chatContainerRef = useRef(null);
 
+  // Obtener el id del usuario logueado desde el backend del chat
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/chat', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        setUserId(response.data.user_id);
+        setMessages(response.data.messages);
+      } catch (error) {
+        console.error('Error al obtener los mensajes:', error);
+      }
+    };
+    fetchMessages();
+  }, []);
+
+  // Desplazarse automáticamente al final de los mensajes
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
-  const handleSendMessage = (e) => {
-    e.preventDefault()
-    if (inputMessage.trim() !== '') {
-      const newMessage = {
-        id: Date.now(),
-        text: inputMessage,
-        user: "You",
-        avatar: "/placeholder.svg?height=40&width=40",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
-      setMessages([...messages, newMessage])
-      setInputMessage('')
+  // Manejar el envío de mensajes
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (inputMessage.trim() === '') return;
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/chat',
+        { message: inputMessage },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+
+      const newMessage = response.data;
+      setMessages([...messages, newMessage]);
+      setInputMessage('');
+    } catch (error) {
+      console.error('Error al enviar el mensaje:', error);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
@@ -39,32 +66,33 @@ export default function ChatGlobal() {
       </div>
 
       {/* Chat messages */}
-      <div 
+      <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
+        style={{ maxHeight: 'calc(100vh - 120px)' }}
       >
         {messages.map((message) => (
-          <div 
-            key={message.id} 
-            className={`flex ${message.user === "You" ? 'justify-end' : 'justify-start'}`}
+          <div
+            key={message.id}
+            className={`flex ${message.user_id === userId ? 'justify-end' : 'justify-start'}`}
           >
-            <div className="flex items-end space-x-2">
-              {message.user !== "You" && (
-                <img src={message.avatar} alt={message.user} className="w-8 h-8 rounded-full" />
+            <div className={`flex items-end space-x-2 ${message.user_id === userId ? 'flex-row-reverse' : ''}`}>
+              {message.user_id !== userId && (
+                <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt={message.user} className="w-8 h-8 rounded-full" />
               )}
-              <div 
+              <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.user === "You" ? 'bg-blue-600' : 'bg-gray-700'
+                  message.user_id === userId ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'
                 }`}
               >
-                {message.user !== "You" && (
+                {message.user_id !== userId && (
                   <p className="font-bold text-sm mb-1">{message.user}</p>
                 )}
-                <p className="text-sm">{message.text}</p>
-                <p className="text-xs text-gray-400 text-right mt-1">{message.timestamp}</p>
+                <p className="text-sm">{message.message}</p>
+                <p className="text-xs text-gray-300 text-right mt-1">{message.timestamp}</p>
               </div>
-              {message.user === "You" && (
-                <img src={message.avatar} alt={message.user} className="w-8 h-8 rounded-full" />
+              {message.user_id === userId && (
+                <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt="You" className="w-8 h-8 rounded-full" />
               )}
             </div>
           </div>
@@ -88,5 +116,5 @@ export default function ChatGlobal() {
         </button>
       </form>
     </div>
-  )
+  );
 }

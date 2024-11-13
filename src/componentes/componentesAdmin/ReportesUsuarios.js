@@ -166,7 +166,7 @@ const ReportesUsuarios = () => {
                 <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
                 <Legend /><Line
                   type="monotone"
-                  dataKey="usuarios"
+                  dataKey="Usuarios"
                   stroke="#FFBB28"
                   activeDot={{ r: 8 }}
                   strokeWidth={3}

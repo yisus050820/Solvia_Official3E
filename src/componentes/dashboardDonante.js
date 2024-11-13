@@ -69,18 +69,18 @@ import ChatGlobal from './ChatGlobal';
       icon: <DescriptionIcon />,
     },      
     {
-      segment: 'beneficiarios-programas',
-      title: 'Beneficiarios y Programas',
+      segment: 'usuarios-programas',
+      title: 'Usuarios y Programas',
       icon: <GroupIcon />,
       children: [
         {
-          segment: 'ver-personas',
-          title: 'Ver Personas',
+          segment: 'usuarios',
+          title: 'Usuarios',
           icon: <PersonIcon />,
         },
         {
-          segment: 'ver-programas',
-          title: 'Ver Programas',
+          segment: 'programas',
+          title: 'Programas',
           icon: <EventIcon />,
         },
       ],
@@ -94,11 +94,6 @@ import ChatGlobal from './ChatGlobal';
           segment: 'contacto',
           title: 'Mensajería',
           icon: <MessageIcon />,
-        },
-        {
-          segment: 'feedback', // Nuevo hijo "Feedback"
-          title: 'Feedback',
-          icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
         },
         {
           segment: 'ver-feedback',
@@ -143,8 +138,8 @@ import ChatGlobal from './ChatGlobal';
         {pathname === '/donaciones/donar' && <Donar />}
         {pathname === '/donaciones/seguimiento/historial' && <HistorialDonaciones />}
         {pathname === '/informes-generales' && <ReportesDonaciones />}
-        {pathname === '/beneficiarios-programas/ver-personas' && <VerPersonas />}
-        {pathname === '/beneficiarios-programas/ver-programas' && <ProgramasDisp />}
+        {pathname === '/usuarios-programas/usuarios' && <VerPersonas />}
+        {pathname === '/usuarios-programas/programas' && <ProgramasDisp />}
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <ChatGlobal />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}

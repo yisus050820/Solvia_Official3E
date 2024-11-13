@@ -315,6 +315,7 @@ const AsignacionesPresupuesto_Pro = () => {
                       fullWidth
                       InputProps={{ style: { color: 'black' } }}
                       sx={{ backgroundColor: '#FFF', borderRadius: '5px' }}
+                      disabled
                     />
                     <TextField
                       label="Cantidad"

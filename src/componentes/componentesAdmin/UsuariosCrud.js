@@ -45,7 +45,11 @@ const CrudUsuarios = () => {
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
-        setUser(response.data);
+        if (Array.isArray(response.data)) {
+          setUser(response.data);
+        } else {
+          console.error('La respuesta de la API no es un array:', response.data);
+        }
       })
       .catch(error => {
         console.error('Error fetching users:', error);
@@ -150,7 +154,7 @@ const CrudUsuarios = () => {
 
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
-        setUser(response.date);
+        setUser([...user, response.data]); // Agrega el nuevo usuario al estado `user`
         handleCloseModal();
         setSuccessMessage('Usuario agregado exitosamente.');
       })
@@ -265,7 +269,7 @@ const CrudUsuarios = () => {
   });
 
   const filteredUser = sortedUser.filter((user) => {
-    return (
+    const matchesSearchQuery = (
       user.name.toLowerCase().includes(searchQuery) ||
       user.email.toLowerCase().includes(searchQuery) ||
       (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
@@ -273,6 +277,10 @@ const CrudUsuarios = () => {
       (user.description && user.description.toLowerCase().includes(searchQuery)) ||
       (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
     );
+
+    const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
+
+    return matchesSearchQuery && matchesRole;
   });
 
   return (
@@ -369,7 +377,7 @@ const CrudUsuarios = () => {
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredUser.map((item) => (
+            {Array.isArray(filteredUser) ? filteredUser.map((item) => (
               <motion.div
                 key={item.id}
                 className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
@@ -406,7 +414,7 @@ const CrudUsuarios = () => {
                   {item.description}
                 </Typography>
               </motion.div>
-            ))}
+            )) : <p>No hay usuarios disponibles</p>}
           </div>
         ) : (
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
@@ -422,7 +430,7 @@ const CrudUsuarios = () => {
               </tr>
             </thead>
             <motion.tbody layout>
-              {filteredUser.map((item) => (
+              {Array.isArray(filteredUser) ? filteredUser.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{item.email}</td>
@@ -449,7 +457,7 @@ const CrudUsuarios = () => {
                     </motion.button>
                   </td>
                 </motion.tr>
-              ))}
+              )) : <p>No hay usuarios disponibles</p>}
             </motion.tbody>
           </motion.table>
         )}

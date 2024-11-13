@@ -97,7 +97,7 @@ return (
         <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dataUsuarios}>
             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="name" stroke="#FFFFFF" />
+            <XAxis dataKey="Usarios" stroke="#FFFFFF" />
             <YAxis stroke="#FFFFFF" />
             <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
             <Legend />

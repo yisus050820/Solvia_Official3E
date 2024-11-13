@@ -4,10 +4,11 @@ import { motion } from 'framer-motion';
 import { Typography, TextField, Avatar } from '@mui/material';
 
 const UsuariosTarjeta = () => {
-  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
   const [filtroRol, setFiltroRol] = useState('');
   const [programasInscritos, setProgramasInscritos] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   // Traducción de roles para la búsqueda en español
   const roleTranslation = {
@@ -24,7 +25,7 @@ const UsuariosTarjeta = () => {
 
     Promise.all([fetchUsuarios, fetchProgramasInscritos])
       .then(([usuariosResponse, programasResponse]) => {
-        setData(usuariosResponse.data);
+        setUser(usuariosResponse.data);
 
         const programasMap = {};
         programasResponse.data.forEach((asignacion) => {
@@ -41,18 +42,35 @@ const UsuariosTarjeta = () => {
       });
   }, []);
 
-  const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  const sortedUser = [...user].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return a.email.localeCompare(b.email);
+    if (sortBy === "birth_date") return new Date(a.birth_date).getTime() - new Date(b.birth_date).getTime();
+    if (sortBy === "role") return a.role.localeCompare(b.role);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "created_at") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    return 0;
+  });
 
   // Filtrar usuarios por el término de búsqueda en nombre, rol (traducido), email y descripción
-  const filteredAndSearchedData = filteredData.filter((user) => {
-    const translatedRole = roleTranslation[user.role] || user.role; // Traducir rol
-    return (
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      translatedRole.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.description && user.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredUser = sortedUser.filter((user) => {
+    const matchesSearchQuery = (
+      user.name.toLowerCase().includes(searchQuery) ||
+      user.email.toLowerCase().includes(searchQuery) ||
+      (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
+      user.role.toLowerCase().includes(searchQuery) ||
+      (user.description && user.description.toLowerCase().includes(searchQuery)) ||
+      (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
     );
-  });
+    
+    const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
+    
+    return matchesSearchQuery && matchesRole;
+  });  
 
   return (
     <>
@@ -120,15 +138,15 @@ const UsuariosTarjeta = () => {
                   top: '-6px',
                 },
               }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
 
         {/* Mostrar contenido en tarjetas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSearchedData.map((item) => (
+          {filteredUser.map((item) => (
             <motion.div
               key={item.id}
               className="bg-gray-800 text-white p-6 rounded-lg shadow-md"

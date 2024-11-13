@@ -177,7 +177,7 @@ export default function Donar() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/donar`, {
+      await axios.post(`http://localhost:5000/donar/donante`, {
         amount: donationAmount,
       }, {
         headers: { Authorization: `Bearer ${token}` },
