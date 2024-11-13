@@ -36,12 +36,30 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 // Insetar las donaciones
-router.post('/', authenticateToken, (req, res) => {
+router.post('/donante', authenticateToken, (req, res) => {
     const userId = req.user.id;
     const { amount } = req.body;
 
     db.query(
         'INSERT INTO donations (donor_id, amount) VALUES (?, ?)',
+        [userId, amount],
+        (err, result) => {
+            if (err) {
+                console.error('Error al crear programa:', err);
+                return res.status(500).json({ message: 'Error al crear programa.' });
+            }
+            res.status(201).json({ message: 'Donación registrada exitosamente', donationId: result.insertId });
+        }
+    );
+
+});
+
+// Insetar las donaciones
+router.post('/usuarios', (req, res) => {
+    const { amount } = req.body;
+
+    db.query(
+        'INSERT INTO donations (amount) VALUES (?)',
         [userId, amount],
         (err, result) => {
             if (err) {
