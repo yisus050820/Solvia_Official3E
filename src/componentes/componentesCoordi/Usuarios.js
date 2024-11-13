@@ -162,7 +162,9 @@ const CrudUsuariosCoordi = () => {
               <Avatar
                 src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
                 alt={item.name}
+                className="mx-auto mb-2 shadow-lg"
                 sx={{
+                  justifyContent: "center",
                   width: 128,
                   height: 128,
                   marginBottom: 2,
@@ -179,7 +181,7 @@ const CrudUsuariosCoordi = () => {
               <Typography variant="body2" gutterBottom className="flex justify-center">
                 {item.email}
               </Typography>
-              <Typography variant="body2" className="flex justify-center">
+              <Typography variant="body2" className="flex text-center">
                 {item.description}
               </Typography>
             </motion.div>

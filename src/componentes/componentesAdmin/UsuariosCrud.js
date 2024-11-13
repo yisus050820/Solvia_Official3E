@@ -402,7 +402,7 @@ const CrudUsuarios = () => {
                 <Typography variant="body2" gutterBottom className="flex justify-center">
                   {item.birth_date}
                 </Typography>
-                <Typography variant="body2" className="flex justify-center">
+                <Typography variant="body2" className="flex text-center">
                   {item.description}
                 </Typography>
               </motion.div>

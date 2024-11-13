@@ -71,7 +71,10 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   return (
     <>
       {/* Vista de la tarjeta del programa */}
-      <motion.div className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4">
+      <motion.div className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      >
         <img className="w-full h-48 object-cover" src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"} alt={title} />
 
         <div className="p-4">
@@ -82,6 +85,8 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
           </div>
           <motion.button
             className="bg-gray-700 text-white px-4 py-2 rounded mt-4"
+            whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={initialFeedback.hasFeedback ? handleOpenViewModal : handleOpenAddModal}
           >
             Dar Feedback
@@ -93,8 +98,16 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
       {/* Modal para agregar comentario */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+            initial={{ y: "-100vh" }}
+            animate={{ y: "0" }}
+            exit={{ y: "-100vh" }}
+            >
               <h2 className="text-2xl font-bold mb-4">Feedback para {title}</h2>
               <p className="text-gray-400 mb-4">{description}</p>
               <div className="flex space-x-1 mb-4">
@@ -108,8 +121,19 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
               </div>
               <textarea value={feedback} onChange={handleFeedbackChange} className="w-full p-2 border border-gray-500 rounded bg-white text-black" rows="4" placeholder="Escribe tu comentario aquí..." />
               <div className="flex justify-between mt-4">
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cancelar</motion.button>
-                <motion.button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmitFeedback}>Enviar Feedback</motion.button>
+                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" 
+                onClick={handleCloseModal}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                >Cancelar
+                </motion.button>
+                <motion.button 
+                className="bg-blue-500 text-white px-4 py-2 rounded" 
+                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleSubmitFeedback}
+                >Enviar Feedback
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
