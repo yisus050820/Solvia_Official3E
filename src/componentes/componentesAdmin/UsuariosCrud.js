@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from '@mui/material';
+import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert, Switch, TextField, Avatar } from '@mui/material';
 import { ReceiptEuroIcon } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const defaultProfilePicture = 'https://via.placeholder.com/150/000000/FFFFFF/?text=Nuevo+Usuario';
 
 const CrudUsuarios = () => {
-  const [data, setData] = useState([]);
+  const [user, setUser] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
+  const [newUser, setNewUser] = useState({ name: '', email: '', birth_date: null, role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
   const [editUser, setEditUser] = useState(null);
   const [originalUser, setOriginalUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -22,15 +25,31 @@ const CrudUsuarios = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [errors, setErrors] = useState({});
+  const [mostrarCards, setMostrarCards] = useState(false); // Estado para el switch de tarjetas
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda}
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
+
   useEffect(() => {
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
-        setData(response.data);
+        if (Array.isArray(response.data)) {
+          setUser(response.data);
+        } else {
+          console.error('La respuesta de la API no es un array:', response.data);
+        }
       })
       .catch(error => {
         console.error('Error fetching users:', error);
@@ -42,8 +61,17 @@ const CrudUsuarios = () => {
     return description.length > 50 ? description.slice(0, 50) + '...' : description;
   };
 
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+    }
+  }, [successMessage]);
+
   const handleOpenModal = () => {
-    setNewUser({ name: '', email: '', role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
+    setNewUser({ name: '', email: '', birthdate: null, role: 'admin', description: '', profile_picture: defaultProfilePicture, password: '' });
     setIsModalOpen(true);
     setErrors({});
   };
@@ -58,13 +86,26 @@ const CrudUsuarios = () => {
     return regex.test(email);
   };
 
+  const calculateAge = (birthdate) => {
+    const diffMs = Date.now() - new Date(birthdate).getTime();
+    const ageDate = new Date(diffMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  };
+
   const validateUser = (user, originalUser = {}, isEditing = false) => {
     const validationErrors = {};
+    const age = user.birth_date ? calculateAge(user.birth_date) : 0;
 
     if (!isEditing || (isEditing && user.email && user.email !== originalUser.email)) {
       if (!isValidEmail(user.email)) {
         validationErrors.email = 'El correo que ingresó no es válido, por favor ingrese un correo válido.';
       }
+    }
+
+    if (!isEditing && (user.role === 'beneficiary' && age < 9)) {
+      validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
+    } else if (!isEditing && user.role !== 'beneficiary' && age < 18) {
+      validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
     }
 
     if (!isEditing || (isEditing && user.password && user.password.trim() !== "")) {
@@ -81,7 +122,7 @@ const CrudUsuarios = () => {
   };
 
   const handleAddUser = () => {
-    const { name, email, password, description, role, profile_picture } = newUser;
+    const { name, email, birth_date, password, description, role, profile_picture } = newUser;
 
     const missingFields = [];
     if (!name) missingFields.push('Nombre');
@@ -89,6 +130,7 @@ const CrudUsuarios = () => {
     if (!password) missingFields.push('Contraseña');
     if (!description) missingFields.push('Descripción');
     if (!role) missingFields.push('Rol');
+    if (!birth_date) missingFields.push('Fecha de Nacimiento');
     if (!profile_picture) missingFields.push('Foto de Perfil');
 
     if (missingFields.length > 0) {
@@ -99,32 +141,22 @@ const CrudUsuarios = () => {
     }
 
     const validationErrors = validateUser(newUser, {}, false);
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
-
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
     }
 
-    const userData = {
-      name,
-      email,
-      role,
-      description,
-      password,
-      profile_picture: profile_picture || defaultProfilePicture,
-    };
+    const userData = { name, email, birth_date, role, description, password, profile_picture: profile_picture || defaultProfilePicture };
 
     axios.post('http://localhost:5000/usuarios', userData)
       .then(response => {
-        const createdUser = response.data;
-        setData([...data, createdUser]);
+        setUser([...user, response.data]); // Agrega el nuevo usuario al estado `user`
         handleCloseModal();
+        setSuccessMessage('Usuario agregado exitosamente.');
       })
       .catch(error => {
         if (error.response && error.response.status === 409) {
@@ -140,13 +172,11 @@ const CrudUsuarios = () => {
   };
 
   const handleEditUser = () => {
-    const validationErrors = validateUser(newUser, {}, false);
+    const validationErrors = validateUser(editUser, originalUser, true);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
       const firstError = Object.values(validationErrors)[0];
-
       setMessage(firstError);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
@@ -156,6 +186,7 @@ const CrudUsuarios = () => {
     const updatedUser = {
       name: editUser.name,
       email: editUser.email,
+      birth_date: editUser.birth_date ? format(editUser.birth_date, 'yyyy-MM-dd') : null,
       role: editUser.role,
       description: editUser.description,
       ...(editUser.password ? { password: editUser.password } : {})
@@ -163,26 +194,21 @@ const CrudUsuarios = () => {
 
     axios.put(`http://localhost:5000/usuarios/${editUser.id}`, updatedUser)
       .then(response => {
-        axios.get('http://localhost:5000/usuarios')
-          .then(response => {
-            setData(response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching users:', error);
-          });
+        setUser(user.map(user => user.id === editUser.id ? response.data : user));
         handleCloseEditModal();
+        setSuccessMessage('Usuario editado exitosamente.');
       })
       .catch(error => {
-        setMessage(`Error al actualizar usuario, intente más tarde.`);
+        setMessage('Error al actualizar usuario, intente más tarde.');
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
-        return;
       });
   };
 
   const handleOpenEditModal = (user) => {
     setEditUser({
       ...user,
+      birth_date: user.birth_date ? new Date(user.birth_date) : null,
       password: ''
     });
     setOriginalUser({ ...user });
@@ -198,7 +224,8 @@ const CrudUsuarios = () => {
   const handleDelete = (id) => {
     axios.delete(`http://localhost:5000/usuarios/${id}`)
       .then(() => {
-        setData(data.filter(user => user.id !== id));
+        setUser(user.filter(user => user.id !== id));
+        setSuccessMessage('Usuario eliminado exitosamente.'); // Mostrar mensaje de éxito
       })
       .catch(error => {
         let errorMessage = 'Error al eliminar usuario, intente más tarde.';
@@ -227,7 +254,34 @@ const CrudUsuarios = () => {
     setShowPassword(!showPassword);
   };
 
-  const filteredData = filtroRol ? data.filter((user) => user.role === filtroRol) : data;
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  const sortedUser = [...user].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return a.email.localeCompare(b.email);
+    if (sortBy === "birth_date") return new Date(a.birth_date).getTime() - new Date(b.birth_date).getTime();
+    if (sortBy === "role") return a.role.localeCompare(b.role);
+    if (sortBy === "description") return a.description.localeCompare(b.description);
+    if (sortBy === "created_at") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    return 0;
+  });
+
+  const filteredUser = sortedUser.filter((user) => {
+    const matchesSearchQuery = (
+      user.name.toLowerCase().includes(searchQuery) ||
+      user.email.toLowerCase().includes(searchQuery) ||
+      (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
+      user.role.toLowerCase().includes(searchQuery) ||
+      (user.description && user.description.toLowerCase().includes(searchQuery)) ||
+      (user.created_at && user.created_at.toLowerCase().includes(searchQuery))
+    );
+
+    const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
+
+    return matchesSearchQuery && matchesRole;
+  });
 
   return (
     <>
@@ -236,88 +290,195 @@ const CrudUsuarios = () => {
           Usuarios
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <label htmlFor="filtroRol" className="text-white mr-2">
-              Filtrar por Rol:
-            </label>
-            <motion.select
-              id="filtroRol"
-              className="p-2 rounded bg-gray-800 text-white border border-gray-700"
-              value={filtroRol}
-              onChange={(e) => setFiltroRol(e.target.value)}
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.2 }}
+          {/* Filtro por rol */}
+          <div className="flex space-x-4">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <option value="">Todos</option>
-              <option value="admin">Administrador</option>
-              <option value="coordinator">Coordinador</option>
-              <option value="volunteer">Voluntario</option>
-              <option value="donor">Donante</option>
-              <option value="beneficiary">Beneficiario</option>
-            </motion.select>
-          </motion.div>
+              <label htmlFor="filtroRol" className="text-white mr-2">
+                Filtrar por Rol:
+              </label>
+              <motion.select
+                id="filtroRol"
+                className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+                value={filtroRol}
+                onChange={(e) => setFiltroRol(e.target.value)}
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <option value="">Todos</option>
+                <option value="admin">Administrador</option>
+                <option value="coordinator">Coordinador</option>
+                <option value="volunteer">Voluntario</option>
+                <option value="donor">Donante</option>
+                <option value="beneficiary">Beneficiario</option>
+              </motion.select>
+            </motion.div>
 
-          <motion.button
-            className="bg-green-500 text-white p-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleOpenModal}
-          >
-            <FaPlus />
-          </motion.button>
+            <TextField
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',          // Fondo blanco
+                color: 'black',                     // Color del texto
+                borderRadius: '5px',                // Bordes redondeados
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',                   // Altura total del input
+                  fontSize: '0.9rem',               // Tamaño del texto
+                  '& input': {
+                    color: 'black',                 // Color del texto en el campo de entrada
+                    padding: '8px 14px',            // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',            // Color del borde
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',            // Color de borde al pasar el cursor
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#888',                    // Color del texto de la etiqueta
+                  fontSize: '0.9rem',
+                  top: '-6px',                      // Ajusta la posición de la etiqueta
+                },
+              }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Typography variant="body1" color="primary" className="mr-2">
+                Ver en tarjetas
+              </Typography>
+              <Switch
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                color="primary"
+              />
+            </div>
+
+            <motion.button
+              className="bg-green-500 text-white p-2 rounded-full"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleOpenModal}
+            >
+              <FaPlus />
+            </motion.button>
+          </div>
         </div>
 
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Correo</th>
-              <th className="p-4">Rol</th>
-              <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Creación</th>
-              <th className="p-4">Acciones</th>
-            </tr>
-          </thead>
-          <motion.tbody layout>
-            {filteredData.map((item) => (
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.id}</td>
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{item.email}</td>
-                <td className="p-4">{item.role}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.created_at}</td>
-                <td className="p-4 flex space-x-4">
-                  <motion.button
-                    className="bg-blue-500 text-white p-2 rounded-full"
-                    onClick={() => handleOpenEditModal(item)}
-                  >
-                    <FaEdit />
-                  </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white p-2 rounded-full"
-                    onClick={() => handleDeleteClick(item.id)}
-                  >
-                    <FaTrashAlt />
-                  </motion.button>
-                </td>
-              </motion.tr>
-            ))}
-          </motion.tbody>
-        </motion.table>
+        {/* Mostrar contenido dependiendo del estado del switch */}
+        {mostrarCards ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.isArray(filteredUser) ? filteredUser.map((item) => (
+              <motion.div
+                key={item.id}
+                className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex justify-center items-center">
+                  <Avatar
+                    src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
+                    alt={item.name}
+                    sx={{
+                      width: 128,
+                      height: 128,
+                      marginBottom: 2,
+                      objectFit: 'cover',
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}
+                  />
+                </div>
+                <Typography variant="h5" gutterBottom className="text-center">
+                  {item.name}
+                </Typography>
+                <Typography variant="body1" gutterBottom className="text-center">
+                  {item.role}
+                </Typography>
+                <Typography variant="body2" gutterBottom className="text-center">
+                  {item.email}
+                </Typography>
+                <Typography variant="body2" gutterBottom className="text-center">
+                  {item.birth_date}
+                </Typography>
+                <Typography variant="body2" className="text-center">
+                  {item.description}
+                </Typography>
+              </motion.div>
+            )) : <p>No hay usuarios disponibles</p>}
+          </div>
+        ) : (
+          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-4">Nombre</th>
+                <th className="p-4">Correo</th>
+                <th className="p-4">Fecha de nacimiento</th>
+                <th className="p-4">Rol</th>
+                <th className="p-4">Descripción</th>
+                <th className="p-4">Fecha Creación</th>
+                <th className="p-4">Acciones</th>
+              </tr>
+            </thead>
+            <motion.tbody layout>
+              {Array.isArray(filteredUser) ? filteredUser.map((item) => (
+                <motion.tr key={item.id} className="border-b border-gray-700">
+                  <td className="p-4">{item.name}</td>
+                  <td className="p-4">{item.email}</td>
+                  <td className="p-4">{item.birth_date}</td>
+                  <td className="p-4">{item.role}</td>
+                  <td className="p-4">{truncateDescription(item.description)}</td>
+                  <td className="p-4">{item.created_at}</td>
+                  <td className="p-4 flex space-x-4">
+                    <motion.button
+                      className="bg-blue-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleOpenEditModal(item)}
+                    >
+                      <FaEdit />
+                    </motion.button>
+                    <motion.button
+                      className="bg-red-500 text-white p-2 rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteClick(item.id)}
+                    >
+                      <FaTrashAlt />
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              )) : <p>No hay usuarios disponibles</p>}
+            </motion.tbody>
+          </motion.table>
+        )}
       </div>
+
 
       {/* Modal para añadir usuario */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
               <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -333,6 +494,19 @@ const CrudUsuarios = () => {
                   placeholder="Correo"
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                />
+                <DatePicker
+                  selected={newUser.birth_date}
+                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Fecha de nacimiento"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  onKeyDown={(e) => {
+                    // Permitir solo teclas numéricas (0-9) y el guion (-)
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                    }
+                  }}
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -368,9 +542,22 @@ const CrudUsuarios = () => {
                   </button>
                 </div>
               </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cancelar</button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleAddUser}>Agregar</button>
+              <div className="mt-4 flex justify-between">
+                <motion.button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleAddUser}>
+                  Agregar
+                </motion.button>
+                <motion.button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCloseModal}
+                >
+                  Cancelar
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
@@ -380,8 +567,18 @@ const CrudUsuarios = () => {
       {/* Modal para editar usuario */}
       <AnimatePresence>
         {isEditModalOpen && editUser && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
               <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
               <div className="space-y-4">
                 <input
@@ -397,6 +594,19 @@ const CrudUsuarios = () => {
                   placeholder="Correo"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                />
+                <DatePicker
+                  selected={newUser.birth_date}
+                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Fecha de nacimiento"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  onKeyDown={(e) => {
+                    // Permitir solo teclas numéricas (0-9) y el guion (-)
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                    }
+                  }}
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
@@ -435,14 +645,16 @@ const CrudUsuarios = () => {
               <div className="flex justify-between mt-4">
                 <motion.button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2' }}
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleEditUser}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
                   className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363' }}
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
                   Cerrar
@@ -498,6 +710,51 @@ const CrudUsuarios = () => {
           {message}
         </Alert>
       </Snackbar>
+
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <motion.div
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </>
   );
 };

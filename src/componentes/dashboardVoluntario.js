@@ -21,11 +21,13 @@ import { Feedback } from '@mui/icons-material';
 
 
 import OtrosVoluntarios from './componentesVol/OtrosVol';
-import MisProgramas from './componentesBeneficiario/MisProgramas';
+import MisProgramasVol from './componentesVol/MisProgramasVol';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
-import VerFeedback from './componentesDonador/VerFeedback';
+import VerFeedback from './componentesAdmin/VerFeedback';
+import ProgramasDisp from './componentesDonador/VerProgramasDisp';
+import ChatGlobal from './ChatGlobal';
 
 
 
@@ -43,25 +45,32 @@ const NAVIGATION = [
   },
     
   {
-    segment: 'voluntarios',
-    title: 'Voluntarios',
+    segment: 'usuarios',
+    title: 'Usuarios',
+    icon: <People />,
+  },
+
+  {
+    segment: 'programas',
+    title: 'Programas',
     icon: <People />,
     children: [
       {
-        segment: 'otros-voluntarios',
-        title: 'Otros Voluntarios',
-        icon: <EmojiPeople />,
+        segment: 'programas-inscritos',
+        title: 'Programas Inscritos',
+        icon: <AssignmentInd />,   
+      },
+
+      {
+        segment: 'programas-disponibles',
+        title: 'Programas Disponibles',
+        icon: <AssignmentInd />,   
       },
     ],
   },
 
 
-  {
-    segment: 'programas-inscritos',
-    title: 'Programas Inscritos',
-    icon: <AssignmentInd />,
 
-  },
   {
     segment: 'comunicacion',
     title: 'Comunicación', // Título actualizado
@@ -69,13 +78,8 @@ const NAVIGATION = [
     children: [
       {
         segment: 'contacto',
-        title: 'Contactar con un administrador',
+        title: 'Mensajería',
         icon: <MessageIcon />,
-      },
-      {
-        segment: 'feedback', // Nuevo hijo "Feedback"
-        title: 'Feedback',
-        icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
       },
       {
         segment: 'ver-feedback',
@@ -117,10 +121,11 @@ function DemoPageContent({ pathname }) {
         width: '100%', // Aseguramos que ocupe todo el ancho disponible
       }}
     >
-      {pathname === '/voluntarios/otros-voluntarios' && <OtrosVoluntarios />}
-      {pathname === '/programas-inscritos' && <MisProgramas />}
+      {pathname === '/usuarios' && <OtrosVoluntarios />}
+      {pathname === '/programas/programas-inscritos' && <MisProgramasVol />}
+      {pathname === '/programas/programas-disponibles' && <ProgramasDisp />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}
-      {pathname === '/comunicacion/contacto' && <Comunicacion />}
+      {pathname === '/comunicacion/contacto' && <ChatGlobal />}
       {pathname === '/comunicacion/feedback' && <Calificar />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
     </Box>
@@ -151,6 +156,10 @@ function DashboardVoluntario(props) {
     // preview-start
     <AppProvider
       navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        title: 'SOLVIA',
+      }}
       router={router}
       theme={demoTheme}
       window={demoWindow}

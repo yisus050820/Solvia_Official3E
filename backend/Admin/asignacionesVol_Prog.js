@@ -119,7 +119,7 @@ router.put('/voluntarios/:id', [
         }
 
         if (exists) {
-            return res.status(409).json({ message: 'El usuario ya está asignado a este programa.' });
+            return res.status(409).json({ message: 'El voluntario ya está asignado a este programa.' });
         }
 
         // Si no existe la asignación, proceder con la actualización

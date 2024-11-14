@@ -19,20 +19,21 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import MessageIcon from '@mui/icons-material/Message';
 import { Feedback } from '@mui/icons-material';
+import ArticleIcon from '@mui/icons-material/Article';
 
 // Importaciones de los formularios hijos
 import ProgramasCrud from './componentesAdmin/ProgramasCrud';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ReportesProgramasAyuda from './componentesAdmin/ReportesProgramasAyuda';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import UsuariosCrud from './componentesAdmin/UsuariosCrud';
 import AsignacionesBen_Pro from './componentesAdmin/AsignacionesBen_Pro';
 import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import Comunicacion from './componentesAdmin/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
+import Mensajes from './componentesAdmin/Mensajes';
+import ChatGlobal from './ChatGlobal';
 
 
 const NAVIGATION = [
@@ -54,18 +55,6 @@ const NAVIGATION = [
     segment: 'programas',
     title: 'Programas',
     icon: <Event />,
-    children: [
-      {
-        segment: 'gestionar-programas',
-        title: 'Gestionar programas',
-        icon: <SettingsIcon />,
-      },
-      {
-        segment: 'todos-programas',
-        title: 'Todos los programas',
-        icon: <Event />,
-      }
-    ],
   },  
   
   {
@@ -119,16 +108,15 @@ const NAVIGATION = [
     title: 'Comunicacion',
     icon: <ChatBubbleIcon />,
     children: [
-
-      {
-        segment: 'contacto',
-        title: 'Contactar con un usuario',
-        icon: <MessageIcon />,
-      },
       {
         segment: 'ver-feedback',
         title: 'Ver feedback de programas',
         icon: <Feedback />,
+      },
+      {
+        segment: 'mensajes',
+        title: 'Mensajería',
+        icon: <ArticleIcon />,
       },
     ],
   },
@@ -166,17 +154,16 @@ function DemoPageContent({ pathname }) {
       }}
     >
       {pathname === '/users' && <UsuariosCrud />}
-      {pathname === '/programas/gestionar-programas' && <ProgramasCrud />}
+      {pathname === '/programas' && <ProgramasCrud />}
       {pathname === '/reportes/usuarios' && <ReportesUsuarios />}
       {pathname === '/reportes/donaciones' && <ReportesDonaciones />}
       {pathname === '/reportes/programas' && <ReportesProgramasAyuda />}
-      {pathname === '/programas/todos-programas' && <TarjetasProgramas />}
       {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
       {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
-      {pathname === '/comunicacion/contacto' && <Comunicacion />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+      {pathname === '/comunicacion/mensajes' && <ChatGlobal />}
     </Box>
   );
 }
@@ -207,6 +194,10 @@ function DashboardLayoutBasic(props) {
     // preview-start
     <AppProvider
       navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        title: 'SOLVIA',
+      }}
       router={router}
       theme={demoTheme}
       window={demoWindow}

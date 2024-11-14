@@ -32,7 +32,7 @@ router.post('/', (req, res) => {
     }
 
     // Generar el token con el id y rol del usuario
-    const token = jwt.sign({ id: user.id, role: user.role }, 'yourSecretKey', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role: user.role }, 'yourSecretKey', { expiresIn: '2h' });
 
     // Enviar el token y el rol del usuario al frontend
     res.json({ token, role: user.role });

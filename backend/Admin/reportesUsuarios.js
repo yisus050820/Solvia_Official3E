@@ -10,14 +10,23 @@ router.get('/totalUsuarios', (req, res) => {
             console.error('Error fetching total users:', err);
             return res.status(500).json({ message: 'Error en el servidor' });
         }
-        res.json({ total: result[0].total }); 
+        res.json({ total: result[0].total });
     });
 });
 
 // Ruta para obtener la distribución de usuarios por rol
 router.get('/usuariosPorRoles', (req, res) => {
     const query = `
-        SELECT role AS name, COUNT(*) AS value
+        SELECT 
+            CASE 
+                WHEN role = 'admin' THEN 'Administrador'
+                WHEN role = 'coordinator' THEN 'Coordinador'
+                WHEN role = 'volunteer' THEN 'Voluntario'
+                WHEN role = 'beneficiary' THEN 'Beneficiario'
+                WHEN role = 'donor' THEN 'Donante'
+                ELSE role
+            END AS name, 
+            COUNT(*) AS value
         FROM users
         GROUP BY role
     `;
@@ -26,7 +35,7 @@ router.get('/usuariosPorRoles', (req, res) => {
             console.error('Error fetching users distribution:', err);
             return res.status(500).json({ message: 'Error en el servidor.' });
         }
-        res.json(result);  
+        res.json(result);
     });
 });
 
@@ -49,14 +58,14 @@ router.get('/nuevosUsuarios', (req, res) => {
 // Ruta para obtener el crecimiento de usuarios a lo largo del tiempo
 router.get('/crecimientoUsuarios', (req, res) => {
     const query = `
-        SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS usuarios
+        SELECT MONTHNAME(created_at) AS month, COUNT(*) AS Usuarios
         FROM users
-        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-        ORDER BY MIN(created_at)
+        GROUP BY MONTH(created_at)
+        ORDER BY MONTH(created_at)
     `;
     db.query(query, (err, results) => {
         if (err) {
-            console.error('Error en /crecimientoUsuarios:', err.message);
+            console.error('Error en crecimientoUsuarios:', err.message);
             return res.status(500).json({ error: 'Error al obtener el crecimiento de usuarios' });
         }
         res.json(results);

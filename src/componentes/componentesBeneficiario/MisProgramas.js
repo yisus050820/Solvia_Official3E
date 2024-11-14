@@ -1,88 +1,126 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import { Typography } from '@mui/material';
+import StudentDashboard from './InterfazBeneficiario';
 
-const ProgramCard = ({ title, description, participants, donations }) => {
+// Componente para mostrar una tarjeta de programa
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (showDashboard = false) => {
+    setShowDashboard(showDashboard);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setShowDashboard(false);
+  };
+
+  // Función para determinar el color del estado
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-500';  // Verde para activo
+      case 'pause':
+        return 'bg-yellow-500'; // Amarillo para pausado
+      case 'unactive':
+        return 'bg-red-500';    // Rojo para inactivo
+      default:
+        return 'bg-gray-500';   // Gris por defecto
+    }
   };
 
   return (
     <>
       {/* Tarjeta del programa */}
-      <motion.div 
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
-        whileHover={{ scale: 1.05 }} 
-        whileTap={{ scale: 0.95 }}   
+      <motion.div
+        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {/* Imagen del programa */}
         <img
           className="w-full h-48 object-cover"
-          src="https://via.placeholder.com/150"
+          src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
-        {/* Contenido principal de la tarjeta */}
         <div className="p-4">
-          <h2 className="text-white text-xl font-bold">{title}</h2>
+          <h2 className="text-white text-xl font-bold">{name}</h2>
+          {/* Estado del programa con un círculo de color */}
+          <div className="flex items-center mt-2">
+            <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
+            <span className="ml-2 text-gray-400 capitalize">{status}</span>
+          </div>
           {/* Limitar la descripción a un máximo de 100 caracteres */}
+          <h2 className="text-white text-xl font-bold">{title}</h2>
           <p className="text-gray-400 mt-2">
-            {description.length > 100 ? `${description.substring(0, 100)}...` : description}
+            {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
-          {/* Participantes */}
           <div className="mt-4">
             <span className="text-green-400">Participantes: {participants}</span>
           </div>
-          {/* Donaciones */}
           <div className="mt-2">
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
-            <motion.button 
-              className="bg-red-500 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#DC2626' }}
-            >
-              Salir del Programa
-            </motion.button>
-            {/* Botón para abrir la ventana emergente */}
-            <motion.button 
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
-              onClick={handleOpenModal}
+            <motion.button
+              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
+              onClick={() => handleOpenModal(false)}
             >
               Más info
+            </motion.button>
+            <motion.button
+              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
+              onClick={() => handleOpenModal(true)}
+            >
+              Tareas
             </motion.button>
           </div>
         </div>
       </motion.div>
 
-      {/* Ventana emergente */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"  // z-50 asegura que esté sobre las demás tarjetas
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
-            {/* Contenido de la ventana emergente */}
-            <motion.div 
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-              initial={{ y: "-100vh" }} 
-              animate={{ y: "0" }} 
+            <motion.div
+              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
+                showDashboard ? 'max-w-3xl' : 'max-w-lg'
+              }`}
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
+              style={{
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                zIndex: 1000,
+              }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">{title}</h2>
-              <p className="text-gray-600">{description}</p> {/* Descripción completa */}
-              {/* Botón para cerrar la ventana */}
-              <motion.button 
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2' }}
+              {showDashboard ? (
+                <StudentDashboard programId={programId} />
+              ) : (
+                <>
+                  <h2 className="text-white text-3xl font-bold">{title}</h2>
+                  <h4 className="text-white-900 mb-4 font-semibold">
+                  </h4>
+                  <img
+                    className="w-full h-48 object-cover shadow-md rounded"
+                    src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
+                    alt={name}
+                  />
+                  <p className="text-gray-400 mt-4">{description}</p>
+                </>
+              )}
+              <motion.button
+                className="bg-red-600 text-white px-4 py-2 rounded mt-4 transition duration-300 hover:bg-red-500 font-bold shadow-md"
+                whileHover={{ scale: 1.05 }}
                 onClick={handleCloseModal}
               >
                 Cerrar
@@ -95,45 +133,61 @@ const ProgramCard = ({ title, description, participants, donations }) => {
   );
 };
 
-// Componente principal que genera las tarjetas
+// Componente principal para mostrar los programas
 const MisProgramas = () => {
-  const programs = [
-    {
-      title: 'Community Food Drive',
-      description: 'This program is dedicated to providing essential food supplies to families and individuals in need in our local communities. Volunteers are actively involved in distributing food packages every weekend and during special holiday drives. We collaborate with local businesses and donors to make sure no one goes hungry.',
-      participants: 25,
-      donations: 1500,
-    },
-    {
-      title: 'Medical Aid Program',
-      description: 'The Medical Aid Program focuses on providing essential healthcare services, including general check-ups, vaccinations, and emergency treatments, to communities with limited access to medical facilities. We work with local and international medical professionals to ensure the health and wellbeing of these populations.',
-      participants: 40,
-      donations: 2300,
-    },
-    {
-      title: 'Education Support Initiative',
-      description: 'Our Education Support Initiative provides free tutoring, school supplies, and financial assistance for students from low-income families. We believe every child deserves a fair chance at education, and our goal is to bridge the educational gap in underserved areas.',
-      participants: 18,
-      donations: 800,
-    },
-  ];
+  const [programs, setPrograms] = useState([]);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/task/programas', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        const programData = await Promise.all(
+          response.data.map(async (program) => {
+            const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`).catch(() => ({ data: { count: 0 } }));
+            const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`).catch(() => ({ data: { total: 0 } }));
+
+            return {
+              ...program,
+              participants: participantsRes.data.count,
+              donations: donationsRes.data.total,
+              imageUrl: program.program_image,
+              coordinator_name: program.coordinator_name || 'No disponible'
+            };
+          })
+        );
+
+        setPrograms(programData);
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
 
   return (
-    <div className="mt-2"> {/* Ajusta el margen superior */}
-      {/* Título de la sección */}
+    <div className="mt-4">
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Mis Programas
       </Typography>
 
-      {/* Flex para centrar y distribuir las tarjetas */}
-      <div className="flex justify-center flex-wrap">
-        {programs.map((program, index) => (
+      <div className="flex justify-center flex-wrap mt-2">
+        {programs.map((program) => (
           <ProgramCard
-            key={index}
-            title={program.title}
+            key={program.id}
+            title={program.name}
+            coordinator_name={program.coordinator_name || 'No disponible'}
             description={program.description}
             participants={program.participants}
             donations={program.donations}
+            status={program.status}
+            imageUrl={program.imageUrl}
+            programId={program.id} 
           />
         ))}
       </div>

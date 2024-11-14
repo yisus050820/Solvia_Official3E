@@ -44,7 +44,7 @@ router.get('/totalVoluntarios', (req, res) => {
 // Obtener crecimiento de programas a lo largo del tiempo (basado en la fecha de creación)
 router.get('/crecimientoProgramas', (req, res) => {
   const query = `
-    SELECT MONTHNAME(start_date) AS month, COUNT(id) AS program_count
+    SELECT MONTHNAME(start_date) AS month, COUNT(id) AS Programas
     FROM programs
     GROUP BY MONTH(start_date)
     ORDER BY MONTH(start_date);
@@ -56,11 +56,9 @@ router.get('/crecimientoProgramas', (req, res) => {
       return res.status(500).json({ message: 'Error fetching data.' });
     }
     res.json(results);
+    console.log(results);
   });
 });
-
-module.exports = router;
-
 
 // Obtener total de donaciones recaudadas agrupadas por mes
 router.get('/totalDonaciones', (req, res) => {

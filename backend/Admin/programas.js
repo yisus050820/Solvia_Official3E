@@ -49,25 +49,22 @@ router.get('/', (req, res) => {
     });
 });
 
-
-
 // Crear programa
 router.post('/', upload.single('program_image'), (req, res) => {
-    const { name, description, start_date, end_date, objectives, status = 'active' } = req.body;  
-    const program_image = req.file ? `/uploads/${req.file.filename}` : null; // Guarda la ruta de la imagen
+  const { name, description, start_date, end_date, objectives, coordinator_charge, status = 'active' } = req.body;  
+  const program_image = req.file ? `/uploads/${req.file.filename}` : null; 
 
-    db.query(
-        'INSERT INTO programs (name, description, start_date, end_date, objectives, coordinator_charge, program_image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',  
-        [name, description, start_date, end_date, objectives, coordinator_charge, program_image, status],
-        (err, result) => {
-            if (err) {
-                console.error('Error inserting program:', err);
-                return res.status(500).json({ message: 'Error al crear programa.' });
-            }
-            const newProgram = { id: result.insertId, name, description, start_date, end_date, objectives, coordinator_charge, program_image, status };
-            res.status(201).json(newProgram);
-        }
-    );
+  db.query(
+    'INSERT INTO programs (name, description, start_date, end_date, objectives, coordinator_charge, program_image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',  
+    [name, description, start_date, end_date, objectives, coordinator_charge, program_image, status],
+    (err, result) => {
+      if (err) {
+        console.error('Error inserting program:', err);
+        return res.status(500).json({ message: 'Error al crear programa.' });
+      }
+      res.status(201).json({ message: 'Programa creado con éxito' });
+    }
+  );
 });
 
 // Editar programa
@@ -190,5 +187,7 @@ router.get('/expenses/total/:id', (req, res) => {
     res.json({ total });
   });
 });
+
+
 
 module.exports = router;

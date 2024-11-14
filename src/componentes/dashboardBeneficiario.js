@@ -15,12 +15,14 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
-import TarjetasProgramas from './componentesAdmin/TarjetasProgramas';
 import MisProgramas from './componentesBeneficiario/MisProgramas';
 import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
 import Calificar from './componentesBeneficiario/Feedback';
 import Comunicacion from './componentesDonador/Comunicacion';
-import VerFeedback from './componentesDonador/VerFeedback';
+import VerFeedback from './componentesAdmin/VerFeedback';
+import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
+import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
+import ChatGlobal from './ChatGlobal';
 
 
 
@@ -55,7 +57,7 @@ const NAVIGATION = [
  
   {
     segment: 'ayuda',
-    title: 'Ayuda recibida',
+    title: 'Donaciones',
     icon: <VolunteerActivism />,
     
   },
@@ -66,17 +68,17 @@ const NAVIGATION = [
     children: [
       {
         segment: 'contacto',
-        title: 'Contactar con un administrador',
+        title: 'Mensajería',
         icon: <MessageIcon />,
       },
       {
         segment: 'feedback', // Nuevo hijo "Feedback"
-        title: 'Feedback',
+        title: 'Dar feedback',
         icon: <Feedback />, // Puedes cambiar el ícono si lo deseas
       },
       {
         segment: 'ver-feedback',
-        title: 'Ver feedback de programas',
+        title: 'Ver feedback',
         icon: <Feedback />,
       },
     ],
@@ -117,11 +119,11 @@ function DemoPageContent({ pathname }) {
     >
     
     {pathname === '/configuracion-perfil' && <PerfilUsuario />}
-    {pathname === '/programas/disponibles' && <TarjetasProgramas />}
+    {pathname === '/programas/disponibles' && <ProgramasActivos />}
     {pathname === '/programas/actuales' && <MisProgramas />}
-    {pathname === '/ayuda' && <AyudaRecibida />}
+    {pathname === '/ayuda' && <ReportesDonaciones />}
     {pathname === '/comunicacion/feedback' && <Calificar />}
-    {pathname === '/comunicacion/contacto' && <Comunicacion />}
+    {pathname === '/comunicacion/contacto' && <ChatGlobal />}
     {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
 
     
@@ -154,6 +156,10 @@ function DashboardBeneficiario(props) {
     // preview-start
     <AppProvider
       navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        title: 'SOLVIA',
+      }}
       router={router}
       theme={demoTheme}
       window={demoWindow}
