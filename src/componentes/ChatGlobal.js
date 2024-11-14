@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
+import { motion } from 'framer-motion';  // Importar framer-motion
 
 export default function ChatGlobal() {
   const [messages, setMessages] = useState([]);
@@ -59,7 +60,7 @@ export default function ChatGlobal() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white">
+    <div className="flex flex-col h-screen bg-gray-900 text-white w-full md:w-3/4 lg:w-2/3 mx-auto">
       {/* Header */}
       <div className="bg-gray-800 p-4">
         <h1 className="text-xl font-bold">Chat Grupal</h1>
@@ -72,8 +73,12 @@ export default function ChatGlobal() {
         style={{ maxHeight: 'calc(100vh - 120px)' }}
       >
         {messages.map((message) => (
-          <div
+          <motion.div
             key={message.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
             className={`flex ${message.user_id === userId ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`flex items-end space-x-2 ${message.user_id === userId ? 'flex-row-reverse' : ''}`}>
@@ -81,9 +86,7 @@ export default function ChatGlobal() {
                 <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt={message.user} className="w-8 h-8 rounded-full" />
               )}
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.user_id === userId ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'
-                }`}
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.user_id === userId ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
               >
                 {message.user_id !== userId && (
                   <p className="font-bold text-sm mb-1">{message.user}</p>
@@ -95,25 +98,29 @@ export default function ChatGlobal() {
                 <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt="You" className="w-8 h-8 rounded-full" />
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Message input */}
       <form onSubmit={handleSendMessage} className="bg-gray-800 p-4 flex space-x-2">
-        <input
+        <motion.input
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
           className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          initial={{ scale: 1 }}
+          whileFocus={{ scale: 1.05 }}  // Al enfocarse, se agranda un poco
         />
-        <button
+        <motion.button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          initial={{ scale: 1 }}
+          whileTap={{ scale: 0.95 }} // Botón reduce tamaño al hacer clic
         >
           Enviar
-        </button>
+        </motion.button>
       </form>
     </div>
   );
