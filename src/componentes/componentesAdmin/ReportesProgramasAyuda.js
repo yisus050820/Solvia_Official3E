@@ -170,7 +170,7 @@ const ReportesProgramasAyuda = () => {
           <div className="flex items-center mb-4">
             <FaDollarSign className="text-blue-500 mr-2" size={24} />
             <Typography variant="h6" color="white" gutterBottom>
-              Crecimiento de Programas a lo largo del tiempo
+              Programas impartidos por mes
             </Typography>
           </div>
           {crecimientoProgramas.length > 0 ? (
