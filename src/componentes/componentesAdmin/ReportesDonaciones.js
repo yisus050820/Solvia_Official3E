@@ -50,40 +50,49 @@ const ReportesDonaciones = () => {
 
   const exportarPDF = () => {
     const input = pdfRef.current;
-
+  
     if (input) {
       html2canvas(input, {
-        scale: 2,
+        scale: 3, // Mejora la calidad de la captura
         useCORS: true,
         allowTaint: true,
       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const imgWidth = 190;
+        const pdf = new jsPDF('landscape'); // Orientación horizontal
+  
+        // Calcula el ancho y alto de la página en el PDF
+        const pageWidth = pdf.internal.pageSize.width;
         const pageHeight = pdf.internal.pageSize.height;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-
-        let position = 0;
-
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
+  
+        // Calcula las dimensiones de la imagen para mantener la proporción y llenar la página
+        const imgAspectRatio = canvas.width / canvas.height;
+        const pageAspectRatio = pageWidth / pageHeight;
+  
+        let imgWidth, imgHeight, xPos, yPos;
+  
+        // Ajusta la imagen según la proporción de aspecto de la página y de la imagen
+        if (imgAspectRatio > pageAspectRatio) {
+          imgWidth = pageWidth;
+          imgHeight = pageWidth / imgAspectRatio;
+          xPos = 0;
+          yPos = (pageHeight - imgHeight) / 2; // Centra verticalmente
+        } else {
+          imgHeight = pageHeight;
+          imgWidth = pageHeight * imgAspectRatio;
+          yPos = 0;
+          xPos = (pageWidth - imgWidth) / 2; // Centra horizontalmente
         }
+  
+        pdf.addImage(imgData, 'PNG', xPos, yPos, imgWidth, imgHeight); // Añade la imagen ajustada y centrada
         pdf.save('reporteDonaciones.pdf');
       }).catch((error) => {
         console.error('Error capturing the image:', error);
       });
     } else {
-      console.error('Element not found for PDF export');
+      console.error('Elemento no encontrado para la exportación de PDF');
     }
   };
-
+  
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
