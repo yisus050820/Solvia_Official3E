@@ -611,7 +611,6 @@ const CrudUsuarios = () => {
                     }
                   }}
                 />
-                />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   value={editUser.role}
