@@ -116,6 +116,8 @@ router.put('/tasks/:taskId', (req, res) => {
 
     const selectQuery = `SELECT image, video FROM tasks WHERE id = ?`;
 
+    const updateQuery = `UPDATE tasks SET title = ?, description = ?, end_date = ?, image = ?, video = ? WHERE id = ?`
+
     db.query(selectQuery, [taskId], (err, results) => {
         if (err) {
             console.error('Error fetching current task:', err);
@@ -129,8 +131,7 @@ router.put('/tasks/:taskId', (req, res) => {
         const currentTask = results[0];
         const updatedImage = image || currentTask.image;
         const updatedVideo = video || currentTask.video;
-
-        // Ejemplo de la consulta SQL en el backend
+ 
         const query = `
         SELECT t.id, 
             t.title, 
