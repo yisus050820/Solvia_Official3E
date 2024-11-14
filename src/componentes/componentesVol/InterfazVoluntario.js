@@ -22,9 +22,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogContentText
 } from "@mui/material";
-import { FaEdit, FaTrashAlt, FaPlus, FaChartBar } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaPlus, FaChartBar, FaCheck } from "react-icons/fa";
 import { YouTube as YouTubeIcon, Image as ImageIcon } from "@mui/icons-material";
 import {
   ResponsiveContainer,
@@ -51,6 +53,9 @@ function TeacherDashboard({ programId }) {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [message, setMessage] = useState("");
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+
 
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
@@ -58,6 +63,20 @@ function TeacherDashboard({ programId }) {
     setSnackbarSeverity('error');
     setOpenSnackbar(true);
   };
+
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
+
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
 
   // Fetch tasks
   useEffect(() => {
@@ -137,6 +156,7 @@ function TeacherDashboard({ programId }) {
       });
       setTasks(response.data);
       handleCloseDialog();
+      setSuccessMessage('Tarea guardada con éxito'); // Establecer el mensaje de éxito al guardar
     } catch (error) {
       console.error("Error saving task:", error);
       const errorMessage = error.response?.data?.message || "Error al guardar la tarea.";
@@ -297,24 +317,58 @@ function TeacherDashboard({ programId }) {
                             </IconButton>
                           )}
                         </TableCell>
-                        <TableCell>
-                          <motion.button
-                            className="bg-blue-500 text-white p-2 rounded-full"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleOpenDialog(task)}
-                          >
-                            <FaEdit />
-                          </motion.button>
-                          <motion.button
-                            className="bg-red-500 text-white p-2 rounded-full"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDeleteTask(task.id)}
-                          >
-                            <FaTrashAlt />
-                          </motion.button>
-                        </TableCell>
+{/* Confirmación de eliminar */}
+<Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+  <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
+  <DialogContent>
+    <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <motion.button 
+      className="bg-gray-500 text-white px-4 py-2 rounded-full" 
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      onClick={() => setIsDeleteConfirmOpen(false)}>
+      Cancelar
+    </motion.button>
+    <motion.button 
+      className="bg-red-500 text-white px-4 py-2 rounded-full" 
+      whileHover={{ scale: 1.1 }} 
+      whileTap={{ scale: 0.9 }}
+      onClick={() => {
+        handleDeleteTask(currentTask.id);
+        setIsDeleteConfirmOpen(false);
+        setSuccessMessage('Tarea eliminada con éxito'); // Establecer el mensaje de éxito al eliminar
+
+      }}>
+      Eliminar
+    </motion.button>
+  </DialogActions>
+</Dialog>
+
+{/* Acciones de la tarea, incluyendo eliminar */}
+<TableCell>
+  <motion.button
+    className="bg-blue-500 text-white p-2 rounded-full"
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
+    onClick={() => handleOpenDialog(task)}
+  >
+    <FaEdit />
+  </motion.button>
+  <motion.button
+    className="bg-red-500 text-white p-2 rounded-full"
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
+    onClick={() => {
+      setCurrentTask(task);  // Establece la tarea actual para eliminar
+      setIsDeleteConfirmOpen(true);  // Muestra el diálogo de confirmación
+    }}
+  >
+    <FaTrashAlt />
+  </motion.button>
+</TableCell>
+
                       </TableRow>
                     ))}
                   </TableBody>
@@ -343,6 +397,49 @@ function TeacherDashboard({ programId }) {
           )}
         </AnimatePresence>
       </Paper>
+       {/* Modal para mensajes de éxito */}
+       <AnimatePresence>
+      {successMessage && (
+        <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <motion.div 
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          exit={{ y: 50 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+          className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                        {/* Icono de palomita */}
+                     
+            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+            <div className='flex justify-center items-center'>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={checkmarkVariants}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className='flex justify-center items-center'
+              style={{
+                borderRadius: '50%',        // Hace que sea un círculo
+                backgroundColor: '#4CAF50', // Color de fondo verde
+                width: '80px',              // Tamaño del círculo
+                height: '80px',             // Tamaño del círculo
+                display: 'flex',            // Para alinear el contenido
+                justifyContent: 'center',   // Centra horizontalmente
+                alignItems: 'center'        // Centra verticalmente
+              }}
+            >
+              <FaCheck size={50} className="text-white"/>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+              </AnimatePresence>
 
       <Snackbar
         open={openSnackbar}
@@ -457,11 +554,24 @@ function TeacherDashboard({ programId }) {
               allowFullScreen
             />
           ) : (
-            <img src={openMaterial?.url} alt="Material de apoyo" style={{ width: "100%" }} />
+            <img src={openMaterial?.url} alt="Material de apoyo" 
+            style={{ 
+              width: "100%", 
+              maxWidth: "100%", 
+              height: "auto", 
+              maxHeight: "calc(100vh - 30px)",  // Resta 20px de la altura total
+              objectFit: "contain", 
+              marginTop: "10px",  // Agrega separación arriba
+              marginBottom: "10px" // Agrega separación abajo
+            }} 
+           
+            />
           )}
         </Box>
       </Modal>
     </Box>
+
+    
   );
 }
 
