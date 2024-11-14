@@ -123,8 +123,17 @@ const ProgramCard = ({ program }) => {
 
 const ProgramasActivos = () => {
   const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     const fetchPrograms = async () => {
       try {
         const response = await axios.get('http://localhost:5000/programas');

@@ -10,9 +10,18 @@ const CrudUsuariosCoordi = () => {
   const [programasInscritos, setProgramasInscritos] = useState({}); // Almacenamos los programas inscritos por usuario.
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
 
   // Obtener usuarios y sus programas inscritos al cargar la página
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     // Obtener información de usuarios
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
 

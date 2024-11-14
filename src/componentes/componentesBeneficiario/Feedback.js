@@ -11,6 +11,7 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [rating, setRating] = useState(initialFeedback ? initialFeedback.score : 0);
   const [feedback, setFeedback] = useState(initialFeedback ? initialFeedback.comment : '');
+  const [loading, setLoading] = useState(true);
 
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
@@ -36,6 +37,14 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   const handleFeedbackChange = (event) => setFeedback(event.target.value);
 
   const handleSubmitFeedback = async () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     if (!feedback.trim()) {
       setError("Por favor ingrese un comentario.");
       return;
@@ -55,6 +64,14 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   };
 
   const confirmDelete = async () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:5000/feedback/${programId}`, {
@@ -199,6 +216,7 @@ const Calificar = () => {
   const [programs, setPrograms] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (successMessage) {
@@ -210,6 +228,14 @@ const Calificar = () => {
   }, [successMessage]);
 
   const fetchPrograms = async () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get('http://localhost:5000/feedback/programas', {

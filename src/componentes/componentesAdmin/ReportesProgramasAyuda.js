@@ -19,9 +19,18 @@ const ReportesProgramasAyuda = () => {
   const pdfRef = useRef();
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Obtener datos desde el backend
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         // Obtener total de programas

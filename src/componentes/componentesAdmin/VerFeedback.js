@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
@@ -7,22 +7,31 @@ import { FaStar } from 'react-icons/fa';
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl, programId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleOpenModal = async () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     setIsModalOpen(true);
     try {
       const response = await axios.get(`http://localhost:5000/feedback/${programId}/feed`);
       const uniqueFeedbacks = Object.values(response.data.reduce((acc, curr) => {
-        acc[curr.username] = curr;  
+        acc[curr.username] = curr;
         return acc;
       }, {}));
-      setFeedbacks(uniqueFeedbacks);  
+      setFeedbacks(uniqueFeedbacks);
     } catch (error) {
       console.error('Error fetching feedback:', error);
-      setFeedbacks([]); 
+      setFeedbacks([]);
     }
   };
-  
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -137,8 +146,17 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
 
 const VerFeedback = () => {
   const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     const fetchPrograms = async () => {
       try {
         const response = await axios.get('http://localhost:5000/programas');
@@ -176,7 +194,7 @@ const VerFeedback = () => {
             description={program.description}
             participants={program.participants}
             donations={program.donations}
-            status={program.status}    
+            status={program.status}
             imageUrl={program.imageUrl}
             programId={program.id}
           />

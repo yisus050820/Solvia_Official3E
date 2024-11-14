@@ -16,8 +16,6 @@ import {
   Select,
   MenuItem,
   Typography,
-  Snackbar,
-  Alert,
   Modal,
   DialogTitle,
   DialogContent,
@@ -48,19 +46,18 @@ function TeacherDashboard({ programId }) {
   const [openMaterial, setOpenMaterial] = useState(null);
   const [sortBy, setSortBy] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const showErrorMessage = (errors) => {
-    const firstError = Object.values(errors)[0];
-    setMessage(firstError);
-    setSnackbarSeverity('error');
-    setOpenSnackbar(true);
-  };
+  const [loading, setLoading] = useState(true);
 
   // Fetch tasks
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     const fetchTasks = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
@@ -71,10 +68,10 @@ function TeacherDashboard({ programId }) {
         setTasks(response.data);
       } catch (error) {
         console.error("Error fetching tasks:", error);
-        const errorMessage = error.response?.data?.message || "Error al cargar las tareas.";
-        setMessage(errorMessage);
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          fetch: "Error al cargar las tareas."
+        }));
       }
     };
 
@@ -103,18 +100,35 @@ function TeacherDashboard({ programId }) {
       video: formData.get("videoUrl"),
       id_program: programId
     };
-
-    const { end_date } = newTask;
-    const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0);
-
-    if (new Date(end_date) < todayDate) {
-      setMessage('La fecha de entrega no puede ser anterior a la fecha actual.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+  
+    // Resetear errores
+    setErrors({});
+  
+    // Validaciones
+    let validationErrors = {};
+  
+    if (!newTask.title || newTask.title.length < 5) {
+      validationErrors.name = "El título es obligatorio y debe tener al menos 5 caracteres.";
+    }
+    if (!newTask.description || newTask.description.length < 10) {
+      validationErrors.description = "La descripción es obligatoria y debe tener al menos 10 caracteres.";
+    }
+    if (!newTask.end_date) {
+      validationErrors.dueDate = "La fecha de entrega es obligatoria.";
+    } else {
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      if (new Date(newTask.end_date) < todayDate) {
+        validationErrors.dueDate = "La fecha de entrega no puede ser anterior a la fecha actual.";
+      }
+    }
+  
+    // Si hay errores, actualizamos el estado y salimos de la función
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
-
+  
     try {
       if (currentTask) {
         await axios.put(`http://localhost:5000/taskVol/tasks/${currentTask.id}`, newTask, {
@@ -129,7 +143,7 @@ function TeacherDashboard({ programId }) {
           }
         });
       }
-
+  
       const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -138,13 +152,13 @@ function TeacherDashboard({ programId }) {
       setTasks(response.data);
       handleCloseDialog();
     } catch (error) {
-      console.error("Error saving task:", error);
       const errorMessage = error.response?.data?.message || "Error al guardar la tarea.";
-      setMessage(errorMessage);
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        saveTask: errorMessage
+      }));
     }
-  };
+  };  
 
   const handleDeleteTask = async (id) => {
     try {
@@ -156,15 +170,11 @@ function TeacherDashboard({ programId }) {
       setTasks(tasks.filter((task) => task.id !== id));
     } catch (error) {
       console.error("Error deleting task:", error);
-      const errorMessage = error.response?.data?.message || "Error al eliminar la tarea.";
-      setMessage(errorMessage);
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        deleteTask: "Error al eliminar la tarea."
+      }));
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   const handleOpenMaterial = (material) => {
@@ -344,94 +354,86 @@ function TeacherDashboard({ programId }) {
         </AnimatePresence>
       </Paper>
 
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: "100%" }}>
-          {message}
-        </Alert>
-      </Snackbar>
-
       <Modal open={openDialog} onClose={handleCloseDialog}>
-        <Box
-          component="form"
-          onSubmit={handleSaveTask}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <DialogTitle>{currentTask ? "Editar Tarea" : "Añadir Tarea"}</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              name="name"
-              label="Nombre de la Tarea"
-              type="text"
-              fullWidth
-              variant="outlined"
-              defaultValue={currentTask?.title || ""}
-              error={!!errors.name}
-              helperText={errors.name}
-            />
-            <TextField
-              margin="dense"
-              name="description"
-              label="Descripción"
-              type="text"
-              fullWidth
-              variant="outlined"
-              defaultValue={currentTask?.description || ""}
-              error={!!errors.description}
-              helperText={errors.description}
-            />
-            <TextField
-              margin="dense"
-              name="dueDate"
-              label="Fecha de Entrega"
-              type="date"
-              fullWidth
-              variant="outlined"
-              defaultValue={currentTask?.end_date || ""}
-              InputLabelProps={{ shrink: true }}
-              error={!!errors.dueDate}
-              helperText={errors.dueDate}
-            />
-            <TextField
-              margin="dense"
-              name="videoUrl"
-              label="URL del Video"
-              type="url"
-              fullWidth
-              variant="outlined"
-            />
-            <TextField
-              margin="dense"
-              name="imageUrl"
-              label="URL de la Imagen"
-              type="url"
-              fullWidth
-              variant="outlined"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancelar</Button>
-            <Button type="submit" variant="contained" color="primary">
-              Guardar
-            </Button>
-          </DialogActions>
-        </Box>
-      </Modal>
+      <Box
+        component="form"
+        onSubmit={handleSaveTask}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <DialogTitle>{currentTask ? "Editar Tarea" : "Añadir Tarea"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Nombre de la Tarea"
+            type="text"
+            fullWidth
+            variant="outlined"
+            defaultValue={currentTask?.title || ""}
+            error={!!errors.name}
+          />
+          {errors.name && <span style={{ color: 'red' }}>{errors.name}</span>}
+
+          <TextField
+            margin="dense"
+            name="description"
+            label="Descripción"
+            type="text"
+            fullWidth
+            variant="outlined"
+            defaultValue={currentTask?.description || ""}
+            error={!!errors.description}
+          />
+          {errors.description && <span style={{ color: 'red' }}>{errors.description}</span>}
+
+          <TextField
+            margin="dense"
+            name="dueDate"
+            label="Fecha de Entrega"
+            type="date"
+            fullWidth
+            variant="outlined"
+            defaultValue={currentTask?.end_date || ""}
+            InputLabelProps={{ shrink: true }}
+            error={!!errors.dueDate}
+          />
+          {errors.dueDate && <span style={{ color: 'red' }}>{errors.dueDate}</span>}
+
+          <TextField
+            margin="dense"
+            name="videoUrl"
+            label="URL del Video"
+            type="url"
+            fullWidth
+            variant="outlined"
+          />
+          <TextField
+            margin="dense"
+            name="imageUrl"
+            label="URL de la Imagen"
+            type="url"
+            fullWidth
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancelar</Button>
+          <Button type="submit" variant="contained" color="primary">
+            Guardar
+          </Button>
+        </DialogActions>
+      </Box>
+    </Modal>
 
       <Modal open={!!openMaterial} onClose={() => setOpenMaterial(null)}>
         <Box

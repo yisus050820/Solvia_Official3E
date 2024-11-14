@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
@@ -91,9 +91,8 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
-              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
-                showDashboard ? 'max-w-3xl' : 'max-w-lg'
-              }`}
+              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${showDashboard ? 'max-w-3xl' : 'max-w-lg'
+                }`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -136,8 +135,17 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
 // Componente principal para mostrar los programas
 const MisProgramas = () => {
   const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     const fetchPrograms = async () => {
       try {
         const response = await axios.get('http://localhost:5000/task/programas', {
@@ -187,7 +195,7 @@ const MisProgramas = () => {
             donations={program.donations}
             status={program.status}
             imageUrl={program.imageUrl}
-            programId={program.id} 
+            programId={program.id}
           />
         ))}
       </div>

@@ -22,6 +22,7 @@ export default function Donar() {
   const [orderNumber, setOrderNumber] = useState(1);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
 
@@ -167,6 +168,13 @@ export default function Donar() {
 
   const handleDonar = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
 
     if (!donationAmount || !formData.email || !formData.card) {
       setMessage('Por favor, complete todos los campos.');

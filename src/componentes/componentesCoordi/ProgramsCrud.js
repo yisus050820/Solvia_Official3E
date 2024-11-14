@@ -26,6 +26,7 @@ const CrudProgramas = () => {
   const [originalProgram, setOriginalProgram] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
 
   const [usuarioActualId, setUsuarioActualId] = useState(null);
   const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);
@@ -48,6 +49,14 @@ const CrudProgramas = () => {
   }, []);
 
   const fetchPrograms = () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     axios.get('http://localhost:5000/programs')
       .then(response => {
         setProgram(response.data);
