@@ -108,6 +108,10 @@ const CrudUsuarios = () => {
       validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
     }
 
+    if (!isEditing && age > 90 || isEditing && age > 90) {
+      validationErrors.birth_date = 'Por favor introduzca una fecha de nacimiento valida.';
+    }
+
     if (!isEditing || (isEditing && user.password && user.password.trim() !== "")) {
       if (!user.password || user.password.length < 8) {
         validationErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
@@ -596,17 +600,17 @@ const CrudUsuarios = () => {
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
                 <DatePicker
-                  selected={newUser.birth_date}
-                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
+                  selected={editUser.birth_date}
+                  onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   onKeyDown={(e) => {
-                    // Permitir solo teclas numéricas (0-9) y el guion (-)
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
-                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                      e.preventDefault();
                     }
                   }}
+                />
                 />
                 <select
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"

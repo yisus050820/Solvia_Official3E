@@ -82,6 +82,7 @@ router.post('/', (req, res) => {
 
 // Actualizar usuario
 router.put('/:id', (req, res) => {
+  console.log(req.body)
   const { name, email, birth_date, role, description, password } = req.body;
   const userId = req.params.id;
 
