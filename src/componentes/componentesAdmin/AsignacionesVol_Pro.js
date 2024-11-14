@@ -21,47 +21,59 @@ const AsignacionesVol_Pro = () => {
   const [errorVoluntario, setErrorVoluntario] = useState('');
   const [errorPrograma, setErrorPrograma] = useState('');
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [loading, setLoading] = useState(true);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
-    // Variantes de animación para la palomita
-    const checkmarkVariants = {
-      hidden: { opacity: 0, pathLength: 0 },
-      visible: { opacity: 1, pathLength: 1 },
-    };
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
 
   // Cargar los voluntarios y programas al montar el componente
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     axios.get('http://localhost:5000/asigVolProg/voluntarios')
       .then(res => {
         setVoluntarios(res.data);
       })
-      .catch(err => console.error('Error fetching volunteers:', err));
+      .catch(err => console.error('Error fetching volunteers:', err),
+        setLoading(false));
 
     axios.get('http://localhost:5000/asigVolProg/programas')
       .then(res => {
         setProgramas(res.data);
       })
-      .catch(err => console.error('Error fetching programs:', err));
+      .catch(err => console.error('Error fetching programs:', err),
+        setLoading(false));
 
     axios.get('http://localhost:5000/asigVolProg/asignaciones')
       .then(res => {
         setAsignaciones(res.data);
       })
-      .catch(err => console.error('Error fetching assignments:', err));
+      .catch(err => console.error('Error fetching assignments:', err),
+        setLoading(false));
   }, []);
 
-    //Alerta se cierra automaticamente despues de 5 segundos
-    useEffect(() => {
-      if (successMessage) {
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
-  
-      }
-    }, [successMessage]);
+  //Alerta se cierra automaticamente despues de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 1000); // definir en cuanto tiempo desaparecera la alerta, se mide en ms (3 segundos)
+
+    }
+  }, [successMessage]);
 
   // Manejar la asignación de voluntarios a programas
   const handleAsignar = () => {
@@ -381,47 +393,47 @@ const AsignacionesVol_Pro = () => {
 
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

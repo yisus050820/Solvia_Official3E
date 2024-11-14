@@ -9,6 +9,7 @@ const UsuariosTarjeta = () => {
   const [programasInscritos, setProgramasInscritos] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
 
   // Traducción de roles para la búsqueda en español
   const roleTranslation = {
@@ -20,6 +21,14 @@ const UsuariosTarjeta = () => {
   };
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
     const fetchProgramasInscritos = axios.get('http://localhost:5000/asigBenProg/asignaciones');
 

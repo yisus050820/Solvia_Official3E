@@ -30,6 +30,7 @@ const CrudUsuarios = () => {
   const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda}
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
 
 
   const handleCloseSnackbar = () => {
@@ -43,6 +44,14 @@ const CrudUsuarios = () => {
   };
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
         if (Array.isArray(response.data)) {
@@ -102,10 +111,16 @@ const CrudUsuarios = () => {
       }
     }
 
-    if (!isEditing && (user.role === 'beneficiary' && age < 9)) {
+    if ((!isEditing && (user.role === 'beneficiary' && age < 9) || isEditing && (user.role === 'beneficiary' && age < 9))) {
       validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
-    } else if (!isEditing && user.role !== 'beneficiary' && age < 18) {
+    } else if (!isEditing && user.role !== 'beneficiary' && age < 18 || isEditing && user.role !== 'beneficiary' && age < 18) {
       validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
+    } else if (!isEditing && age > 90 || isEditing && age > 90) {
+      validationErrors.birth_date = 'Por favor ingrese una fecha de nacimiento válida.';
+    }
+
+    if (!isEditing && age > 90 || isEditing && age > 90) {
+      validationErrors.birth_date = 'Por favor introduzca una fecha de nacimiento valida.';
     }
 
     if (!isEditing || (isEditing && user.password && user.password.trim() !== "")) {
@@ -596,15 +611,14 @@ const CrudUsuarios = () => {
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
                 <DatePicker
-                  selected={newUser.birth_date}
-                  onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
+                  selected={editUser.birth_date}
+                  onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
                   className="w-full p-2 border border-gray-300 rounded bg-white text-black"
                   onKeyDown={(e) => {
-                    // Permitir solo teclas numéricas (0-9) y el guion (-)
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
-                      e.preventDefault(); // Bloquea cualquier tecla que no sea número o guion
+                      e.preventDefault();
                     }
                   }}
                 />

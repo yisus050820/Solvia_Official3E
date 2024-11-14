@@ -21,6 +21,7 @@ const AsignacionesPresupuesto_Pro = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -32,17 +33,27 @@ const AsignacionesPresupuesto_Pro = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     axios.get('http://localhost:5000/asigPresProg/asignaciones')
       .then(res => setAsignaciones(res.data))
-      .catch(err => console.error('Error fetching assignments:', err));
+      .catch(err => console.error('Error fetching assignments:', err),
+        setLoading(false));
 
     axios.get('http://localhost:5000/asigPresProg/programas')
       .then(res => setProgramas(res.data))
-      .catch(err => console.error('Error fetching programs:', err));
+      .catch(err => console.error('Error fetching programs:', err),
+        setLoading(false));
 
     axios.get('http://localhost:5000/asigPresProg/disponible')
       .then(res => setDineroDisponible(res.data.dineroDisponible))
-      .catch(err => console.error('Error fetching available funds:', err));
+      .catch(err => console.error('Error fetching available funds:', err),
+        setLoading(false));
   }, []);
 
   useEffect(() => {

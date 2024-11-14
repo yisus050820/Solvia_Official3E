@@ -26,6 +26,7 @@ function StudentDashboard({ programId }) {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
@@ -35,6 +36,14 @@ function StudentDashboard({ programId }) {
   };
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     const fetchTasks = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
@@ -107,38 +116,49 @@ function StudentDashboard({ programId }) {
       <Typography variant="h5" className="text-white-900 mb-4 font-semibold" gutterBottom>
         Tareas Asignadas
       </Typography>
-      <List>
-        {tasks.map((task) => (
-          <ListItem key={task.id} divider>
-            <ListItemText
-              primary={task.title}
-              secondary={
-                <React.Fragment>
-                  <Typography component="span" variant="body2" color="text.primary">
-                    {task.description}
-                  </Typography>
-                  <br />
-                  Fecha de entrega: {task.end_date}
-                </React.Fragment>
-              }
-            />
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {task.materials && task.materials.map((material, index) => (
-                <IconButton key={index} onClick={() => handleOpenMaterial(material)}>
-                  {material.type === "video" ? <YouTubeIcon /> : <ImageIcon />}
-                </IconButton>
-              ))}
-              <Checkbox
-                edge="end"
-                onChange={() => handleToggleTaskCompletion(task.id, task.completed)}
-                checked={!!task.completed}
-                checkedIcon={<CheckCircleIcon />}
-                inputProps={{ 'aria-labelledby': `checkbox-list-label-${task.id}` }}
+      {tasks.length === 0 ? (
+        <Typography variant="body1" color="text.secondary">
+          No hay tareas asignadas para este programa.
+        </Typography>
+      ) : (
+        <List>
+          {tasks.map((task) => (
+            <ListItem key={task.id} divider>
+              <ListItemText
+                primary={task.title}
+                secondary={
+                  <React.Fragment>
+                    <Typography component="span" variant="body2" color="text.primary">
+                      {task.description}
+                    </Typography>
+                    <br />
+                    Fecha de entrega: {task.end_date}
+                  </React.Fragment>
+                }
               />
-            </Box>
-          </ListItem>
-        ))}
-      </List>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                {task.image && (
+                  <IconButton onClick={() => handleOpenMaterial({ type: "image", url: task.image })}>
+                    <ImageIcon />
+                  </IconButton>
+                )}
+                {task.video && (
+                  <IconButton onClick={() => handleOpenMaterial({ type: "video", url: task.video })}>
+                    <YouTubeIcon />
+                  </IconButton>
+                )}
+                <Checkbox
+                  edge="end"
+                  onChange={() => handleToggleTaskCompletion(task.id, task.completed)}
+                  checked={!!task.completed}
+                  checkedIcon={<CheckCircleIcon />}
+                  inputProps={{ 'aria-labelledby': `checkbox-list-label-${task.id}` }}
+                />
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+      )}
 
       <Modal open={!!openMaterial} onClose={handleCloseMaterial}>
         <Box sx={{

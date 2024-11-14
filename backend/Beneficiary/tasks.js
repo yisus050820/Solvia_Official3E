@@ -31,7 +31,7 @@ router.get('/programas', (req, res) => {
     }
 
     const query = `
-        SELECT p.*
+        SELECT DISTINCT p.id, name, description, start_date, end_date, objectives, coordinator_charge, program_image, status
         FROM programs p
         JOIN beneficiaries v ON p.id = v.program_id
         WHERE v.user_id = ?

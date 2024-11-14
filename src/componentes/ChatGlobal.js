@@ -8,9 +8,18 @@ export default function ChatGlobal() {
   const [inputMessage, setInputMessage] = useState('');
   const [userId, setUserId] = useState(null);
   const chatContainerRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   // Obtener el id del usuario logueado desde el backend del chat
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     const fetchMessages = async () => {
       try {
         const response = await axios.get('http://localhost:5000/chat', {

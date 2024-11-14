@@ -15,9 +15,18 @@ const ReportesUsuarios = () => {
   const [usuariosPorRoles, setUsuariosPorRoles] = useState([]);
   const [crecimientoUsuarios, setCrecimientoUsuarios] = useState([]);
   const [coordinadores, setCoordinadores] = useState(0);
+  const [loading, setLoading] = useState(true);
   const pdfRef = useRef(); // Ref para el PDF
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     const fetchData = async () => {
       try {
         // Obtener total de usuarios

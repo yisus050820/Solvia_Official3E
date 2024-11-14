@@ -26,6 +26,7 @@ const CrudProgramas = () => {
   const [originalProgram, setOriginalProgram] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [loading, setLoading] = useState(true);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -43,18 +44,25 @@ const CrudProgramas = () => {
   }, []);
 
   const fetchPrograms = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+
     axios.get('http://localhost:5000/programas')
       .then(response => {
         setProgram(response.data);
       })
       .catch(error => {
-        console.error('Error fetching programs:', error);
+        console.error('Error fetching programs:', error)
       });
   };
 
-  useEffect(() => {
-    console.log(program); // Esto mostrará el contenido del array `program`
-  }, [program]);  
+  //useEffect(() => {
+  //  console.log(program); 
+  //}, [program]);  
 
   //Alerta se cierra automaticamente despues de 5 segundos
   useEffect(() => {

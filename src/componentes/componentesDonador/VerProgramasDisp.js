@@ -17,6 +17,7 @@ const ProgramasDisp = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPrograms();
@@ -27,6 +28,14 @@ const ProgramasDisp = () => {
   };
 
   const fetchPrograms = () => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró el token.');
+      setLoading(false);
+      return;
+    }
+    
     axios.get('http://localhost:5000/programas')
       .then(response => {
         setProgram(response.data);

@@ -60,6 +60,7 @@ const Registro = () => {
     const missingFields = [];
     if (!name) missingFields.push('Nombre');
     if (!email) missingFields.push('Correo Electrónico');
+    if (!birthdate) missingFields.push('Fecha de Nacimiento');
     if (!password) missingFields.push('Contraseña');
     if (!confirmPassword) missingFields.push('Confirmar Contraseña');
     if (!role) missingFields.push('Rol');
@@ -102,6 +103,10 @@ const Registro = () => {
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
+    } else if ( age > 90) {
+      setMessage('Por favor ingrese una fecha de nacimiento válida.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true)
     }
 
     // Validación de coincidencia de contraseñas
