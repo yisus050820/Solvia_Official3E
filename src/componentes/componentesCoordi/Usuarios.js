@@ -163,19 +163,19 @@ const CrudUsuariosCoordi = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-                <div className="flex justify-center items-center">
-                  <Avatar
-                    src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
-                    alt={item.name}
-                    sx={{
-                      width: 128,
-                      height: 128,
-                      marginBottom: 2,
-                      objectFit: 'cover',
-                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                    }}
-                  />
-                </div>
+              <Avatar
+                src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
+                alt={item.name}
+                className="mx-auto mb-2 shadow-lg"
+                sx={{
+                  justifyContent: "center",
+                  width: 128,
+                  height: 128,
+                  marginBottom: 2,
+                  objectFit: 'cover',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }}
+              />
               <Typography variant="h5" gutterBottom className="flex justify-center">
                 {item.name}
               </Typography>
@@ -185,7 +185,7 @@ const CrudUsuariosCoordi = () => {
               <Typography variant="body2" gutterBottom className="flex justify-center">
                 {item.email}
               </Typography>
-              <Typography variant="body2" className="text-center">
+              <Typography variant="body2" className="flex text-center">
                 {item.description}
               </Typography>
             </motion.div>
