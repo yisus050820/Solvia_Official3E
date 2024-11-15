@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
+  CardMedia,
   Button,
   Paper,
   Table,
@@ -27,7 +28,7 @@ import {
   DialogContentText
 } from "@mui/material";
 import { FaEdit, FaTrashAlt, FaPlus, FaChartBar, FaCheck } from "react-icons/fa";
-import { YouTube as YouTubeIcon, Image as ImageIcon } from "@mui/icons-material";
+import { YouTube as YouTubeIcon, Image as ImageIcon, Close as CloseIcon, CheckCircle as CheckCircleIcon, } from "@mui/icons-material";
 import {
   ResponsiveContainer,
   BarChart,
@@ -201,6 +202,10 @@ function TeacherDashboard({ programId }) {
     }
   };
 
+  const handleCloseMaterial = () => {
+    setOpenMaterial(null);
+  };
+
   const sortedTasks = [...tasks].sort((a, b) => {
     if (sortBy === "name") return a.title.localeCompare(b.title);
     if (sortBy === "dueDate") return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
@@ -214,8 +219,8 @@ function TeacherDashboard({ programId }) {
   );
 
   const getCompletionPercentage = (task) => {
-    if (!task.total || task.total === 0) return 0;  
-    return (task.completed / task.total) * 100;  
+    if (!task.total || task.total === 0) return 0;
+    return (task.completed / task.total) * 100;
   };
 
   const chartData = tasks.map(task => ({
@@ -317,57 +322,57 @@ function TeacherDashboard({ programId }) {
                             </IconButton>
                           )}
                         </TableCell>
-{/* Confirmación de eliminar */}
-<Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-  <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
-  <DialogContent>
-    <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
-  </DialogContent>
-  <DialogActions>
-    <motion.button 
-      className="bg-gray-500 text-white px-4 py-2 rounded-full" 
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      onClick={() => setIsDeleteConfirmOpen(false)}>
-      Cancelar
-    </motion.button>
-    <motion.button 
-      className="bg-red-500 text-white px-4 py-2 rounded-full" 
-      whileHover={{ scale: 1.1 }} 
-      whileTap={{ scale: 0.9 }}
-      onClick={() => {
-        handleDeleteTask(currentTask.id);
-        setIsDeleteConfirmOpen(false);
-        setSuccessMessage('Tarea eliminada con éxito'); // Establecer el mensaje de éxito al eliminar
+                        {/* Confirmación de eliminar */}
+                        <Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+                          <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
+                          <DialogContent>
+                            <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
+                          </DialogContent>
+                          <DialogActions>
+                            <motion.button
+                              className="bg-gray-500 text-white px-4 py-2 rounded-full"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => setIsDeleteConfirmOpen(false)}>
+                              Cancelar
+                            </motion.button>
+                            <motion.button
+                              className="bg-red-500 text-white px-4 py-2 rounded-full"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => {
+                                handleDeleteTask(currentTask.id);
+                                setIsDeleteConfirmOpen(false);
+                                setSuccessMessage('Tarea eliminada con éxito'); // Establecer el mensaje de éxito al eliminar
 
-      }}>
-      Eliminar
-    </motion.button>
-  </DialogActions>
-</Dialog>
+                              }}>
+                              Eliminar
+                            </motion.button>
+                          </DialogActions>
+                        </Dialog>
 
-{/* Acciones de la tarea, incluyendo eliminar */}
-<TableCell>
-  <motion.button
-    className="bg-blue-500 text-white p-2 rounded-full"
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.9 }}
-    onClick={() => handleOpenDialog(task)}
-  >
-    <FaEdit />
-  </motion.button>
-  <motion.button
-    className="bg-red-500 text-white p-2 rounded-full"
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.9 }}
-    onClick={() => {
-      setCurrentTask(task);  // Establece la tarea actual para eliminar
-      setIsDeleteConfirmOpen(true);  // Muestra el diálogo de confirmación
-    }}
-  >
-    <FaTrashAlt />
-  </motion.button>
-</TableCell>
+                        {/* Acciones de la tarea, incluyendo eliminar */}
+                        <TableCell>
+                          <motion.button
+                            className="bg-blue-500 text-white p-2 rounded-full"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleOpenDialog(task)}
+                          >
+                            <FaEdit />
+                          </motion.button>
+                          <motion.button
+                            className="bg-red-500 text-white p-2 rounded-full"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              setCurrentTask(task);  // Establece la tarea actual para eliminar
+                              setIsDeleteConfirmOpen(true);  // Muestra el diálogo de confirmación
+                            }}
+                          >
+                            <FaTrashAlt />
+                          </motion.button>
+                        </TableCell>
 
                       </TableRow>
                     ))}
@@ -397,49 +402,49 @@ function TeacherDashboard({ programId }) {
           )}
         </AnimatePresence>
       </Paper>
-       {/* Modal para mensajes de éxito */}
-       <AnimatePresence>
-      {successMessage && (
-        <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div 
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          exit={{ y: 50 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-          className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                        {/* Icono de palomita */}
-                     
-            <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-            <div className='flex justify-center items-center'>
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={checkmarkVariants}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className='flex justify-center items-center'
-              style={{
-                borderRadius: '50%',        // Hace que sea un círculo
-                backgroundColor: '#4CAF50', // Color de fondo verde
-                width: '80px',              // Tamaño del círculo
-                height: '80px',             // Tamaño del círculo
-                display: 'flex',            // Para alinear el contenido
-                justifyContent: 'center',   // Centra horizontalmente
-                alignItems: 'center'        // Centra verticalmente
-              }}
-            >
-              <FaCheck size={50} className="text-white"/>
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: 50 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
+              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              {/* Icono de palomita */}
+
+              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <div className='flex justify-center items-center'>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={checkmarkVariants}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className='flex justify-center items-center'
+                  style={{
+                    borderRadius: '50%',        // Hace que sea un círculo
+                    backgroundColor: '#4CAF50', // Color de fondo verde
+                    width: '80px',              // Tamaño del círculo
+                    height: '80px',             // Tamaño del círculo
+                    display: 'flex',            // Para alinear el contenido
+                    justifyContent: 'center',   // Centra horizontalmente
+                    alignItems: 'center'        // Centra verticalmente
+                  }}
+                >
+                  <FaCheck size={50} className="text-white" />
+                </motion.div>
+              </div>
             </motion.div>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-              </AnimatePresence>
+        )}
+      </AnimatePresence>
 
       <Snackbar
         open={openSnackbar}
@@ -530,48 +535,55 @@ function TeacherDashboard({ programId }) {
         </Box>
       </Modal>
 
-      <Modal open={!!openMaterial} onClose={() => setOpenMaterial(null)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "80%",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
+      <Modal open={!!openMaterial} onClose={handleCloseMaterial}>
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '80%',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseMaterial}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           {openMaterial?.type === "video" ? (
             <iframe
               width="100%"
               height="400"
               src={openMaterial.url}
-              title="Material de apoyo"
+              title={openMaterial.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
           ) : (
-            <img src={openMaterial?.url} alt="Material de apoyo" 
-            style={{ 
-              width: "100%", 
-              maxWidth: "100%", 
-              height: "auto", 
-              maxHeight: "calc(100vh - 30px)",  // Resta 20px de la altura total
-              objectFit: "contain", 
-              marginTop: "10px",  // Agrega separación arriba
-              marginBottom: "10px" // Agrega separación abajo
-            }} 
-           
+            <CardMedia
+              component="img"
+              image={openMaterial?.url}
+              alt={openMaterial?.title}
+              sx={{ maxHeight: '80vh', objectFit: 'contain' }}
             />
           )}
+          <Typography variant="h6" component="h2" mt={2}>
+            {openMaterial?.title}
+          </Typography>
         </Box>
       </Modal>
     </Box>
 
-    
+
   );
 }
 
