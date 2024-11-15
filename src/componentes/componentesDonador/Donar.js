@@ -14,7 +14,7 @@ export default function Donar() {
     email: '',
     card: '',
     name: '',
-    country: 'es',
+    country: 'mx',
     postalCode: '',
   });
   const [message, setMessage] = useState('');
@@ -23,8 +23,70 @@ export default function Donar() {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState({});
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
+
+  const handleCvvChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 3) {
+      value = value.slice(0, 3);
+    }
+    setFormData({
+      ...formData,
+      cvv: value
+    });
+
+    if (value.length !== 3) {
+      setErrors({
+        ...errors,
+        cvv: 'El CVV debe tener 3 dígitos'
+      });
+    } else {
+      const { cvv, ...rest } = errors;
+      setErrors(rest);
+    }
+  };
+
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'El email es requerido'
+      }));
+      return false;
+    } else if (!emailRegex.test(email)) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Por favor ingrese un email válido'
+      }));
+      return false;
+    } else {
+      setErrors(prev => {
+        const { email, ...rest } = prev;
+        return rest;
+      });
+      return true;
+    }
+  };
+
+
+
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]{2,50}$/;
+    if (!nameRegex.test(name)) {
+      setErrors({
+        ...errors,
+        name: 'El nombre debe contener solo letras y espacios (2-50 caracteres)'
+      });
+      return false;
+    }
+    const { name: nameError, ...rest } = errors;
+    setErrors(rest);
+    return true;
+  };
 
   //Aniamcion de exito al actualizar datos de perfil
   useEffect(() => {
@@ -35,26 +97,164 @@ export default function Donar() {
     }
   }, [successMessage]);
 
-  const handleCardChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleCardExpiryChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+
+    if (value.length > 4) {
+      value = value.slice(0, 4);
+    }
+
+    if (value.length >= 2) {
+      value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+
+    setFormData({
+      ...formData,
+      cardExpiry: value
+    });
   };
+
+  const validateCardExpiry = () => {
+    const value = formData.cardExpiry;
+    if (!value) {
+      setErrors({
+        ...errors,
+        cardExpiry: 'La fecha de vencimiento es requerida'
+      });
+      return false;
+    }
+
+    const [month, year] = value.split('/');
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2));
+    const inputMonth = parseInt(month);
+    const inputYear = parseInt(year);
+
+    if (!month || !year || inputMonth < 1 || inputMonth > 12) {
+      setErrors({
+        ...errors,
+        cardExpiry: 'Mes inválido'
+      });
+      return false;
+    }
+
+    if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
+      setErrors({
+        ...errors,
+        cardExpiry: 'La tarjeta ha expirado'
+      });
+      return false;
+    }
+
+    const { cardExpiry, ...rest } = errors;
+    setErrors(rest);
+    return true;
+  };
+
+
+  
+  // Validate postal code based on country
+  const validatePostalCode = (code, country) => {
+    const postalCodeRegex = {
+      es: /^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$/, // Spain: 5 digits
+      mx: /^\d{5}$/, // Mexico: 5 digits
+      ar: /^[A-Z]\d{4}[A-Z]{3}$/, // Argentina: Letter + 4 digits + 3 letters
+      co: /^\d{6}$/ // Colombia: 6 digits
+    };
+
+    if (!postalCodeRegex[country].test(code)) {
+      setErrors({
+        ...errors,
+        postalCode: 'Código postal no válido para el país seleccionado'
+      });
+      return false;
+    }
+    const { postalCode: postalError, ...rest } = errors;
+    setErrors(rest);
+    return true;
+  };
+
+  const handlePostalCodeChange = (e) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      postalCode: value
+    }));
+    validatePostalCode(value, formData.country);
+  };
+
+  const handleCardChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remueve caracteres que no sean números
+    
+    if (value.length > 16) {
+      value = value.slice(0, 16); // Limita a 16 caracteres
+    }
+
+    setFormData({
+      ...formData,
+      card: value
+    });
+
+    // Validación de longitud de la tarjeta
+    if (value.length < 16) {
+      setErrors({
+        ...errors,
+        card: 'El número de tarjeta debe tener exactamente 16 dígitos'
+      });
+    } else {
+      const { card, ...rest } = errors; // Elimina el error si la longitud es correcta
+      setErrors(rest);
+    }
+  };
+  const validateAmount = (amount) => {
+    const numAmount = parseFloat(amount);
+    if (!amount) {
+      setErrors(prev => ({
+        ...prev,
+        amount: 'La cantidad es requerida'
+      }));
+      return false;
+    } else if (isNaN(numAmount) || numAmount <= 0) {
+      setErrors(prev => ({
+        ...prev,
+        amount: 'La cantidad debe ser mayor a 0'
+      }));
+      return false;
+    } else {
+      setErrors(prev => {
+        const { amount, ...rest } = prev;
+        return rest;
+      });
+      return true;
+    }
+  };
+
 
   const handleDonationChange = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, '');
     setDonationAmount(value);
+    validateAmount(value);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'email') {
+      validateEmail(value);
+    }
   };
+
+  
 
   const generarFacturaPDF = () => {
     const { email, card, name, country, postalCode } = formData
     const subtotal = Number(donationAmount)
     const iva = subtotal * 0.16 // IVA del 16%
     const total = subtotal + iva
+
+   
 
     if (!donationAmount || !email || !card || !name || !postalCode) {
       setMessage('Por favor complete todos los campos.');
@@ -161,23 +361,59 @@ export default function Donar() {
       card: '',
       name: '',
       country: 'es',
-      postalCode: ''
+      postalCode: '',
+      cvv: '',          // Añadir cvv al estado inicial
+      cardExpiry: ''    // También añadir cardExpiry
     })
     setDonationAmount('')
   }
 
   const handleDonar = async (e) => {
     e.preventDefault();
+    
+    // Validate all fields
+    const isCardExpiryValid = validateCardExpiry();
+    const isNameValid = validateName(formData.name);
+    const isPostalCodeValid = validatePostalCode(formData.postalCode, formData.country);
+  const isCvvValid = formData.cvv?.length === 3;  // Usar optional chaining
+    const isAmountValid = validateAmount(donationAmount);
+    const isEmailValid = validateEmail(formData.email);
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No se encontró el token.');
-      setLoading(false);
+    if (!formData.cvv || formData.cvv.length !== 3) {
+    setErrors(prev => ({
+      ...prev,
+      cvv: 'El CVV debe tener 3 dígitos'
+    }));
+    return;
+  }
+    // Check card number
+    if (formData.card.length !== 16) {
+      setErrors(prev => ({
+        ...prev,
+        card: 'El número de tarjeta debe tener 16 dígitos'
+      }));
       return;
     }
 
-    if (!donationAmount || !formData.email || !formData.card) {
-      setMessage('Por favor, complete todos los campos.');
+    // Check donation amount
+    if (!donationAmount || donationAmount <= 0) {
+      setMessage('La cantidad de donación debe ser mayor a 0.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Check if any validation failed
+    if (!isAmountValid || !isEmailValid || !isCardExpiryValid || !isNameValid || !isPostalCodeValid || !isCvvValid) {
+      setMessage('Por favor, corrija los errores en el formulario.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Check for empty required fields
+    if (!donationAmount || !formData.email || !formData.card || !formData.name || !formData.postalCode || !formData.cardExpiry || !formData.cvv) {
+      setMessage('Por favor complete todos los campos.');
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
@@ -185,11 +421,16 @@ export default function Donar() {
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No se encontró el token.');
+      }
+
       await axios.post(`http://localhost:5000/donar/donante`, {
         amount: donationAmount,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
       generarFacturaPDF();
       setSuccessMessage('¡Donación realizada con éxito!');
     } catch (error) {
@@ -198,6 +439,7 @@ export default function Donar() {
       setOpenSnackbar(true);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
@@ -251,8 +493,13 @@ export default function Donar() {
                   placeholder="0.00"
                   value={donationAmount}
                   onChange={handleDonationChange}
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+                  className={`w-full px-4 py-2 border ${
+                    errors.amount ? 'border-red-600' : 'border-gray-600'
+                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
                 />
+                {errors.amount && (
+                  <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
+                )}               
               </div>
 
               <div className="space-y-2">
@@ -264,97 +511,101 @@ export default function Donar() {
                   placeholder="tu@ejemplo.com"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+                  className={`w-full px-4 py-2 border ${
+                    errors.email ? 'border-red-600' : 'border-gray-600'
+                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
+
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="card" className="block text-sm font-medium text-gray-300">Información de la tarjeta</label>
-                <input
-                  id="card"
-                  name="card"
-                  placeholder="1234 1234 1234 1234"
-                  value={formData.card}
-                  onChange={handleCardChange}
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                <input
-                    placeholder="MM / AA"
-                    name="cardExpiry"
-                    value={formData.cardExpiry || ''}
-                    onChange={(e) => {
-                      let value = e.target.value;
+  <label htmlFor="card" className="block text-sm font-medium text-gray-300">Información de la tarjeta</label>
+  <input
+    id="card"
+    name="card"
+    placeholder="1234 1234 1234 1234"
+    value={formData.card}
+    onChange={handleCardChange}
+    className={`w-full px-4 py-2 border ${errors.card ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+  />
+  {errors.card && <p className="text-red-500 text-sm mt-1">{errors.card}</p>}
+                
+  <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-1">
+      <input
+        placeholder="MM / AA"
+        name="cardExpiry"
+        value={formData.cardExpiry || ''}
+        onBlur={validateCardExpiry}
+        onChange={handleCardExpiryChange}
+        className={`w-full px-4 py-2 border ${errors.cardExpiry ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+      />
+      {errors.cardExpiry && <p className="text-red-500 text-sm">{errors.cardExpiry}</p>}
+    </div>
 
-                      // 1. Permitir solo números
-                      value = value.replace(/\D/g, ''); // Remover cualquier cosa que no sea número
+    <div className="space-y-1">
+      <input
+        placeholder="CVC"
+        value={formData.cvv}
+        onChange={handleCvvChange}
+        className={`w-full px-4 py-2 border ${errors.cvv ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+      />
+      {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
+    </div>
+  </div>
+</div>
 
-                      // 2. Limitar a 4 caracteres
-                      if (value.length > 4) {
-                        value = value.slice(0, 4);
-                      }
+<div className="space-y-2">
+  <label htmlFor="name" className="block text-sm font-medium text-gray-300">Nombre del titular</label>
+  <input
+    id="name"
+    name="name"
+    placeholder="Nombre completo en la tarjeta"
+    value={formData.name}
+    onChange={(e) => {
+      setFormData(prev => ({ ...prev, name: e.target.value }));
+      validateName(e.target.value);
+    }}
+    className={`w-full px-4 py-2 border ${errors.name ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+  />
+  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+</div>
 
-                      // 3. Agregar '/' automáticamente después de 2 dígitos
-                      if (value.length >= 2 && value.length <= 4) {
-                        value = value.slice(0, 2) + '/' + value.slice(2, 4); // Insertar '/' después de 2 dígitos
-                      }
-
-                      // 4. Actualizar el estado (aquí se mantiene en el mismo formData)
-                      setFormData({
-                        ...formData,
-                        cardExpiry: value
-                      });
-                    }}
-                    className="px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                  />
-
-                  <input
-                    placeholder="CVC"
-                    className="px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300">Nombre del titular</label>
-                <input
-                  id="name"
-                  name="name"
-                  placeholder="Nombre completo en la tarjeta"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-300">País o región</label>
-                <select
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                >
-                  <option value="es">España</option>
-                  <option value="mx">México</option>
-                  <option value="ar">Argentina</option>
-                  <option value="co">Colombia</option>
-                </select>
-                <input
-                  placeholder="Código postal"
-                  value={formData.postalCode}
-                  name="postalCode"
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
+<div className="space-y-2">
+  <label className="block text-sm font-medium text-gray-300">País o región</label>
+  <select
+    className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+    name="country"
+    value={formData.country}
+    onChange={handleInputChange}
+  >
+    <option value="es">España</option>
+    <option value="mx">México</option>
+    <option value="ar">Argentina</option>
+    <option value="co">Colombia</option>
+  </select>
+  
+  <div className="space-y-1">
+    <input
+      placeholder="Código postal"
+      value={formData.postalCode}
+      name="postalCode"
+      onChange={handlePostalCodeChange}
+      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+    />
+    {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>}
+  </div>
+</div>
 
               <button
                 type="submit"
                 className="w-full px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
               >
-                Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
-              </button>
+Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
+</button>
             </form>
           </div>
         </div>
@@ -436,6 +687,8 @@ export default function Donar() {
             </motion.div>
           </motion.div>
         )}
+
+        
       </AnimatePresence>
 
       <Snackbar
