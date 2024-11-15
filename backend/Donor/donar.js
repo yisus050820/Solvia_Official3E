@@ -57,10 +57,11 @@ router.post('/donante', authenticateToken, (req, res) => {
 // Insetar las donaciones
 router.post('/usuarios', (req, res) => {
     const { amount } = req.body;
+    console.log(req.body)
 
     db.query(
         'INSERT INTO donations (amount) VALUES (?)',
-        [userId, amount],
+        [amount],
         (err, result) => {
             if (err) {
                 console.error('Error al crear programa:', err);

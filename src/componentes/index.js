@@ -86,6 +86,9 @@ export default function LandingPage() {
             SOLVIA
           </motion.h1>
           <ul className="flex space-x-4">
+          <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <a href="/donar" className="hover:text-purple-400">Donar</a>
+            </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <a href="/" className="hover:text-purple-400">Home</a>
             </motion.li>

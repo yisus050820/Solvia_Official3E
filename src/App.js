@@ -10,6 +10,7 @@ import DashboardBeneficiario from './componentes/dashboardBeneficiario';
 import LandingPage from './componentes/index';
 import ResetPassword from './componentes/ResetPassword';
 import DashboardVoluntario from './componentes/dashboardVoluntario';
+import Donar from './componentes/Donar';
 import TeacherDashboard from './componentes/componentesVol/InterfazVoluntario';
 import ChatGlobal from './componentes/ChatGlobal';
 
@@ -67,6 +68,7 @@ function App() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/donar" element={<Donar />} />
         <Route path="/register" element={<Registro />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/Admin" element={<DashboardAdmin />} />
