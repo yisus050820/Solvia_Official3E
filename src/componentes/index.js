@@ -8,18 +8,18 @@ import { Avatar } from '@mui/material';
 
 
 const carouselImages = [
-  "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-  "https://images.pexels.com/photos/4672720/pexels-photo-4672720.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-  "https://images.pexels.com/photos/4672717/pexels-photo-4672717.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4672707/pexels-photo-4672707.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-  "https://images.pexels.com/photos/4672720/pexels-photo-4672720.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-  "https://images.pexels.com/photos/4672717/pexels-photo-4672717.jpeg?auto=compress&cs=tinysrgb&w=600"
+  "https://educationfoundation.com/wp-content/uploads/2022/11/IMG_7949.jpg",
+  "https://voyaser.santillana.com/wp-content/uploads/2023/08/VoyaSer23-13-1-scaled.jpg",
+  "https://voyaser.santillana.com/wp-content/uploads/2023/08/VoyaSer23-4-scaled.jpg",
+  "https://voyaser.santillana.com/wp-content/uploads/2023/08/VoyaSer-1-de-9-scaled.jpg",
+  "https://i.ytimg.com/vi/WMIRhP487ZQ/maxresdefault.jpg",
+  "https://www.infoans.org/media/k2/items/cache/5848023d5b50528d6c54d64dc2203bd7_XL.jpg",
 ]
 
 const infoCards = [
-  { title: "Programas Educativos", description: "Brindamos apoyo a estudiantes de todo el mundo con programas diseñados para garantizar el acceso a la educación.", image: "https://images.pexels.com/photos/7983552/pexels-photo-7983552.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { title: "Lucha contra la Desigualdad", description: "Nuestras iniciativas se centran en reducir la desigualdad en comunidades vulnerables a través de la educación y el empoderamiento.", image: "https://images.pexels.com/photos/5935752/pexels-photo-5935752.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { title: "Apoyo Integral", description: "Ofrecemos ayudas integrales a personas y familias en situación de riesgo social para mejorar su calidad de vida.", image: "https://images.pexels.com/photos/3280130/pexels-photo-3280130.jpeg?auto=compress&cs=tinysrgb&w=600" }
+  { title: "Programas Educativos", description: "Brindamos apoyo a estudiantes de todo el mundo con programas diseñados para garantizar el acceso a la educación.", image: "https://utdelmayab.edu.mx/wp-content/uploads/2024/03/campana-de-promocion-de-nuestros-programas-educativos-5.jpg" },
+  { title: "Lucha contra la Desigualdad", description: "Nuestras iniciativas se centran en reducir la desigualdad en comunidades vulnerables a través de la educación y el empoderamiento.", image: "https://global.unitednations.entermediadb.net/assets/mediadb/services/module/asset/downloads/preset/Libraries/Production+Library/11-10-2021-balqees-2.jpeg/image1170x530cropped.jpg" },
+  { title: "Apoyo Integral", description: "Ofrecemos ayudas integrales a personas y familias en situación de riesgo social para mejorar su calidad de vida.", image: "https://www.comunicaciontucuman.gob.ar/fotos/cache/notas/2022/03/07/818x460_220307172330_17848.jpg" },
 ]
 
 const testimonials = [
