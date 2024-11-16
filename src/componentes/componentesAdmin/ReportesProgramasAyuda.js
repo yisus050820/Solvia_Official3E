@@ -76,35 +76,102 @@ const ReportesProgramasAyuda = () => {
   }, []);
 
   const exportarPDF = () => {
-    const input = pdfRef.current;
+    const pdf = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
   
-    if (input) {
-      html2canvas(input, {
-        scale: 3, // Incrementa la calidad de la captura
-        useCORS: true,
-        allowTaint: true,
-      }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('portrait'); // Orientación vertical
+    // Colores personalizados
+    const primaryColor = "#007BFF"; // Azul corporativo
+    const secondaryColor = "#444"; // Gris oscuro
   
-        // Dimensiones de la página en el PDF
-        const pageWidth = pdf.internal.pageSize.width;
-        const pageHeight = pdf.internal.pageSize.height;
+    // Título "SOLVIA" como logo de empresa
+    pdf.setFontSize(20); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(primaryColor);
+    pdf.text("SOLVIA", 10, 15);
   
-        // Ajusta la imagen para centrarla en la página
-        const imgWidth = pageWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const yPos = imgHeight < pageHeight ? (pageHeight - imgHeight) / 2 : 0;
+    // Título "Reporte de Programas de Ayuda"
+    pdf.setFontSize(24); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Reporte de Programas de Ayuda", pageWidth / 2, 30, { align: "center" });
   
-        pdf.addImage(imgData, 'PNG', 0, yPos, imgWidth, imgHeight); // Centrar imagen verticalmente
-        pdf.save('reporteProgramasAyuda.pdf');
-      }).catch((error) => {
-        console.error('Error al capturar la imagen:', error);
-      });
-    } else {
-      console.error('Elemento no encontrado para la exportación de PDF');
-    }
+    // Línea divisoria
+    pdf.setLineWidth(0.8);
+    pdf.setDrawColor(primaryColor);
+    pdf.line(10, 35, pageWidth - 10, 35);
+  
+    // Datos del reporte
+    pdf.setFontSize(12); // Tamaño reducido para compactar texto
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+  
+    let startY = 40;
+    const lineSpacing = 8;
+  
+    pdf.text(`Total de Programas Activos:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${totalProgramas}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Total de Beneficiarios Activos:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${beneficiariosTotales}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Total de Voluntarios Activos:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${voluntariosTotales}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 3;
+  
+    // Tablas y datos
+    pdf.setFontSize(10); // Reducir tamaño de fuente para caber en una sola hoja
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Crecimiento de Programas (por mes):", 10, startY);
+    startY += lineSpacing;
+  
+    pdf.setFont("helvetica", "normal");
+    crecimientoProgramas.forEach((data, index) => {
+      pdf.text(`${data.month}`, 10, startY);
+      pdf.text(`${data.Programas}`, 60, startY);
+      startY += lineSpacing;
+    });
+  
+    startY += lineSpacing;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Beneficiarios por Programa:", 10, startY);
+    startY += lineSpacing;
+  
+    // Tabla para beneficiarios por programa
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(secondaryColor);
+    pdf.setLineWidth(0.1);
+    pdf.setDrawColor(secondaryColor);
+  
+    pdf.rect(10, startY, pageWidth - 20, 8); // Cabecera
+    pdf.text("Programa", 15, startY + 6);
+    pdf.text("Beneficiarios", pageWidth - 50, startY + 6);
+    startY += 10;
+  
+    beneficiariosPorPrograma.forEach((data, index) => {
+      pdf.rect(10, startY, pageWidth - 20, 8); // Fila
+      pdf.text(data.program_name, 15, startY + 6);
+      pdf.text(`${data.total_beneficiaries}`, pageWidth - 50, startY + 6);
+      startY += 10;
+  
+      if (startY > 280) {
+        // Si el contenido excede una hoja, detén la adición de más datos
+        pdf.text("... Más datos omitidos", 10, startY + 6);
+        return;
+      }
+    });
+  
+    // Guardar el PDF
+    pdf.save("reporteProgramasAyuda.pdf");
   };
+  
   
 
   const handleCloseSnackbar = () => {
