@@ -52,7 +52,7 @@ export default function ChatGlobal() {
     if (chatContainer && atBottom) {
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-  }, [messages, atBottom]); // Se activa cuando los mensajes o la posición cambian
+  }, [messages, atBottom]);  
 
   // Función para manejar el cambio de scroll
   const handleScroll = () => {
@@ -67,7 +67,7 @@ export default function ChatGlobal() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() === '') return;
-
+  
     try {
       const response = await axios.post(
         'http://localhost:5000/chat',
@@ -78,14 +78,20 @@ export default function ChatGlobal() {
           },
         }
       );
-
+  
       const newMessage = response.data;
-      setMessages([...messages, newMessage]);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
       setInputMessage('');
+      
+      // Forzar scroll al final
+      const chatContainer = chatContainerRef.current;
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
     } catch (error) {
       console.error('Error al enviar el mensaje:', error);
     }
-  };
+  };  
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white w-full md:w-3/4 lg:w-2/3 mx-auto">
