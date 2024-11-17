@@ -17,12 +17,12 @@ const verifyAssignmentExists = (user_id, program_id, id, callback) => {
 // Obtener todos los usuarios con el rol de beneficiario
 router.get('/beneficiarios', (req, res) => {
     const query = `
-        SELECT id, name, email 
+        SELECT id, name, email
         FROM users 
         WHERE role = 'beneficiary'
     `;
     
-    db.query(query, (err, results) => {
+    db.query(query, (err, results) => { 
         if (err) {
             console.error('Error fetching beneficiaries:', err);
             return res.status(500).json({ message: 'Error al obtener beneficiarios.' });

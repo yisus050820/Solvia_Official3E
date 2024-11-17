@@ -35,6 +35,12 @@ export default function ChatGlobal() {
       }
     };
     fetchMessages();
+
+    // Actualizar los mensajes cada 5 segundos
+    const intervalId = setInterval(fetchMessages, 1000);
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
   }, []);
 
   // Desplazarse automáticamente al final de los mensajes
