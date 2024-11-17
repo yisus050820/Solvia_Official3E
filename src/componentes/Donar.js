@@ -437,192 +437,280 @@ export default function Donar() {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
-      <div className="w-full max-w-[1000px] bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row">
-          {/* Left Column */}
-          <div className="md:w-1/2 p-8 bg-gray-700">
-            <div className="mb-8">
-              <div className="flex items-center gap-4">
-                <button className="text-gray-400 hover:text-gray-300">
-                  <ArrowLeft className="h-6 w-6" />
-                </button>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-                    <CreditCard className="h-4 w-4 text-primary-foreground" />
-                  </div>
-                  <span className="font-medium text-gray-300">SOLVIA</span>
-                  <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
-                    DONACION
-                  </span>
-                </div>
-              </div>
-            </div>
-            <h1 className="text-xl font-semibold text-gray-300 mb-6">Donar a SOLVIA para fondeo de programas</h1>
-            <div className="text-3xl font-bold mb-8">
-              ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
-            </div>
-            <div className="bg-gray-600 p-6 rounded-lg shadow-md">
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-8 w-8 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">Tu donación</h3>
-                  <div className="text-sm text-gray-400">Ayuda a nuestra causa</div>
-                </div>
-                <div className="font-medium">${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="md:w-1/2 p-8">
-            <h2 className="text-2xl font-semibold mb-6">Pagar con tarjeta</h2>
-            <form onSubmit={handleDonar} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="donation" className="block text-sm font-medium text-gray-300">Cantidad a donar</label>
-                <input
-                  id="donation"
-                  type="text"
-                  placeholder="0.00"
-                  value={donationAmount}
-                  onChange={handleDonationChange}
-                  className={`w-full px-4 py-2 border ${
-                    errors.amount ? 'border-red-600' : 'border-gray-600'
-                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-                />
-                {errors.amount && (
-                  <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
-                )}               
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="tu@ejemplo.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-2 border ${
-                    errors.email ? 'border-red-600' : 'border-gray-600'
-                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-
-              </div>
-
-              <div className="space-y-2">
-  <label htmlFor="card" className="block text-sm font-medium text-gray-300">Información de la tarjeta</label>
-  <input
-    id="card"
-    name="card"
-    placeholder="1234 1234 1234 1234"
-    value={formData.card}
-    onChange={handleCardChange}
-    className={`w-full px-4 py-2 border ${errors.card ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-  />
-  {errors.card && <p className="text-red-500 text-sm mt-1">{errors.card}</p>}
-                
-  <div className="grid grid-cols-2 gap-4">
-    <div className="space-y-1">
-      <input
-        placeholder="MM / AA"
-        name="cardExpiry"
-        value={formData.cardExpiry || ''}
-        onBlur={validateCardExpiry}
-        onChange={handleCardExpiryChange}
-        className={`w-full px-4 py-2 border ${errors.cardExpiry ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-      />
-      {errors.cardExpiry && <p className="text-red-500 text-sm">{errors.cardExpiry}</p>}
-    </div>
-
-    <div className="space-y-1">
-      <input
-        placeholder="CVC"
-        value={formData.cvv}
-        onChange={handleCvvChange}
-        className={`w-full px-4 py-2 border ${errors.cvv ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-      />
-      {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
-    </div>
-  </div>
-</div>
-
-<div className="space-y-2">
-  <label htmlFor="name" className="block text-sm font-medium text-gray-300">Nombre del titular</label>
-  <input
-    id="name"
-    name="name"
-    placeholder="Nombre completo en la tarjeta"
-    value={formData.name}
-    onChange={(e) => {
-      setFormData(prev => ({ ...prev, name: e.target.value }));
-      validateName(e.target.value);
-    }}
-    className={`w-full px-4 py-2 border ${errors.name ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-  />
-  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-</div>
-
-<div className="space-y-2">
-  <label className="block text-sm font-medium text-gray-300">País o región</label>
-  <select
-    className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
-    name="country"
-    value={formData.country}
-    onChange={handleInputChange}
-  >
-    <option value="es">España</option>
-    <option value="mx">México</option>
-    <option value="ar">Argentina</option>
-    <option value="co">Colombia</option>
-  </select>
+    <div className="min-h-screen bg-gray-900 flex text-white">
+      {/* Contenedor izquierdo (título y texto) */}
+      <div className="w-1/3 bg-gray-900 flex flex-col items-center justify-center p-8 text-center">
+        <h1 className="text-4xl font-bold mb-4 text-gray-100">
+          ¡Apoya nuestra causa!
+        </h1>
+        <p className="text-lg text-gray-300">
+          Tu donación marca la diferencia en la vida de muchas personas. Gracias
+          por unirte a nuestro esfuerzo para crear un cambio positivo.
+        </p>
+      </div>
   
-  <div className="space-y-1">
-    <input
-      placeholder="Código postal"
-      value={formData.postalCode}
-      name="postalCode"
-      onChange={handlePostalCodeChange}
-      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
-    />
-    {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>}
-  </div>
-</div>
-
-              <button
-                type="submit"
-                className="w-full px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
-              >
-Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
-</button>
-            </form>
+      {/* Contenedor derecho (componente existente) */}
+      <div className="w-2/3 flex items-center justify-center">
+        <div className="w-full max-w-[1000px] bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+          <div className="flex flex-col md:flex-row">
+            {/* Left Column */}
+            <div className="md:w-1/2 p-8 bg-gray-700">
+              <div className="mb-8">
+                <div className="flex items-center gap-4">
+                  <button
+                    className="text-gray-400 hover:text-gray-300"
+                    onClick={() => (window.location.href = "/index")}
+                  >
+                    <ArrowLeft className="h-6 w-6" />
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                      <CreditCard className="h-4 w-4 text-primary-foreground" />
+                    </div>
+                    <span className="font-medium text-gray-300">SOLVIA</span>
+                    <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      DONACION
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <h1 className="text-xl font-semibold text-gray-300 mb-6">
+                Donar a SOLVIA para fondeo de programas
+              </h1>
+              <div className="text-3xl font-bold mb-8">
+                $
+                {donationAmount
+                  ? parseFloat(donationAmount).toFixed(2)
+                  : "0.00"}
+              </div>
+              <div className="bg-gray-600 p-6 rounded-lg shadow-md">
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <DollarSign className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium">Tu donación</h3>
+                    <div className="text-sm text-gray-400">Ayuda a nuestra causa</div>
+                  </div>
+                  <div className="font-medium">
+                    $
+                    {donationAmount
+                      ? parseFloat(donationAmount).toFixed(2)
+                      : "0.00"}
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            {/* Right Column */}
+            <div className="md:w-1/2 p-8">
+              <h2 className="text-2xl font-semibold mb-6">Pagar con tarjeta</h2>
+              <form onSubmit={handleDonar} className="space-y-6">
+                {/* Cantidad a donar */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="donation"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Cantidad a donar
+                  </label>
+                  <input
+                    id="donation"
+                    type="text"
+                    placeholder="0.00"
+                    value={donationAmount}
+                    onChange={handleDonationChange}
+                    className={`w-full px-4 py-2 border ${
+                      errors.amount ? "border-red-600" : "border-gray-600"
+                    } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  />
+                  {errors.amount && (
+                    <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
+                  )}
+                </div>
+  
+                {/* Email */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="tu@ejemplo.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-2 border ${
+                      errors.email ? "border-red-600" : "border-gray-600"
+                    } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
+                </div>
+  
+                {/* Información de la tarjeta */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="card"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Información de la tarjeta
+                  </label>
+                  <input
+                    id="card"
+                    name="card"
+                    placeholder="1234 1234 1234 1234"
+                    value={formData.card}
+                    onChange={handleCardChange}
+                    className={`w-full px-4 py-2 border ${
+                      errors.card ? "border-red-600" : "border-gray-600"
+                    } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  />
+                  {errors.card && (
+                    <p className="text-red-500 text-sm mt-1">{errors.card}</p>
+                  )}
+  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <input
+                        placeholder="MM / AA"
+                        name="cardExpiry"
+                        value={formData.cardExpiry || ""}
+                        onBlur={validateCardExpiry}
+                        onChange={handleCardExpiryChange}
+                        className={`w-full px-4 py-2 border ${
+                          errors.cardExpiry ? "border-red-600" : "border-gray-600"
+                        } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                      />
+                      {errors.cardExpiry && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.cardExpiry}
+                        </p>
+                      )}
+                    </div>
+  
+                    <div className="space-y-1">
+                      <input
+                        placeholder="CVC"
+                        value={formData.cvv}
+                        onChange={handleCvvChange}
+                        className={`w-full px-4 py-2 border ${
+                          errors.cvv ? "border-red-600" : "border-gray-600"
+                        } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                      />
+                      {errors.cvv && (
+                        <p className="text-red-500 text-sm mt-1">{errors.cvv}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+  
+                {/* Nombre del titular */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Nombre del titular
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    placeholder="Nombre completo en la tarjeta"
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, name: e.target.value }));
+                      validateName(e.target.value);
+                    }}
+                    className={`w-full px-4 py-2 border ${
+                      errors.name ? "border-red-600" : "border-gray-600"
+                    } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  )}
+                </div>
+  
+                {/* País o región y código postal */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    País o región
+                  </label>
+                  <select
+                    className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                  >
+                    <option value="es">España</option>
+                    <option value="mx">México</option>
+                    <option value="ar">Argentina</option>
+                    <option value="co">Colombia</option>
+                  </select>
+  
+                  <div className="space-y-1">
+                    <input
+                      placeholder="Código postal"
+                      value={formData.postalCode}
+                      name="postalCode"
+                      onChange={handlePostalCodeChange}
+                      className={`w-full px-4 py-2 border ${
+                        errors.postalCode
+                          ? "border-red-600"
+                          : "border-gray-600"
+                      } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                    />
+                    {errors.postalCode && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.postalCode}
+                      </p>
+                    )}
+                  </div>
+                </div>
+  
+                {/* Botón de donación */}
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
+                >
+                  Donar $
+                  {donationAmount
+                    ? parseFloat(donationAmount).toFixed(2)
+                    : "0.00"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-
+  
+      {/* Animaciones y componentes MUI */}
       <AnimatePresence>
         {successMessage && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="bg-gray-800 p-6 rounded-xl shadow-lg"
+            >
               {/* Icono de palomita */}
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              <h2 className="text-white text-2xl font-bold mb-4">
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
@@ -632,15 +720,15 @@ Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
                     visible: { opacity: 1, pathLength: 1 },
                   }}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: "50%",
+                    backgroundColor: "#4CAF50",
+                    width: "80px",
+                    height: "80px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
                   <FaCheck size={50} className="text-white" />
@@ -650,31 +738,31 @@ Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
           </motion.div>
         )}
       </AnimatePresence>
-
+  
       <AnimatePresence>
-        {message && snackbarSeverity === 'success' && (
+        {message && snackbarSeverity === "success" && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: 'easeIn' }}
+            transition={{ duration: 0.2, ease: "easeIn" }}
             className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
               className="bg-gray-800 p-6 rounded-xl shadow-lg"
             >
               <h2 className="text-white text-2xl font-bold mb-4">{message}</h2>
               <motion.div
                 className="flex justify-center items-center"
                 style={{
-                  borderRadius: '50%',
-                  backgroundColor: '#4CAF50',
-                  width: '80px',
-                  height: '80px',
+                  borderRadius: "50%",
+                  backgroundColor: "#4CAF50",
+                  width: "80px",
+                  height: "80px",
                 }}
               >
                 <FaCheck size={50} className="text-white" />
@@ -682,20 +770,22 @@ Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
             </motion.div>
           </motion.div>
         )}
-
-        
       </AnimatePresence>
-
+  
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {message}
         </Alert>
       </Snackbar>
     </div>
   );
-}
+}  

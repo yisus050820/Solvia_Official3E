@@ -26,27 +26,38 @@ const CrudProgramas = () => {
   const [originalProgram, setOriginalProgram] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
-  const [loading, setLoading] = useState(true);
-  const [atBottom, setAtBottom] = useState(true);
+  const [loading, setLoading] = useState(true);const [atBottom, setAtBottom] = useState(true);
   const userListRef = useRef(null);
-
-  setAtBottom(
-    Math.abs(userListContainer.scrollHeight - userListContainer.scrollTop - userListContainer.clientHeight) < 1
-  );
   
+  // Manejador del evento de scroll
   const handleScroll = () => {
     const userListContainer = userListRef.current;
     if (userListContainer) {
-      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
+      setAtBottom(
+        Math.abs(
+          userListContainer.scrollHeight -
+          userListContainer.scrollTop -
+          userListContainer.clientHeight
+        ) < 1
+      );
     }
   };
+  
+  // Configuración del evento de scroll
+  useEffect(() => {
+    const userListContainer = userListRef.current;
+    if (userListContainer) {
+      userListContainer.addEventListener('scroll', handleScroll);
+      return () => userListContainer.removeEventListener('scroll', handleScroll);
+    }
+  }, []); 
   
   useEffect(() => {
     const userListContainer = userListRef.current;
     if (userListContainer && atBottom) {
       userListContainer.scrollTop = userListContainer.scrollHeight;
     }
-  }, [program, atBottom]);  // Solo desplazarse al fondo si estamos al final  
+  }, [program, atBottom]);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -128,7 +139,7 @@ const CrudProgramas = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
-  };  
+  };
 
   const sortedProgram = [...program].sort((a, b) => {
     if (sortBy === "name") return a.name.localeCompare(b.name);
@@ -146,10 +157,10 @@ const CrudProgramas = () => {
     pause: 'pausado',
     unactive: 'inactivo'
   };
-  
+
   const filteredPrograms = sortedProgram.filter((program) => {
     const translatedStatus = statusTranslation[program.status] || program.status; // Traducir status
-  
+
     return (
       (program.name && program.name.toLowerCase().includes(searchQuery)) ||
       (program.description && program.description.toLowerCase().includes(searchQuery)) ||
@@ -160,8 +171,8 @@ const CrudProgramas = () => {
       (translatedStatus && translatedStatus.toLowerCase().includes(searchQuery))
     );
   });
-  
-  
+
+
   const validateProgram = (program, originalProgram, isEditing) => {
     const validationErrors = {};
     const todayDate = new Date();
@@ -387,302 +398,302 @@ const CrudProgramas = () => {
   return (
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
-      {/* Título encima del contenido */}
-      <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
-        Gestionar Programas
-      </Typography>
-      <div className="flex justify-between mb-4 space-x-4">
-        <div className="flex items-center space-x-2">
-          <Typography variant="body1" color="primary" className="mr-2">
-            Ver en tarjetas
-          </Typography>
-          <Switch
-            checked={mostrarCards}
-            onChange={() => setMostrarCards(!mostrarCards)}
-            color="primary"
-          />
-          <TextField
-            fullWidth
-            label="Buscar..."
-            variant="outlined"
-            sx={{
-              mb: 2,
-              backgroundColor: 'white',
-              color: 'black',
-              borderRadius: '5px',
-              '& .MuiOutlinedInput-root': {
-                height: '36px',
-                fontSize: '0.9rem',
-                '& input': {
-                  color: 'black',
-                  padding: '8px 14px',
+        {/* Título encima del contenido */}
+        <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
+          Gestionar Programas
+        </Typography>
+        <div className="flex justify-between mb-4 space-x-4">
+          <div className="flex items-center space-x-2">
+            <Typography variant="body1" color="primary" className="mr-2">
+              Ver en tarjetas
+            </Typography>
+            <Switch
+              checked={mostrarCards}
+              onChange={() => setMostrarCards(!mostrarCards)}
+              color="primary"
+            />
+            <TextField
+              fullWidth
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '5px',
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.9rem',
+                  '& input': {
+                    color: 'black',
+                    padding: '8px 14px',
+                  },
+                  '& fieldset': {
+                    borderColor: '#ccc',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#888',
+                  },
                 },
-                '& fieldset': {
-                  borderColor: '#ccc',
+                '& .MuiInputLabel-root': {
+                  color: '#888',
+                  fontSize: '0.9rem',
+                  top: '-6px',
                 },
-                '&:hover fieldset': {
-                  borderColor: '#888',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: '#888',
-                fontSize: '0.9rem',
-                top: '-6px',
-              },
-            }}
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
+              }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <motion.button
+            className="bg-green-500 text-white p-2 rounded-full"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleOpenModal}
+          >
+            <FaPlus />
+          </motion.button>
         </div>
 
-        <motion.button
-          className="bg-green-500 text-white p-2 rounded-full"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleOpenModal}
-        >
-          <FaPlus />
-        </motion.button>
-      </div>
+        {mostrarCards ? (
+          <div ref={userListRef} className="overflow-auto" style={{ maxHeight: '400px' }}>
+            {filteredPrograms.map((program) => (
+              <motion.div
+                key={program.id}
+                className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <img
+                  className="w-full h-48 object-cover"
+                  src={program.program_image ? `http://localhost:5000${program.program_image}` : "https://via.placeholder.com/150"}
+                  alt={program.name}
+                />
+                <div className="p-4">
+                  <h2 className="text-white text-xl font-bold">{program.name}</h2>
+                  <div className="flex items-center mt-2">
+                    <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
+                    <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
+                  </div>
+                  <p className="text-gray-400 mt-2">
+                    {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
+                  </p>
 
-      {mostrarCards ? (
-        <div className="flex justify-center flex-wrap mt-2">
-          {filteredPrograms.map((program) => (
-            <motion.div
-              key={program.id}
-              className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <img
-                className="w-full h-48 object-cover"
-                src={program.program_image ? `http://localhost:5000${program.program_image}` : "https://via.placeholder.com/150"}
-                alt={program.name}
-              />
-              <div className="p-4">
-                <h2 className="text-white text-xl font-bold">{program.name}</h2>
-                <div className="flex items-center mt-2">
-                  <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
-                  <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
+                  <div className="mt-2">
+                    <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
+                  </div>
+                  <div className="flex mt-4 justify-between">
+                    <motion.button
+                      className="bg-gray-700 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setSelectedProgram(program)}
+                    >
+                      Más info
+                    </motion.button>
+
+                    <div className='flex space-x-2'>
+                      <motion.button
+                        className="bg-blue-500 text-white p-2 rounded-full"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleOpenEditModal(program)}
+                      >
+                        <FaEdit />
+                      </motion.button>
+
+                      <motion.button
+                        className="bg-red-500 text-white p-2 rounded-full"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDeleteConfirm(program.id)}
+                      >
+                        <FaTrashAlt />
+                      </motion.button>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-400 mt-2">
-                  {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
-                </p>
-
-                <div className="mt-2">
-                  <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
-                </div>
-                <div className="flex mt-4 justify-between">
-                  <motion.button
-                    className="bg-gray-700 text-white px-4 py-2 rounded"
-                    whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setSelectedProgram(program)}
-                  >
-                    Más info
-                  </motion.button>
-
-                  <div className='flex space-x-2'>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-4">Nombre</th>
+                <th className="p-4">Descripción</th>
+                <th className="p-4">Fecha Inicio</th>
+                <th className="p-4">Fecha Fin</th>
+                <th className="p-4">Objetivos</th>
+                <th className="p-4">Coordinador</th>
+                <th className="p-4">Estado</th>
+                <th className="p-4">Acciones</th>
+              </tr>
+            </thead>
+            <motion.tbody layout className="bg-gray-900">
+              {filteredPrograms.map((item) => (
+                <motion.tr key={item.id} className="border-b border-gray-700">
+                  <td className="p-4">{item.name}</td>
+                  <td className="p-4">{truncateDescription(item.description)}</td>
+                  <td className="p-4">{item.start_date.split('T')[0]}</td>
+                  <td className="p-4">{item.end_date.split('T')[0]}</td>
+                  <td className="p-4">{truncateDescription(truncateDescription(item.objectives))}</td>
+                  <td className="p-4">{item.coordinator_name}</td>
+                  <td className="p-4">
+                    <span
+                      className={`text-lg font-bold ${item.status === 'active'
+                        ? 'text-green-500'
+                        : item.status === 'pause'
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
+                        }`}
+                    >
+                      {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="p-4 flex space-x-4">
                     <motion.button
                       className="bg-blue-500 text-white p-2 rounded-full"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleOpenEditModal(program)}
+                      onClick={() => handleOpenEditModal(item)}
                     >
                       <FaEdit />
                     </motion.button>
-
                     <motion.button
                       className="bg-red-500 text-white p-2 rounded-full"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDeleteConfirm(program.id)}
+                      onClick={() => handleDeleteConfirm(item.id)}
                     >
                       <FaTrashAlt />
                     </motion.button>
-                  </div>
-                </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
+          </motion.table>
+        )}
+      </div>
+
+      {/* Ventana emergente para agregar un nuevo registro */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
+              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  placeholder="Nombre"
+                  value={newProgram.nombre}
+                  onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  placeholder="Descripción"
+                  value={newProgram.descripcion}
+                  onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
+                />
+
+                <DatePicker
+                  selected={newProgram.fechaInicio}
+                  onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
+                  dateFormat="yyyy-MM-dd"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  placeholderText="Fecha de Inicio"
+                  onKeyDown={(e) => {
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+
+                <DatePicker
+                  selected={newProgram.fechaFin}
+                  onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
+                  dateFormat="yyyy-MM-dd"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  placeholderText="Fecha Final"
+                  onKeyDown={(e) => {
+                    if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  placeholder="Objetivos"
+                  value={newProgram.objetivos}
+                  onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
+                />
+
+                <select
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  value={newProgram.coordinador}
+                  onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
+                >
+                  <option value="">Selecciona un coordinador</option>
+                  {coordinadores.map((coordinador) => (
+                    <option key={coordinador.id} value={coordinador.id}>
+                      {coordinador.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  value={newProgram.status || 'active'}
+                  onChange={(e) => setNewProgram({ ...newProgram, status: e.target.value })}
+                >
+                  <option value="active">Activo</option>
+                  <option value="pause">Pausado</option>
+                  <option value="unactive">Inactivo</option>
+                </select>
+                <input
+                  type="file"
+                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, 'new')}
+                />
+              </div>
+              <div className="flex justify-between mt-4">
+                <motion.button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleAddProgram}
+                >
+                  Agregar
+                </motion.button>
+                <motion.button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCloseModal}
+                >
+                  Cerrar
+                </motion.button>
               </div>
             </motion.div>
-          ))}
-        </div>
-      ) : (
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
-            <tr>
-              <th className="p-4">Nombre</th>
-              <th className="p-4">Descripción</th>
-              <th className="p-4">Fecha Inicio</th>
-              <th className="p-4">Fecha Fin</th>
-              <th className="p-4">Objetivos</th>
-              <th className="p-4">Coordinador</th>
-              <th className="p-4">Estado</th>
-              <th className="p-4">Acciones</th>
-            </tr>
-          </thead>
-          <motion.tbody layout className="bg-gray-900">
-            {filteredPrograms.map((item) => (
-              <motion.tr key={item.id} className="border-b border-gray-700">
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">{truncateDescription(item.description)}</td>
-                <td className="p-4">{item.start_date.split('T')[0]}</td>
-                <td className="p-4">{item.end_date.split('T')[0]}</td>
-                <td className="p-4">{truncateDescription(truncateDescription(item.objectives))}</td>
-                <td className="p-4">{item.coordinator_name}</td>
-                <td className="p-4">
-                  <span
-                    className={`text-lg font-bold ${item.status === 'active'
-                      ? 'text-green-500'
-                      : item.status === 'pause'
-                      ? 'text-yellow-500'
-                      : 'text-red-500'
-                    }`}
-                  >
-                    {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
-                  </span>
-                </td>
-                <td className="p-4 flex space-x-4">
-                  <motion.button
-                    className="bg-blue-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleOpenEditModal(item)}
-                  >
-                    <FaEdit />
-                  </motion.button>
-                  <motion.button
-                    className="bg-red-500 text-white p-2 rounded-full"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleDeleteConfirm(item.id)}
-                  >
-                    <FaTrashAlt />
-                  </motion.button>
-                </td>
-              </motion.tr>
-            ))}
-          </motion.tbody>
-        </motion.table>
-      )}
-    </div>
-
-    {/* Ventana emergente para agregar un nuevo registro */}
-    <AnimatePresence>
-      {isModalOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
-          >
-            <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                placeholder="Nombre"
-                value={newProgram.nombre}
-                onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
-              />
-
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                placeholder="Descripción"
-                value={newProgram.descripcion}
-                onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
-              />
-
-              <DatePicker
-                selected={newProgram.fechaInicio}
-                onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
-                dateFormat="yyyy-MM-dd"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                placeholderText="Fecha de Inicio"
-                onKeyDown={(e) => {
-                  if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
-                    e.preventDefault();
-                  }
-                }}
-              />
-
-              <DatePicker
-                selected={newProgram.fechaFin}
-                onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
-                dateFormat="yyyy-MM-dd"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                placeholderText="Fecha Final"
-                onKeyDown={(e) => {
-                  if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
-                    e.preventDefault();
-                  }
-                }}
-              />
-
-              <input
-                type="text"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                placeholder="Objetivos"
-                value={newProgram.objetivos}
-                onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
-              />
-
-              <select
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                value={newProgram.coordinador}
-                onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
-              >
-                <option value="">Selecciona un coordinador</option>
-                {coordinadores.map((coordinador) => (
-                  <option key={coordinador.id} value={coordinador.id}>
-                    {coordinador.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                value={newProgram.status || 'active'}
-                onChange={(e) => setNewProgram({ ...newProgram, status: e.target.value })}
-              >
-                <option value="active">Activo</option>
-                <option value="pause">Pausado</option>
-                <option value="unactive">Inactivo</option>
-              </select>
-              <input
-                type="file"
-                className="w-full p-2 border border-gray-300 rounded bg-white text-black"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, 'new')}
-              />
-            </div>
-            <div className="flex justify-between mt-4">
-              <motion.button
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleAddProgram}
-              >
-                Agregar
-              </motion.button>
-              <motion.button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleCloseModal}
-              >
-                Cerrar
-              </motion.button>
-            </div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {selectedProgram && (
           <motion.div

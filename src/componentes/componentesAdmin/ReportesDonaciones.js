@@ -63,49 +63,102 @@ const ReportesDonaciones = () => {
   }, []);
 
   const exportarPDF = () => {
-    const input = pdfRef.current;
+    const pdf = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
   
-    if (input) {
-      html2canvas(input, {
-        scale: 3, // Mejora la calidad de la captura
-        useCORS: true,
-        allowTaint: true,
-      }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('landscape'); // Orientación horizontal
+    // Colores personalizados
+    const primaryColor = "#007BFF"; // Azul corporativo
+    const secondaryColor = "#444"; // Gris oscuro
   
-        // Calcula el ancho y alto de la página en el PDF
-        const pageWidth = pdf.internal.pageSize.width;
-        const pageHeight = pdf.internal.pageSize.height;
+    // Título "SOLVIA" como logo de empresa
+    pdf.setFontSize(20); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(primaryColor);
+    pdf.text("SOLVIA", 10, 15);
   
-        // Calcula las dimensiones de la imagen para mantener la proporción y llenar la página
-        const imgAspectRatio = canvas.width / canvas.height;
-        const pageAspectRatio = pageWidth / pageHeight;
+    // Título "Reporte de Donaciones"
+    pdf.setFontSize(24); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Reporte de Donaciones", pageWidth / 2, 30, { align: "center" });
   
-        let imgWidth, imgHeight, xPos, yPos;
+    // Línea divisoria
+    pdf.setLineWidth(0.8);
+    pdf.setDrawColor(primaryColor);
+    pdf.line(10, 35, pageWidth - 10, 35);
   
-        // Ajusta la imagen según la proporción de aspecto de la página y de la imagen
-        if (imgAspectRatio > pageAspectRatio) {
-          imgWidth = pageWidth;
-          imgHeight = pageWidth / imgAspectRatio;
-          xPos = 0;
-          yPos = (pageHeight - imgHeight) / 2; // Centra verticalmente
-        } else {
-          imgHeight = pageHeight;
-          imgWidth = pageHeight * imgAspectRatio;
-          yPos = 0;
-          xPos = (pageWidth - imgWidth) / 2; // Centra horizontalmente
-        }
+    // Datos del reporte
+    pdf.setFontSize(12); // Tamaño reducido para compactar texto
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
   
-        pdf.addImage(imgData, 'PNG', xPos, yPos, imgWidth, imgHeight); // Añade la imagen ajustada y centrada
-        pdf.save('reporteDonaciones.pdf');
-      }).catch((error) => {
-        console.error('Error capturing the image:', error);
-      });
-    } else {
-      console.error('Elemento no encontrado para la exportación de PDF');
-    }
+    let startY = 40;
+    const lineSpacing = 8;
+  
+    pdf.text(`Total de Donaciones:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`$${totalDonaciones.toFixed(2)}`, 10, startY + 5); // Monto debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Total de Gastos:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`$${totalGastos.toFixed(2)}`, 10, startY + 5); // Monto debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Promedio de Donaciones por Usuario:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`$${promedioPorUsuario.toFixed(2)}`, 10, startY + 5); // Monto debajo
+    startY += lineSpacing * 3;
+  
+    // Tablas y datos
+    pdf.setFontSize(10); // Reducir tamaño de fuente para caber en una sola hoja
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Evolución de Donaciones:", 10, startY);
+    startY += lineSpacing;
+  
+    pdf.setFont("helvetica", "normal");
+    evolucionDonaciones.forEach((data, index) => {
+      pdf.text(`${data.month}`, 10, startY);
+      pdf.text(`$${data.Donaciones}`, 60, startY);
+      startY += lineSpacing;
+    });
+  
+    startY += lineSpacing;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Distribución de Donaciones por Donante:", 10, startY);
+    startY += lineSpacing;
+  
+    // Tabla para distribución por donantes
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(secondaryColor);
+    pdf.setLineWidth(0.1);
+    pdf.setDrawColor(secondaryColor);
+  
+    pdf.rect(10, startY, pageWidth - 20, 8); // Cabecera
+    pdf.text("Donante", 15, startY + 6);
+    pdf.text("Monto", pageWidth - 50, startY + 6);
+    startY += 10;
+  
+    donacionesPorDonante.forEach((data, index) => {
+      pdf.rect(10, startY, pageWidth - 20, 8); // Fila
+      pdf.text(data.donor_name, 15, startY + 6);
+      pdf.text(`$${data.total_donations}`, pageWidth - 50, startY + 6);
+      startY += 10;
+  
+      if (startY > 280) {
+        // Si el contenido excede una hoja, detén la adición de más datos
+        pdf.text("... Más datos omitidos", 10, startY + 6);
+        return;
+      }
+    });
+  
+    // Guardar el PDF
+    pdf.save("reporteDonaciones.pdf");
   };
+  
   
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);

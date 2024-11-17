@@ -43,7 +43,7 @@ const ReportesUsuarios = () => {
         setUsuariosPorRoles(rolesRes.data);
 
         // Extraer la cantidad de coordinadores
-        const coordinadores = rolesRes.data.find(role => role.name === 'coordinator')?.value || 0;
+        const coordinadores = rolesRes.data.find(role => role.name === 'Coordinador')?.value || 0;
         setCoordinadores(coordinadores);
 
         // Obtener nuevos usuarios en la última semana
@@ -72,31 +72,90 @@ const ReportesUsuarios = () => {
   };
 
   const exportarPDF = () => {
-    const input = pdfRef.current;
+    const pdf = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
   
-    if (input) {
-      html2canvas(input, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-      }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('landscape'); // Establece el PDF en orientación horizontal
+    // Colores personalizados
+    const primaryColor = "#007BFF"; // Azul corporativo
+    const secondaryColor = "#444"; // Gris oscuro
   
-        // Ajusta las dimensiones para llenar la hoja completa en horizontal
-        const pageWidth = pdf.internal.pageSize.width;
-        const pageHeight = pdf.internal.pageSize.height;
+    // Título "SOLVIA" como logo de empresa
+    pdf.setFontSize(20); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(primaryColor);
+    pdf.text("SOLVIA", 10, 15);
   
-        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight); // Llenar toda la hoja
+    // Título "Reporte de Usuarios"
+    pdf.setFontSize(24); // Tamaño reducido
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Reporte de Usuarios", pageWidth / 2, 30, { align: "center" });
   
-        pdf.save('reporteUsuarios.pdf');
-      }).catch((error) => {
-        console.error('Error al capturar la imagen:', error);
-      });
-    } else {
-      console.error('Elemento no encontrado para la exportación de PDF');
-    }
+    // Línea divisoria
+    pdf.setLineWidth(0.8);
+    pdf.setDrawColor(primaryColor);
+    pdf.line(10, 35, pageWidth - 10, 35);
+  
+    // Datos del reporte
+    pdf.setFontSize(12); // Tamaño reducido para compactar texto
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+  
+    let startY = 40;
+    const lineSpacing = 8;
+  
+    pdf.text(`Total de Usuarios Registrados:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${totalUsuarios}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Nuevos Usuarios:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${nuevosUsuarios}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 2;
+  
+    pdf.setFont("helvetica", "bold");
+    pdf.text(`Total de Coordinadores:`, 10, startY);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`${coordinadores}`, 10, startY + 5); // Valor debajo
+    startY += lineSpacing * 3;
+  
+    // Distribución de Usuarios por Rol
+    pdf.setFontSize(10); // Reducir tamaño de fuente para caber en una sola hoja
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(secondaryColor);
+    pdf.text("Distribución de Usuarios por Rol:", 10, startY);
+    startY += lineSpacing;
+  
+    // Tabla para distribución por roles
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(secondaryColor);
+    pdf.setLineWidth(0.1);
+    pdf.setDrawColor(secondaryColor);
+  
+    pdf.rect(10, startY, pageWidth - 20, 8); // Cabecera
+    pdf.text("Rol", 15, startY + 6);
+    pdf.text("Cantidad", pageWidth - 50, startY + 6);
+    startY += 10;
+  
+    usuariosPorRoles.forEach((data, index) => {
+      pdf.rect(10, startY, pageWidth - 20, 8); // Fila
+      pdf.text(data.name, 15, startY + 6);
+      pdf.text(`${data.value}`, pageWidth - 50, startY + 6);
+      startY += 10;
+  
+      if (startY > 280) {
+        // Si el contenido excede una hoja, detén la adición de más datos
+        pdf.text("... Más datos omitidos", 10, startY + 6);
+        return;
+      }
+    });
+  
+    // Guardar el PDF
+    pdf.save("reporteUsuarios.pdf");
   };
+  
   
 
   return (
