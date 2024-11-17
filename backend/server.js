@@ -18,7 +18,7 @@ app.use(cors({
 app.use(express.json());
 
 // Importar las rutas
-const userRoutes = require('./Admin/usuarios');
+const usuariosRoutes = require('./Admin/usuarios');
 const programRoutes = require('./Admin/programas');
 const registerRoute = require('./auth/register');
 const loginRoute = require('./auth/login');
@@ -37,9 +37,10 @@ const taskBenRoutes = require('./Beneficiary/tasks');
 const donarRoutes = require('./Donor/donar');
 const feedRoutes = require('./index/feed');
 const chatRoutes = require('./index/chat');
+const userRoutes = require('./Coordi/user')
 
 // Usar las rutas
-app.use('/usuarios', userRoutes);
+app.use('/usuarios', usuariosRoutes);
 app.use('/programas', programRoutes);
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
@@ -52,6 +53,7 @@ app.use('/asigPresProg', asigPresProgRoutes);
 app.use('/asigVolProg', asigVolProgRoutes);
 app.use('/perfil', perfilRoutes);
 app.use('/programs', programsRoutes);
+app.use('/user', userRoutes);
 app.use('/feedback', feedbackRoutes);
 app.use('/taskVol', taskVolRoutes);
 app.use('/task', taskBenRoutes);
