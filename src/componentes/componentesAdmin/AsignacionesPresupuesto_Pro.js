@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,23 @@ const AsignacionesPresupuesto_Pro = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const userListRef = useRef(null);
+
+  const handleScroll = () => {
+    const userListContainer = userListRef.current;
+    if (userListContainer) {
+      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
+    }
+  };
+
+
+  useEffect(() => {
+    const userListContainer = userListRef.current;
+    if (userListContainer && atBottom) {
+      userListContainer.scrollTop = userListContainer.scrollHeight;
+    }
+  }, [asignaciones, atBottom]); // Solo desplazarse al fondo si estamos al final  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -276,8 +293,12 @@ const AsignacionesPresupuesto_Pro = () => {
             </motion.button>
           </div>
 
-          <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
-            <Table>
+          <TableContainer
+            component={Paper}
+            sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}
+            ref={userListRef}  // Asignación del ref
+            onScroll={handleScroll}  // Evento de scroll
+          >            <Table>
               <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
                   <TableCell sx={{ color: '#fff' }}>Programa</TableCell>

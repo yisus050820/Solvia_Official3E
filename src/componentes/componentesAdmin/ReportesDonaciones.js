@@ -54,6 +54,12 @@ const ReportesDonaciones = () => {
     };
 
     fetchData();
+
+    // Actualizar los mensajes cada 5 segundos
+    const intervalId = setInterval(fetchData, 1000);
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
   }, []);
 
   const exportarPDF = () => {

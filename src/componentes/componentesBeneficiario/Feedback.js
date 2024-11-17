@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography, Snackbar, Alert } from '@mui/material';
@@ -12,6 +12,25 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   const [rating, setRating] = useState(initialFeedback ? initialFeedback.score : 0);
   const [feedback, setFeedback] = useState(initialFeedback ? initialFeedback.comment : '');
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const feedbackListRef = useRef(null);
+
+  const handleScroll = () => {
+    const feedbackListContainer = feedbackListRef.current;
+    if (feedbackListContainer) {
+      setAtBottom(
+        Math.ceil(feedbackListContainer.scrollTop + feedbackListContainer.clientHeight) >=
+        feedbackListContainer.scrollHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    const feedbackListContainer = feedbackListRef.current;
+    if (feedbackListContainer && atBottom) {
+      feedbackListContainer.scrollTop = feedbackListContainer.scrollHeight;
+    }
+  }, [atBottom, feedback]);
 
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
@@ -89,8 +108,8 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
     <>
       {/* Vista de la tarjeta del programa */}
       <motion.div className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <img className="w-full h-48 object-cover" src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"} alt={title} />
 
@@ -116,14 +135,14 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
       <AnimatePresence>
         {isAddModalOpen && (
           <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-            initial={{ y: "-100vh" }}
-            animate={{ y: "0" }}
-            exit={{ y: "-100vh" }}
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
             >
               <h2 className="text-2xl font-bold mb-4">Feedback para {title}</h2>
               <p className="text-gray-400 mb-4">{description}</p>
@@ -138,17 +157,17 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
               </div>
               <textarea value={feedback} onChange={handleFeedbackChange} className="w-full p-2 border border-gray-500 rounded bg-white text-black" rows="4" placeholder="Escribe tu comentario aquí..." />
               <div className="flex justify-between mt-4">
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" 
-                onClick={handleCloseModal}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={handleCloseModal}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >Cancelar
                 </motion.button>
-                <motion.button 
-                className="bg-blue-500 text-white px-4 py-2 rounded" 
-                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleSubmitFeedback}
+                <motion.button
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleSubmitFeedback}
                 >Enviar Feedback
                 </motion.button>
               </div>
@@ -160,33 +179,40 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
       {/* Modal de vista de un comentario existente */}
       <AnimatePresence>
         {isViewModalOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div className="bg-white text-black p-8 rounded-xl shadow-lg max-w-lg w-full">
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white text-black p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: '-100vh' }}
+              animate={{ y: '0' }}
+              exit={{ y: '-100vh' }}
+            >
               <h2 className="text-2xl font-bold mb-4">Feedback de {title}</h2>
-
-
-              {/* Estrellas del rating */}
-              <div className="flex space-x-1 mb-4">
-                {[...Array(5)].map((_, index) => (
-                  <FaStar
-                    key={index}
-                    className={index < initialFeedback.score ? "text-yellow-500" : "text-gray-500"}
-                  />
-                ))}
+              <div
+                ref={feedbackListRef}
+                className="overflow-y-auto max-h-96"
+                onScroll={handleScroll}
+              >
+                {/* Estrellas del rating */}
+                <div className="flex space-x-1 mb-4">
+                  {[...Array(5)].map((_, index) => (
+                    <FaStar
+                      key={index}
+                      className={index < initialFeedback.score ? "text-yellow-500" : "text-gray-500"}
+                    />
+                  ))}
+                </div>
+                {/* Comentario */}
+                <div className="mb-4">
+                  <p>{initialFeedback.comment || "No hay comentario disponible."}</p>
+                </div>
               </div>
-
-              {/* Comentario */}
-              <div className="mb-4">
-                <p>{initialFeedback.comment || "No hay comentario disponible."}</p>
-              </div>
-
-              {/* Botones en la parte inferior */}
               <div className="flex justify-between mt-4">
                 <motion.button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={handleCloseModal}>Cerrar</motion.button>
-                <div className="flex space-x-2">
-                  <motion.button className="bg-blue-500 text-white p-2 rounded-full" onClick={handleOpenAddModal}><FaEdit /></motion.button>
-                  <motion.button className="bg-red-500 text-white p-2 rounded-full" onClick={handleDeleteClick}><FaTrashAlt /></motion.button>
-                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -223,7 +249,7 @@ const Calificar = () => {
       const timer = setTimeout(() => {
         setSuccessMessage('');
       }, 2000);
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
     }
   }, [successMessage]);
 

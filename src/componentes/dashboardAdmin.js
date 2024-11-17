@@ -32,7 +32,6 @@ import AsignacionesVol_Pro from './componentesAdmin/AsignacionesVol_Pro';
 import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuesto_Pro';
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import VerFeedback from './componentesAdmin/VerFeedback';
-import Mensajes from './componentesAdmin/Mensajes';
 import ChatGlobal from './ChatGlobal';
 
 

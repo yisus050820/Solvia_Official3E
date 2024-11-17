@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck } from 'react-icons/fa';
@@ -18,6 +18,29 @@ const ProgramasDisp = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const programListRef = useRef(null);
+  const modalContentRef = useRef(null);
+
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  const handleScroll = () => {
+    const modalContent = modalContentRef.current;
+    if (modalContent) {
+      setAtBottom(
+        Math.ceil(modalContent.scrollTop + modalContent.clientHeight) >= modalContent.scrollHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    const modalContent = modalContentRef.current;
+    if (modalContent && atBottom) {
+      modalContent.scrollTop = modalContent.scrollHeight;
+    }
+  }, [selectedProgram, atBottom]);
 
   useEffect(() => {
     fetchPrograms();
@@ -138,7 +161,12 @@ const ProgramasDisp = () => {
         </div>
 
         {mostrarCards ? (
-          <div className="flex justify-center flex-wrap mt-2">
+            <div
+          ref={programListRef} 
+          onScroll={handleScroll} 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
+          style={{ maxHeight: 'calc(100vh - 120px)' }} 
+        >
             {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
@@ -223,11 +251,14 @@ const ProgramasDisp = () => {
       <AnimatePresence>
         {selectedProgram && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+          className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+          initial={{ y: "-100vh" }}
+          animate={{ y: "0" }}
+          exit={{ y: "-100vh" }}
+          ref={modalContentRef}
+          onScroll={handleScroll}
+          style={{ maxHeight: '90vh', overflowY: 'auto' }}
+        >
             <motion.div
               className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}

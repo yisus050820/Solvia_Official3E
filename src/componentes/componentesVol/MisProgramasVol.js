@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
 import TeacherDashboard from './InterfazVoluntario';
 
-// Componente para mostrar una tarjeta de programa
 const ProgramCard = ({ title, description, participants, donations, imageUrl, programId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  const modalContentRef = useRef(null); // Referencia para manejar el scroll
+  const [atBottom, setAtBottom] = useState(true); // Estado para verificar si estamos al final del scroll
 
   const handleOpenModal = (showDashboard = false) => {
     setShowDashboard(showDashboard);
@@ -18,6 +19,22 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
     setIsModalOpen(false);
     setShowDashboard(false);
   };
+
+  const handleScroll = () => {
+    const modalContent = modalContentRef.current;
+    if (modalContent) {
+      setAtBottom(
+        Math.ceil(modalContent.scrollTop + modalContent.clientHeight) >= modalContent.scrollHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    const modalContent = modalContentRef.current;
+    if (modalContent && atBottom) {
+      modalContent.scrollTop = modalContent.scrollHeight;
+    }
+  }, [atBottom]);
 
   return (
     <>
@@ -68,7 +85,6 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
               className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
@@ -77,10 +93,11 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
+              ref={modalContentRef} // Referencia para manejar el scroll
+              onScroll={handleScroll} // Evento para detectar el scroll
               style={{
                 maxHeight: '90vh',
-                overflowY: 'auto',
-                zIndex: 1000,
+                overflowY: 'auto', // Habilitar el scroll dentro del modal
               }}
             >
               {showDashboard ? (
@@ -88,8 +105,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
               ) : (
                 <>
                   <h2 className="text-white text-3xl font-bold">{title}</h2>
-                  <h4 className="text-white-900 mb-4 font-semibold">
-                  </h4>
+                  <h4 className="text-white-900 mb-4 font-semibold"></h4>
                   <img
                     className="w-full h-48 object-cover shadow-md rounded"
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
@@ -113,13 +129,11 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
   );
 };
 
-// Componente principal para mostrar los programas
 const MisProgramasVol = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No se encontró el token.');
@@ -131,14 +145,18 @@ const MisProgramasVol = () => {
       try {
         const response = await axios.get('http://localhost:5000/taskVol/programas', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}` // Token de autenticación
+            Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
 
         const programData = await Promise.all(
           response.data.map(async (program) => {
-            const participantsRes = await axios.get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`).catch(() => ({ data: { count: 0 } }));
-            const donationsRes = await axios.get(`http://localhost:5000/programas/expenses/total/${program.id}`).catch(() => ({ data: { total: 0 } }));
+            const participantsRes = await axios
+              .get(`http://localhost:5000/programas/beneficiaries/count/${program.id}`)
+              .catch(() => ({ data: { count: 0 } }));
+            const donationsRes = await axios
+              .get(`http://localhost:5000/programas/expenses/total/${program.id}`)
+              .catch(() => ({ data: { total: 0 } }));
 
             return {
               ...program,

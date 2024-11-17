@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +27,22 @@ const CrudProgramas = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const userListRef = useRef(null);
+
+  const handleScroll = () => {
+    const userListContainer = userListRef.current;
+    if (userListContainer) {
+      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
+    }
+  };
+  
+  useEffect(() => {
+    const userListContainer = userListRef.current;
+    if (userListContainer && atBottom) {
+      userListContainer.scrollTop = userListContainer.scrollHeight;
+    }
+  }, [program, atBottom]);
 
   const [usuarioActualId, setUsuarioActualId] = useState(null);
   const [usuarioActualNombre, setUsuarioActualNombre] = useState(null);

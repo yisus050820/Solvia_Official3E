@@ -1,13 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
 import { FaStar } from 'react-icons/fa';
+import { Feed } from '@mui/icons-material';
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl, programId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);
+  const userListRef = useRef(null); // Reference for the feedback list
+
+  const handleScroll = () => {
+    const userListContainer = userListRef.current;
+    if (userListContainer) {
+      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
+    }
+  };
+  
+  useEffect(() => {
+    const userListContainer = userListRef.current;
+    if (userListContainer && atBottom) {
+      userListContainer.scrollTop = userListContainer.scrollHeight;
+    }
+  }, [atBottom]);
 
   const handleOpenModal = async () => {
 
@@ -31,7 +48,6 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
       setFeedbacks([]);
     }
   };
-
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -115,19 +131,25 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
               exit={{ y: "-100vh" }}
             >
               <h2 className="text-black text-2xl font-bold mb-4">Feedback de {title}</h2>
-              <ul className="text-gray-600">
-                {feedbacks.length > 0 ? (
-                  feedbacks.map((fb, index) => (
-                    <li key={index} className="mb-6">
-                      <div className="font-bold text-gray-800">{fb.username}:</div>
-                      <div className="flex items-center mt-1">{renderStars(fb.rating)}</div>
-                      <p className="text-gray-700 mt-2">{fb.message}</p>
-                    </li>
-                  ))
-                ) : (
-                  <p>No hay feedback disponible.</p>
-                )}
-              </ul>
+              <div
+                ref={userListRef}
+                className="overflow-y-auto max-h-96" // Max height for scrollable area
+                onScroll={handleScroll}
+              >
+                <ul className="text-gray-600">
+                  {feedbacks.length > 0 ? (
+                    feedbacks.map((fb, index) => (
+                      <li key={index} className="mb-6">
+                        <div className="font-bold text-gray-800">{fb.username}:</div>
+                        <div className="flex items-center mt-1">{renderStars(fb.rating)}</div>
+                        <p className="text-gray-700 mt-2">{fb.message}</p>
+                      </li>
+                    ))
+                  ) : (
+                    <p>No hay feedback disponible.</p>
+                  )}
+                </ul>
+              </div>
               <motion.button
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                 whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}

@@ -16,9 +16,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import MisProgramas from './componentesBeneficiario/MisProgramas';
-import AyudaRecibida from './componentesBeneficiario/AyudaRecibida';
 import Calificar from './componentesBeneficiario/Feedback';
-import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';

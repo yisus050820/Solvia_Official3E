@@ -170,6 +170,8 @@ function StudentDashboard({ programId }) {
           bgcolor: 'background.paper',
           boxShadow: 24,
           p: 4,
+          maxHeight: '80vh', // Max height for the modal content
+          overflowY: 'auto', // Enable scrolling if content overflows
         }}>
           <IconButton
             aria-label="close"

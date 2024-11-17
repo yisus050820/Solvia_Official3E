@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import { Typography, TextField, Avatar } from '@mui/material';
 
 const UsuariosTarjeta = () => {
@@ -10,6 +10,8 @@ const UsuariosTarjeta = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(false); // Estado para verificar si estamos al final del scroll
+  const contentRef = useRef(null); // Referencia para manejar el scroll
 
   // Traducción de roles para la búsqueda en español
   const roleTranslation = {
@@ -21,14 +23,13 @@ const UsuariosTarjeta = () => {
   };
 
   useEffect(() => {
-
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No se encontró el token.');
       setLoading(false);
       return;
     }
-    
+
     const fetchUsuarios = axios.get('http://localhost:5000/usuarios');
     const fetchProgramasInscritos = axios.get('http://localhost:5000/asigBenProg/asignaciones');
 
@@ -55,6 +56,15 @@ const UsuariosTarjeta = () => {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
+  const handleScroll = () => {
+    const container = contentRef.current;
+    if (container) {
+      setAtBottom(
+        Math.ceil(container.scrollTop + container.clientHeight) >= container.scrollHeight
+      );
+    }
+  };
+
   const sortedUser = [...user].sort((a, b) => {
     if (sortBy === "name") return a.name.localeCompare(b.name);
     if (sortBy === "email") return a.email.localeCompare(b.email);
@@ -79,7 +89,7 @@ const UsuariosTarjeta = () => {
     const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
     
     return matchesSearchQuery && matchesRole;
-  });  
+  });
 
   return (
     <>
@@ -148,13 +158,18 @@ const UsuariosTarjeta = () => {
                 },
               }}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
 
-        {/* Mostrar contenido en tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Contenedor con scroll */}
+        <div
+          ref={contentRef}
+          onScroll={handleScroll}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
+          style={{ maxHeight: 'calc(100vh - 120px)' }}
+        >
           {filteredUser.map((item) => (
             <motion.div
               key={item.id}

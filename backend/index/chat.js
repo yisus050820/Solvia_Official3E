@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../db');
+const moment = require('moment-timezone'); // Asegúrate de instalar moment-timezone
 
 // Middleware para autenticar el token JWT
 function authenticateToken(req, res, next) {
@@ -34,10 +35,10 @@ router.get('/', authenticateToken, (req, res) => {
             return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
         }
         
-        // Ajustar el formato de la respuesta para incluir user_id del usuario logueado
+        // Convertir timestamps al huso horario de México
         const formattedResults = results.map((message) => ({
             ...message,
-            timestamp: new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: moment(message.timestamp).tz('America/Mexico_City').format('HH:mm')
         }));
 
         res.json({
@@ -81,7 +82,7 @@ router.post('/', authenticateToken, (req, res) => {
                 return res.status(500).json({ message: 'Error en el servidor al obtener el mensaje.' });
             }
             const messageData = messageResult[0];
-            messageData.timestamp = new Date(messageData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageData.timestamp = moment(messageData.timestamp).tz('America/Mexico_City').format('HH:mm');
             res.status(201).json(messageData);
         });
     });

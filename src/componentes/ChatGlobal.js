@@ -9,6 +9,7 @@ export default function ChatGlobal() {
   const [userId, setUserId] = useState(null);
   const chatContainerRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true);  // Estado para verificar si el usuario está al final
 
   // Obtener el id del usuario logueado desde el backend del chat
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function ChatGlobal() {
       return;
     }
     
+    // Función para obtener los mensajes
     const fetchMessages = async () => {
       try {
         const response = await axios.get('http://localhost:5000/chat', {
@@ -34,15 +36,32 @@ export default function ChatGlobal() {
         console.error('Error al obtener los mensajes:', error);
       }
     };
-    fetchMessages();
+
+    fetchMessages(); // Obtener mensajes al cargar el componente
+
+    // Actualizar los mensajes cada 5 segundos
+    const intervalId = setInterval(fetchMessages, 1000);
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
   }, []);
 
-  // Desplazarse automáticamente al final de los mensajes
+  // Desplazarse automáticamente al final de los mensajes si el usuario está al final
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer && atBottom) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, atBottom]); // Se activa cuando los mensajes o la posición cambian
+
+  // Función para manejar el cambio de scroll
+  const handleScroll = () => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      // Si el usuario está muy cerca del final, actualizamos el estado
+      setAtBottom(chatContainer.scrollHeight - chatContainer.scrollTop === chatContainer.clientHeight);
+    }
+  };
 
   // Manejar el envío de mensajes
   const handleSendMessage = async (e) => {
@@ -80,6 +99,7 @@ export default function ChatGlobal() {
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
         style={{ maxHeight: 'calc(100vh - 120px)' }}
+        onScroll={handleScroll}  // Detectar el scroll
       >
         {messages.map((message) => (
           <motion.div
@@ -134,4 +154,3 @@ export default function ChatGlobal() {
     </div>
   );
 }
-

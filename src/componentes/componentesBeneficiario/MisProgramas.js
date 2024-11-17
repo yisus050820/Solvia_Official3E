@@ -1,13 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Typography } from '@mui/material';
 import StudentDashboard from './InterfazBeneficiario';
 
-// Componente para mostrar una tarjeta de programa
 const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [atBottom, setAtBottom] = useState(true);
+  const modalContentRef = useRef(null);
+
+  const handleScroll = () => {
+    const modalContent = modalContentRef.current;
+    if (modalContent) {
+      setAtBottom(
+        Math.ceil(modalContent.scrollTop + modalContent.clientHeight) >= modalContent.scrollHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    const modalContent = modalContentRef.current;
+    if (modalContent && atBottom) {
+      modalContent.scrollTop = modalContent.scrollHeight;
+    }
+  }, [isModalOpen, atBottom]);
 
   const handleOpenModal = (showDashboard = false) => {
     setShowDashboard(showDashboard);
@@ -19,23 +36,21 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
     setShowDashboard(false);
   };
 
-  // Función para determinar el color del estado
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
-        return 'bg-green-500';  // Verde para activo
+        return 'bg-green-500';
       case 'pause':
-        return 'bg-yellow-500'; // Amarillo para pausado
+        return 'bg-yellow-500';
       case 'unactive':
-        return 'bg-red-500';    // Rojo para inactivo
+        return 'bg-red-500';
       default:
-        return 'bg-gray-500';   // Gris por defecto
+        return 'bg-gray-500';
     }
   };
 
   return (
     <>
-      {/* Tarjeta del programa */}
       <motion.div
         className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
@@ -48,12 +63,10 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
         />
         <div className="p-4">
           <h2 className="text-white text-xl font-bold">{name}</h2>
-          {/* Estado del programa con un círculo de color */}
           <div className="flex items-center mt-2">
             <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
             <span className="ml-2 text-gray-400 capitalize">{status}</span>
           </div>
-          {/* Limitar la descripción a un máximo de 100 caracteres */}
           <h2 className="text-white text-xl font-bold">{title}</h2>
           <p className="text-gray-400 mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
@@ -91,8 +104,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
-              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${showDashboard ? 'max-w-3xl' : 'max-w-lg'
-                }`}
+              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${showDashboard ? 'max-w-3xl' : 'max-w-lg'}`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -101,6 +113,8 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                 overflowY: 'auto',
                 zIndex: 1000,
               }}
+              ref={modalContentRef}
+              onScroll={handleScroll}
             >
               {showDashboard ? (
                 <StudentDashboard programId={programId} />
@@ -132,13 +146,11 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
   );
 };
 
-// Componente principal para mostrar los programas
 const MisProgramas = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No se encontró el token.');

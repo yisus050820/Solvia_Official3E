@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
@@ -31,7 +31,22 @@ const CrudUsuarios = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
+  const [atBottom, setAtBottom] = useState(true); 
+  const userListRef = useRef(null);
 
+  const handleScroll = () => {
+    const userListContainer = userListRef.current;
+    if (userListContainer) {
+      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
+    }
+  };  
+
+  useEffect(() => {
+    const userListContainer = userListRef.current;
+    if (userListContainer && atBottom) {
+      userListContainer.scrollTop = userListContainer.scrollHeight;
+    }
+  }, [user, atBottom]); // Solo desplazarse al fondo si estamos al final  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -391,7 +406,12 @@ const CrudUsuarios = () => {
 
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+          ref={userListRef} 
+          onScroll={handleScroll} 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
+          style={{ maxHeight: 'calc(100vh - 120px)' }} 
+        >
             {Array.isArray(filteredUser) ? filteredUser.map((item) => (
               <motion.div
                 key={item.id}

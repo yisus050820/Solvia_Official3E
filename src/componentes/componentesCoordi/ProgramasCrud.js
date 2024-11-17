@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +29,35 @@ const CrudProgramas = () => {
   const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const containerRef = useRef(null); // Referencia al contenedor principal para el scroll
+  const [isAtBottom, setIsAtBottom] = useState(false); // Para detectar si el scroll llegó al fondo
+
+  // Función para manejar el evento de scroll
+  const handleScroll = () => {
+    const container = containerRef.current;
+    if (container) {
+      const atBottom =
+        Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 1;
+      setIsAtBottom(atBottom);
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Acción adicional al llegar al final del scroll
+    if (isAtBottom) {
+      console.log('Llegaste al final del scroll');
+    }
+  }, [isAtBottom]);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -356,7 +385,11 @@ const CrudProgramas = () => {
 
   return (
     <>
-      <div className="w-full px-6 py-0.1 mx-auto mt-2">
+      <div
+      ref={containerRef}
+      className="overflow-y-auto"
+      style={{ maxHeight: '80vh', padding: '1rem' }} // Contenedor con scroll vertical
+    >
         {/* Título encima del contenido */}
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
           Gestionar Programas

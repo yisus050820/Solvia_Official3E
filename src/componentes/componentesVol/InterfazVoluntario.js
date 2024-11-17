@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   CardMedia,
@@ -55,8 +55,25 @@ function TeacherDashboard({ programId }) {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [message, setMessage] = useState("");
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito;
+  const [atBottom, setAtBottom] = useState(true);
+  const taskContainerRef = useRef(null);
 
+  const handleScroll = () => {
+    const taskContainer = taskContainerRef.current;
+    if (taskContainer) {
+      setAtBottom(
+        Math.ceil(taskContainer.scrollTop + taskContainer.clientHeight) >= taskContainer.scrollHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    const taskContainer = taskContainerRef.current;
+    if (taskContainer && atBottom) {
+      taskContainer.scrollTop = taskContainer.scrollHeight;
+    }
+  }, [tasks, atBottom]);
 
   const showErrorMessage = (errors) => {
     const firstError = Object.values(errors)[0];
