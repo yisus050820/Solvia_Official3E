@@ -94,18 +94,26 @@ export default function ChatGlobal() {
   };  
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white w-full md:w-3/4 lg:w-2/3 mx-auto">
+    <div
+      className="flex flex-col h-screen mx-auto"
+      style={{
+        backgroundColor: '#383D3B', // Fondo oscuro
+        color: '#EEE5E9', // Texto claro
+        width: '80%', // Más ancho (ajusta al porcentaje deseado)
+        maxWidth: '1200px', // Ancho máximo para pantallas grandes
+      }}
+    >
       {/* Header */}
-      <div className="bg-gray-800 p-4">
+      <div style={{ backgroundColor: '#7C7C7C' }} className="p-4 text-center"> {/* Fondo gris medio */}
         <h1 className="text-xl font-bold">Chat Grupal</h1>
       </div>
-
+  
       {/* Chat messages */}
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
         style={{ maxHeight: 'calc(100vh - 120px)' }}
-        onScroll={handleScroll}  // Detectar el scroll
+        onScroll={handleScroll} // Detectar el scroll
       >
         {messages.map((message) => (
           <motion.div
@@ -118,40 +126,75 @@ export default function ChatGlobal() {
           >
             <div className={`flex items-end space-x-2 ${message.user_id === userId ? 'flex-row-reverse' : ''}`}>
               {message.user_id !== userId && (
-                <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt={message.user} className="w-8 h-8 rounded-full" />
+                <Avatar
+                  src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`}
+                  alt={message.user}
+                  className="w-8 h-8 rounded-full"
+                />
               )}
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.user_id === userId ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  message.user_id === userId ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'
+                }`}
+                style={{
+                  backgroundColor: message.user_id === userId ? '#92DCE5' : '#7C7C7C', // Azul claro para enviados, gris medio para recibidos
+                  color: message.user_id === userId ? '#383D3B' : '#EEE5E9', // Texto oscuro para enviados
+                }}
               >
                 {message.user_id !== userId && (
                   <p className="font-bold text-sm mb-1">{message.user}</p>
                 )}
                 <p className="text-sm">{message.message}</p>
-                <p className="text-xs text-gray-300 text-right mt-1">{message.timestamp}</p>
+                <p
+                  className="text-xs text-right mt-1"
+                  style={{
+                    color: message.user_id === userId ? '#000000' : '#EEE5E9', // Negro para hora en enviados, claro en recibidos
+                  }}
+                >
+                  {message.timestamp}
+                </p>
               </div>
               {message.user_id === userId && (
-                <Avatar src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`} alt="You" className="w-8 h-8 rounded-full" />
+                <Avatar
+                  src={`http://localhost:5000${message.avatar}?${new Date().getTime()}`}
+                  alt="You"
+                  className="w-8 h-8 rounded-full"
+                />
               )}
             </div>
           </motion.div>
         ))}
       </div>
-
+  
       {/* Message input */}
-      <form onSubmit={handleSendMessage} className="bg-gray-800 p-4 flex space-x-2">
+      <form
+        onSubmit={handleSendMessage}
+        className="p-4 flex space-x-2"
+        style={{
+          backgroundColor: '#7C7C7C', // Fondo gris medio
+        }}
+      >
         <motion.input
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-2 rounded-full focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          }}
           initial={{ scale: 1 }}
-          whileFocus={{ scale: 1.05 }}  // Al enfocarse, se agranda un poco
+          whileFocus={{ scale: 1.05 }} // Al enfocarse, se agranda un poco
         />
         <motion.button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          initial={{ scale: 1 }}
+          className="px-4 py-2 rounded-full focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#92DCE5', // Botón azul claro
+            color: '#383D3B', // Texto oscuro
+          }}
+          whileHover={{ backgroundColor: '#7C7C7C', scale: 1.1 }} // Gris medio al hover
           whileTap={{ scale: 0.95 }} // Botón reduce tamaño al hacer clic
         >
           Enviar
@@ -159,4 +202,4 @@ export default function ChatGlobal() {
       </form>
     </div>
   );
-}
+}  

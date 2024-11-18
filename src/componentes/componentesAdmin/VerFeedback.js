@@ -79,7 +79,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
   return (
     <>
       <motion.div
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
+        className="max-w-sm rounded-xl shadow-lg overflow-hidden m-4"
+        style={{ backgroundColor: '#383D3B' }} // Fondo principal oscuro
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -88,25 +89,31 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
           src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
           alt={title}
         />
-        <div className="p-4">
-          <h2 className="text-white text-xl font-bold">{title}</h2>
+        <div className="p-4" style={{ backgroundColor: '#383D3B' }}> {/* Fondo claro para el contenido */}
+          <h2 className="text-xl font-bold" style={{ color: '#92DCE5' }}>{title}</h2> {/* Título con azul claro */}
           <div className="flex items-center mt-2">
-            <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
-            <span className="ml-2 text-gray-400 capitalize">{status}</span>
+            <span
+              className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}
+            ></span>
+            <span className="ml-2 capitalize" style={{ color: 'white' }}>{status}</span> {/* Texto gris medio */}
           </div>
-          <p className="text-gray-400 mt-2">
+          <p className="mt-2" style={{ color: 'white' }}>
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
-            <span className="text-green-400">Participantes: {participants}</span>
+            <span style={{ color: '#92DCE5' }}>Participantes: {participants}</span> {/* Azul claro */}
           </div>
           <div className="mt-2">
-            <span className="text-green-600">Presupuesto: {donations ? `$${donations}` : "No asignado"}</span>
+            <span style={{ color: '#7C7C7C' }}>Presupuesto: {donations ? `$${donations}` : "No asignado"}</span> {/* Gris medio */}
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+              className="px-4 py-2 rounded"
+              style={{
+                backgroundColor: '#7C7C7C', // Fondo gris medio
+                color: '#EEE5E9', // Texto claro
+              }}
+              whileHover={{ backgroundColor: '#92DCE5', scale: 1.1 }} // Cambia a azul claro al hover
               whileTap={{ scale: 0.9 }}
               onClick={handleOpenModal}
             >
@@ -119,30 +126,35 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            className="fixed inset-0 flex justify-center items-center z-50"
+            style={{ backgroundColor: 'rgba(56, 61, 59, 0.8)' }} // Fondo con transparencia (oscuro)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{
+                backgroundColor: '#EEE5E9', // Fondo claro para el modal
+                color: '#383D3B', // Texto oscuro
+              }}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-black text-2xl font-bold mb-4">Feedback de {title}</h2>
+              <h2 className="text-2xl font-bold mb-4">Feedback de {title}</h2>
               <div
                 ref={userListRef}
                 className="overflow-y-auto max-h-96" // Max height for scrollable area
                 onScroll={handleScroll}
               >
-                <ul className="text-gray-600">
+                <ul>
                   {feedbacks.length > 0 ? (
                     feedbacks.map((fb, index) => (
                       <li key={index} className="mb-6">
-                        <div className="font-bold text-gray-800">{fb.username}:</div>
+                        <div className="font-bold" style={{ color: '#383D3B' }}>{fb.username}:</div>
                         <div className="flex items-center mt-1">{renderStars(fb.rating)}</div>
-                        <p className="text-gray-700 mt-2">{fb.message}</p>
+                        <p className="mt-2" style={{ color: '#7C7C7C' }}>{fb.message}</p> {/* Texto gris medio */}
                       </li>
                     ))
                   ) : (
@@ -151,8 +163,12 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
                 </ul>
               </div>
               <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                className="mt-4 px-4 py-2 rounded"
+                style={{
+                  backgroundColor: '#92DCE5', // Azul claro
+                  color: '#383D3B', // Texto oscuro
+                }}
+                whileHover={{ backgroundColor: '#7C7C7C', scale: 1.1 }} // Gris medio al hover
                 whileTap={{ scale: 0.9 }}
                 onClick={handleCloseModal}
               >
@@ -163,8 +179,8 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
         )}
       </AnimatePresence>
     </>
-  );  
-};
+  );
+}
 
 const VerFeedback = () => {
   const [programs, setPrograms] = useState([]);

@@ -13,11 +13,8 @@ import Event from '@mui/icons-material/Event';
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
 import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
-import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import MessageIcon from '@mui/icons-material/Message';
 import { Feedback } from '@mui/icons-material';
 import ArticleIcon from '@mui/icons-material/Article';
 
@@ -34,12 +31,8 @@ import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ChatGlobal from './ChatGlobal';
 
-
 const NAVIGATION = [
-  {
-    kind: 'header',
-    title: 'Opciones',
-  },
+
   {
     segment: 'configuracion-perfil',
     title: 'Mi perfil',
@@ -54,53 +47,50 @@ const NAVIGATION = [
     segment: 'programas',
     title: 'Programas',
     icon: <Event />,
-  },  
-  
+  },
   {
     segment: 'reportes',
     title: 'Reportes',
     icon: <BarChartIcon />,
     children: [
-        {
-          segment: 'usuarios',
-          title: 'Usuarios',
-          icon: <PersonIcon />,
-        },
-        {
-          segment: 'donaciones',
-          title: 'Donaciones',
-          icon: <Paid />,
-        },
-        {
-          segment: 'programas',
-          title: 'Programas',
-          icon: <Event />,
-        },
-      
-      ],
+      {
+        segment: 'usuarios',
+        title: 'Usuarios',
+        icon: <PersonIcon />,
+      },
+      {
+        segment: 'donaciones',
+        title: 'Donaciones',
+        icon: <Paid />,
+      },
+      {
+        segment: 'programas',
+        title: 'Programas',
+        icon: <Event />,
+      },
+    ],
   },
   {
     segment: 'asignaciones',
     title: 'Asignaciones',
     icon: <AssignmentInd />,
     children: [
-        {
-          segment: 'beneficiario-programa',
-          title: 'Beneficiario/Programa',
-          icon: <VolunteerActivism />,
-        },
-        {
-          segment: 'voluntarios-programas',
-          title: 'Voluntarios/Programas',
-          icon: <EmojiPeople />,
-        },
-        {
-          segment: 'presupuesto-programa',
-          title: 'Presupuesto/Programa',
-          icon: <AttachMoney />,
-        },
-      
-      ],
+      {
+        segment: 'beneficiario-programa',
+        title: 'Beneficiario/Programa',
+        icon: <VolunteerActivism />,
+      },
+      {
+        segment: 'voluntarios-programas',
+        title: 'Voluntarios/Programas',
+        icon: <EmojiPeople />,
+      },
+      {
+        segment: 'presupuesto-programa',
+        title: 'Presupuesto/Programa',
+        icon: <AttachMoney />,
+      },
+    ],
   },
   {
     segment: 'comunicacion',
@@ -119,37 +109,56 @@ const NAVIGATION = [
       },
     ],
   },
-    
 ];
 
 const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+  palette: {
+    primary: {
+      main: '#383D3B', // Color principal oscuro
+    },
+    secondary: {
+      main: '#92DCE5', // Color secundario
+    },
+    background: {
+      default: '#EEE5E9', // Fondo principal claro
+      paper: '#7C7C7C',   // Fondo de componentes
+    },
   },
-  colorSchemes: { light: true, dark: true },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
+  components: {
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#383D3B', // Color de la barra lateral
+          color: '#EEE5E9',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#383D3B', // Color de la barra superior
+          color: '#EEE5E9', // Color del texto en la barra superior
+        },
+      },
     },
   },
 });
 
+
+  
 function DemoPageContent({ pathname }) {
   return (
     <Box
       sx={{
         py: 4,
-        px: 6, // Ajustamos el padding horizontal
+        px: 6,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-start', // Aseguramos que los items estén hacia el inicio
-        alignItems: 'flex-start', // Los alineamos a la izquierda
-        textAlign: 'left', // El texto alineado a la izquierda
-        width: '100%', // Aseguramos que ocupe todo el ancho disponible
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        width: '100%',
+        backgroundColor: '#EEE5E9', // Usa el color del tema
       }}
     >
       {pathname === '/users' && <UsuariosCrud />}
@@ -160,14 +169,12 @@ function DemoPageContent({ pathname }) {
       {pathname === '/asignaciones/beneficiario-programa' && <AsignacionesBen_Pro />}
       {pathname === '/asignaciones/voluntarios-programas' && <AsignacionesVol_Pro />}
       {pathname === '/asignaciones/presupuesto-programa' && <AsignacionPresupuesto_Pro />}
-      {pathname === '/configuracion-perfil' && <PerfilUsuario />}   
+      {pathname === '/configuracion-perfil' && <PerfilUsuario />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
       {pathname === '/comunicacion/mensajes' && <ChatGlobal />}
     </Box>
   );
 }
-
-
 
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
@@ -186,11 +193,9 @@ function DashboardLayoutBasic(props) {
     };
   }, [pathname]);
 
-  // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
     <AppProvider
       navigation={NAVIGATION}
       branding={{
@@ -205,15 +210,10 @@ function DashboardLayoutBasic(props) {
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }
 
 DashboardLayoutBasic.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window: PropTypes.func,
 };
 

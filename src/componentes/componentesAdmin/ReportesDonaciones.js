@@ -183,7 +183,7 @@ const ReportesDonaciones = () => {
         {/* Tarjetas de métricas */}
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
+            <Card sx={{ backgroundColor: '#383D3B', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
                   <FaDollarSign className="text-green-400 mr-2" size={40} />
@@ -197,7 +197,7 @@ const ReportesDonaciones = () => {
           </Grid>
   
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
+            <Card sx={{ backgroundColor: '#383D3B', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
                   <FaMoneyBillWave className="text-blue-400 mr-2" size={40} />
@@ -211,7 +211,7 @@ const ReportesDonaciones = () => {
           </Grid>
   
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
+            <Card sx={{ backgroundColor: '#383D3B', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
                   <FaChartPie className="text-yellow-400 mr-2" size={40} />
@@ -230,7 +230,7 @@ const ReportesDonaciones = () => {
           <motion.div
             className="p-6 rounded-lg shadow-lg"
             style={{
-              backgroundColor: '#1C1E22',
+              backgroundColor: '#383D3B',
               color: '#FFFFFF',
               border: '1px solid #3A3B3F',
             }}
@@ -271,7 +271,7 @@ const ReportesDonaciones = () => {
           <motion.div
             className="p-6 rounded-lg shadow-lg"
             style={{
-              backgroundColor: '#1C1E22',
+              backgroundColor: '#383D3B',
               color: '#FFFFFF',
               border: '1px solid #3A3B3F',
             }}

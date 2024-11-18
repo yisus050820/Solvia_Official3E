@@ -161,7 +161,7 @@ const ReportesUsuarios = () => {
   return (
     <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
       {/* Título encima del contenido */}
-      <Typography variant="h3" align="center" style={{ color: "#EEE5E9" }} gutterBottom>
+      <Typography variant="h3" align="center" color="primary" gutterBottom>
         Reporte Usuarios
       </Typography>
       {/* Resumen rápido - Total de usuarios, nuevos usuarios, usuarios por rol */}

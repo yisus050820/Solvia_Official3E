@@ -374,7 +374,14 @@ const CrudUsuarios = () => {
               <Switch
                 checked={mostrarCards}
                 onChange={() => setMostrarCards(!mostrarCards)}
-                color="primary"
+                sx={{
+                  '& .MuiSwitch-thumb': {
+                    backgroundColor: '#92DCE5', // Aqua
+                  },
+                  '& .MuiSwitch-track': {
+                    backgroundColor: '#7C7C7C', // Gris oscuro
+                  },
+                }}
               />
             </div>
 
