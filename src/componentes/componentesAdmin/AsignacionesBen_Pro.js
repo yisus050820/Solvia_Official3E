@@ -111,15 +111,18 @@ const AsignacionesBen_Pro = () => {
     setErrorPrograma('');
 
     if (!beneficiarioSeleccionado) {
-      setErrorBeneficiario('Debes seleccionar un beneficiario.');
-      isValid = false;
+      setMessage('Debes seleccionar un beneficiario.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
     }
-    if (!programaSeleccionado) {
-      setErrorPrograma('Debes seleccionar un programa.');
-      isValid = false;
-    }
-    if (!isValid) return;
 
+    if (!programaSeleccionado) {
+      setMessage('Debes seleccionar un programa.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
 
     const nuevaAsignacion = {
       user_id: beneficiarioSeleccionado,
@@ -242,18 +245,33 @@ const AsignacionesBen_Pro = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Título "Asignación" */}
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
+      <Typography variant="h3" align="center" color='primary' gutterBottom>
         Asignación
       </Typography>
-      <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
+      <Card
+        sx={{
+          backgroundColor: '#383D3B', // Fondo principal oscuro
+          color: '#EEE5E9', // Texto claro
+          padding: '20px',
+          borderRadius: '15px',
+        }}
+      >
         <CardContent>
-          <Typography variant="h4" align="center" color="white" gutterBottom>
+          <Typography variant="h4" align="center" color="#EEE5E9" gutterBottom>
             Asignar Beneficiario a Programa
           </Typography>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="beneficiario-label" sx={{ color: 'black' }}>Selecciona un Beneficiario</InputLabel>
+              <FormControl
+                fullWidth
+                sx={{
+                  backgroundColor: '#7C7C7C', // Fondo de los selects
+                  borderRadius: '5px',
+                }}
+              >
+                <InputLabel id="beneficiario-label" sx={{ color: '#EEE5E9' }}>
+                  Selecciona un Beneficiario
+                </InputLabel>
                 <Select
                   labelId="beneficiario-label"
                   value={beneficiarioSeleccionado}
@@ -261,8 +279,8 @@ const AsignacionesBen_Pro = () => {
                   label="Selecciona un Beneficiario"
                   sx={{
                     '.MuiSelect-select': {
-                      color: beneficiarioSeleccionado ? 'black' : 'inherit',
-                    }
+                      color: beneficiarioSeleccionado ? '#EEE5E9' : '#7C7C7C', // Texto en selects
+                    },
                   }}
                 >
                   {beneficiarios.map((beneficiario) => (
@@ -272,12 +290,18 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
-              {errorBeneficiario && <span style={{ color: 'red' }}>{errorBeneficiario}</span>}
-
             </Grid>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
-                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
+              <FormControl
+                fullWidth
+                sx={{
+                  backgroundColor: '#7C7C7C', // Fondo de selects
+                  borderRadius: '5px',
+                }}
+              >
+                <InputLabel id="programa-label" sx={{ color: '#EEE5E9' }}>
+                  Selecciona un Programa
+                </InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
@@ -285,8 +309,8 @@ const AsignacionesBen_Pro = () => {
                   label="Selecciona un Programa"
                   sx={{
                     '.MuiSelect-select': {
-                      color: programaSeleccionado ? 'black' : 'inherit',
-                    }
+                      color: programaSeleccionado ? '#EEE5E9' : '#7C7C7C', // Texto
+                    },
                   }}
                 >
                   {programas.map((programa) => (
@@ -296,44 +320,42 @@ const AsignacionesBen_Pro = () => {
                   ))}
                 </Select>
               </FormControl>
-              {errorPrograma && <span style={{ color: 'red' }}>{errorPrograma}</span>}
             </Grid>
           </Grid>
           <div className="mt-6 flex justify-end">
             <motion.button
-              className="bg-green-500 text-white px-4 py-2 rounded-full"
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-              onClick={handleAsignar}>
+              className="bg-[#0097A7] text-[#EEE5E9] px-4 py-2 rounded-full" // Botón de asignación
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleAsignar}
+            >
               <FaPlus />
             </motion.button>
           </div>
-
-          {/* Tabla de Asignaciones */}
+          {/* Tabla */}
           <TableContainer
             component={Paper}
-            sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}
-            ref={userListRef}  // Asignación del ref
-            onScroll={handleScroll}  // Evento de scroll
+            sx={{
+              marginTop: '20px',
+              backgroundColor: '#383D3B', // Fondo oscuro
+            }}
           >
             <Table>
-              <TableHead sx={{ backgroundColor: '#4a5568' }}>
+              <TableHead sx={{ backgroundColor: '#7C7C7C' }}> {/* Encabezados */}
                 <TableRow>
-                  <TableCell sx={{ color: '#fff' }}>Beneficiario</TableCell>
-                  <TableCell sx={{ color: '#fff' }}>Programa</TableCell>
-                  <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
+                  <TableCell sx={{ color: '#EEE5E9' }}>Beneficiario</TableCell>
+                  <TableCell sx={{ color: '#EEE5E9' }}>Programa</TableCell>
+                  <TableCell sx={{ color: '#EEE5E9' }}>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {asignaciones.map((asignacion) => (
-                  <TableRow key={asignacion.id} style={{ borderBottom: '1px solid #4a5568' }}>
-                    <TableCell sx={{ color: '#fff' }}>{asignacion.beneficiario}</TableCell>
-                    <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
-                    <TableCell sx={{ color: '#fff' }}>
+                  <TableRow key={asignacion.id} style={{ borderBottom: '1px solid #7C7C7C' }}>
+                    <TableCell sx={{ color: '#EEE5E9' }}>{asignacion.beneficiario}</TableCell>
+                    <TableCell sx={{ color: '#EEE5E9' }}>{asignacion.programa}</TableCell>
+                    <TableCell sx={{ color: '#EEE5E9' }}>
                       <motion.button
-                        className="bg-blue-500 text-white px-2 py-1 rounded-full"
-                        variants={buttonVariants}
+                        className="bg-[#0097A7] text-[#EEE5E9] px-2 py-1 rounded-full" // Botón de editar
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleEditar(asignacion)}
@@ -341,8 +363,7 @@ const AsignacionesBen_Pro = () => {
                         <FaEdit />
                       </motion.button>
                       <motion.button
-                        className="bg-red-500 text-white px-2 py-1 rounded-full ml-2"
-                        variants={buttonVariants}
+                        className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" // Botón de eliminar
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleEliminar(asignacion.id)}
@@ -361,41 +382,74 @@ const AsignacionesBen_Pro = () => {
       {/* Formulario de Edición */}
       <AnimatePresence>
         {isEditModalOpen && editAsignacion && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full" initial={{ y: '-100vh' }} animate={{ y: '0' }} exit={{ y: '-100vh' }}>
-              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
-              <div className="space-y-4">
-                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={beneficiarioSeleccionado} onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}>
-                  <option value="">Selecciona un beneficiario</option>
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{
+                backgroundColor: '#383D3B', // Fondo oscuro
+                color: '#EEE5E9', // Texto claro
+              }}
+              initial={{ y: '-100vh' }}
+              animate={{ y: '0' }}
+              exit={{ y: '-100vh' }}
+            >
+              <Typography variant="h5" gutterBottom>
+                Editar Asignación
+              </Typography>
+              <FormControl fullWidth sx={{ marginBottom: '16px', backgroundColor: '#7C7C7C', borderRadius: '5px' }}>
+                <InputLabel id="edit-beneficiario-label" sx={{ color: '#EEE5E9' }}>
+                  Selecciona un Beneficiario
+                </InputLabel>
+                <Select
+                  labelId="edit-beneficiario-label"
+                  value={beneficiarioSeleccionado}
+                  onChange={(e) => setBeneficiarioSeleccionado(e.target.value)}
+                  sx={{ '.MuiSelect-select': { color: '#EEE5E9' } }}
+                >
                   {beneficiarios.map((beneficiario) => (
-                    <option key={beneficiario.id} value={beneficiario.id}>
+                    <MenuItem key={beneficiario.id} value={beneficiario.id}>
                       {beneficiario.name}
-                    </option>
+                    </MenuItem>
                   ))}
-                </select>
-
-                <select className="w-full p-2 border border-gray-500 rounded bg-gray-900 text-white" value={programaSeleccionado} onChange={(e) => setProgramaSeleccionado(e.target.value)}>
-                  <option value="">Selecciona un programa</option>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: '16px', backgroundColor: '#7C7C7C', borderRadius: '5px' }}>
+                <InputLabel id="edit-programa-label" sx={{ color: '#EEE5E9' }}>
+                  Selecciona un Programa
+                </InputLabel>
+                <Select
+                  labelId="edit-programa-label"
+                  value={programaSeleccionado}
+                  onChange={(e) => setProgramaSeleccionado(e.target.value)}
+                  sx={{ '.MuiSelect-select': { color: '#EEE5E9' } }}
+                >
                   {programas.map((programa) => (
-                    <option key={programa.id} value={programa.id}>
+                    <MenuItem key={programa.id} value={programa.id}>
                       {programa.name}
-                    </option>
+                    </MenuItem>
                   ))}
-                </select>
-              </div>
-              <div className="flex justify-between mt-4">
+                </Select>
+              </FormControl>
+              <div className="flex justify-between">
                 <motion.button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  className="bg-[#0097A7] text-[#EEE5E9] px-4 py-2 rounded-full"
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={confirmEdit}>
+                  onClick={confirmEdit}
+                >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  className="bg-red-500 text-white px-4 py-2 rounded-full"
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsEditModalOpen(false)}>
+                  onClick={() => setIsEditModalOpen(false)}
+                >
                   Cerrar
                 </motion.button>
               </div>
@@ -403,30 +457,45 @@ const AsignacionesBen_Pro = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Confirmación de eliminar */}
-      <Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+      <Dialog
+        open={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          },
+        }}
+      >
         <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
+            Esta acción no se puede deshacer. ¿Deseas continuar?
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <motion.button
-            className="bg-gray-500 text-white px-4 py-2 rounded-full"
+            className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsDeleteConfirmOpen(false)}>
+            onClick={() => setIsDeleteConfirmOpen(false)}
+          >
             Cancelar
           </motion.button>
           <motion.button
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={confirmDelete}>
+            onClick={confirmDelete}
+          >
             Eliminar
           </motion.button>
         </DialogActions>
       </Dialog>
+      {/* Snackbar para errores */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -437,7 +506,6 @@ const AsignacionesBen_Pro = () => {
           {message}
         </Alert>
       </Snackbar>
-
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
         {successMessage && (
@@ -445,36 +513,51 @@ const AsignacionesBen_Pro = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
-              {/* Icono de palomita */}
-
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
+            >
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
                   variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>

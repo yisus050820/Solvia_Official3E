@@ -188,16 +188,16 @@ const ReportesProgramasAyuda = () => {
   return (
     <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
       {/* Título encima del contenido */}
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
+      <Typography variant="h3" align="center" style={{ color: "#EEE5E9" }} gutterBottom>
         Reporte Programas
       </Typography>
       {/* Resumen rápido - Total de programas, beneficiarios, voluntarios */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaHandsHelping className="text-blue-500 mr-2" size={40} />
+                <FaHandsHelping className="text-red-500 mr-2" size={40} /> {/* Color original */}
                 <div>
                   <Typography variant="h4">{totalProgramas}</Typography>
                   <Typography variant="subtitle1">Programas Activos</Typography>
@@ -206,12 +206,12 @@ const ReportesProgramasAyuda = () => {
             </CardContent>
           </Card>
         </Grid>
-
+  
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaUserFriends className="text-green-500 mr-2" size={40} />
+                <FaUserFriends className="text-orange-500 mr-2" size={40} /> {/* Color original */}
                 <div>
                   <Typography variant="h4">{beneficiariosTotales}</Typography>
                   <Typography variant="subtitle1">Beneficiarios Activos</Typography>
@@ -220,12 +220,12 @@ const ReportesProgramasAyuda = () => {
             </CardContent>
           </Card>
         </Grid>
-
+  
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaUsers className="text-purple-500 mr-2" size={40} />
+                <FaUsers className="text-yellow-500 mr-2" size={40} /> {/* Color original */}
                 <div>
                   <Typography variant="h4">{voluntariosTotales}</Typography>
                   <Typography variant="subtitle1">Voluntarios Activos</Typography>
@@ -235,57 +235,69 @@ const ReportesProgramasAyuda = () => {
           </Card>
         </Grid>
       </Grid>
-
+  
       {/* Gráficas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
         {/* Gráfica de línea - Crecimiento de programas */}
         <motion.div
-          className="bg-gray-800 p-6 rounded-lg shadow-lg"
+          className="p-6 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: '#383D3B',
+            color: '#EEE5E9',
+            border: '1px solid #7C7C7C',
+          }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.02 }}
         >
           <div className="flex items-center mb-4">
-            <FaDollarSign className="text-blue-500 mr-2" size={24} />
-            <Typography variant="h6" color="white" gutterBottom>
+            <FaDollarSign className="text-blue-500 mr-2" size={24} /> {/* Color original */}
+            <Typography variant="h6" style={{ color: "#EEE5E9" }} gutterBottom>
               Programas impartidos por mes
             </Typography>
           </div>
           {crecimientoProgramas.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={crecimientoProgramas}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="month" stroke="#FFFFFF" />
-                <YAxis stroke="#FFFFFF" />
-                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#7C7C7C" />
+                <XAxis dataKey="month" stroke="#EEE5E9" />
+                <YAxis stroke="#EEE5E9" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+                />
                 <Legend />
                 <Line
                   type="monotone"
-                  dataKey="Programas"  // Cambiado de "program_count" a "Programas"
-                  stroke="#FFBB28"
+                  dataKey="Programas"
+                  stroke="#FF5722" // Color original
                   activeDot={{ r: 8 }}
                   strokeWidth={3}
-                  dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                  dot={{ stroke: '#FF7043', strokeWidth: 2 }} // Color original
                 />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <Typography color="white">Cargando datos de crecimiento...</Typography>
+            <Typography style={{ color: "#EEE5E9" }}>Cargando datos de crecimiento...</Typography>
           )}
         </motion.div>
-
+  
         {/* Gráfica de pastel - Proporción de beneficiarios por programa */}
         <motion.div
-          className="bg-gray-800 p-6 rounded-lg shadow-lg"
+          className="p-6 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: '#383D3B',
+            color: '#EEE5E9',
+            border: '1px solid #7C7C7C',
+          }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.02 }}
         >
           <div className="flex items-center mb-4">
-            <FaChartPie className="text-green-500 mr-2" size={24} />
-            <Typography variant="h6" color="white" gutterBottom>
+            <FaChartPie className="text-green-500 mr-2" size={24} /> 
+            <Typography variant="h6" style={{ color: "#EEE5E9" }} gutterBottom>
               Proporción de Beneficiarios por Programa
             </Typography>
           </div>
@@ -296,44 +308,37 @@ const ReportesProgramasAyuda = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                fill="#8884d8"
+                fill="#8884d8" // Color original
                 dataKey="total_beneficiaries"
                 nameKey="program_name"
                 label={({ program_name }) =>
                   program_name.length > 10 ? `${program_name.slice(0, 10)}...` : program_name
                 }
-                labelLine={false}  // Esto elimina las líneas blancas
+                labelLine={false} // Esto elimina las líneas blancas
               >
                 {beneficiariosPorPrograma.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value, name, props) => {
-                  const { program_name } = props.payload;
-                  return [`${value}`, `${program_name}`];
-                }}
-                contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }}
+                contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
               />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
-
+  
       {/* Botón para exportar en PDF */}
       <div className="flex justify-center mt-8">
         <button
-          className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600"
+          className="bg-92DCE5 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-7C7C7C"
           onClick={exportarPDF}
         >
           Exportar en PDF
         </button>
       </div>
     </div>
-  );
+  );  
 };
 
 export default ReportesProgramasAyuda;

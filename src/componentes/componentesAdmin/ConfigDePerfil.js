@@ -186,7 +186,7 @@ const PerfilUsuario = () => {
 
   return (
     <motion.div className="w-full mx-auto mt-5 px-4" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
+      <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
@@ -199,7 +199,7 @@ const PerfilUsuario = () => {
               </motion.div>
               {isEditing && (
                 <div className="mt-4 flex justify-center">
-                  <Button variant="contained" component="label" color="primary" sx={{ backgroundColor: '#60b4c7', color: 'black' }}>
+                  <Button variant="contained" component="label" color="primary" sx={{ backgroundColor: '#92DCE5', color: '#383D3B' }}>
                     Cambiar Foto
                     <input type="file" accept="image/*" onChange={handleProfilePictureChange} hidden />
                   </Button>
@@ -209,20 +209,20 @@ const PerfilUsuario = () => {
             <Grid item xs={12} md={8}>
               {!isEditing ? (
                 <div>
-                  <Typography variant="h4" color="white" sx={{ fontSize: '2rem' }}>
-                    <FaUserCircle className="inline-block text-blue-500 mr-2" />
+                  <Typography variant="h4" color="#EEE5E9" sx={{ fontSize: '2rem' }}>
+                    <FaUserCircle className="inline-block text-blue-300 mr-2" />
                     {userInfo.name}
                   </Typography>
                   {/* Mostrar la fecha de nacimiento en modo visualización */}
-                  <Typography variant="subtitle2" color="gray" sx={{ fontSize: '1rem', marginTop: '4px', display: 'flex', alignItems: 'center' }}>
-                    <FaCalendarAlt className="inline-block text-red-500 mr-2" />
+                  <Typography variant="subtitle2" sx={{ fontSize: '1rem', marginTop: '4px', display: 'flex', alignItems: 'center', color: '#7C7C7C' }}>
+                    <FaCalendarAlt className="inline-block text-red-400 mr-2" />
                     {userInfo.birth_date || 'No disponible'}
                   </Typography>
-                  <Typography variant="subtitle1" color="gray" sx={{ fontSize: '1.2rem' }}>
-                    <FaUserTag className="inline-block text-green-500 mr-2" />
+                  <Typography variant="subtitle1" sx={{ fontSize: '1.2rem', color: '#7C7C7C' }}>
+                    <FaUserTag className="inline-block text-green-400 mr-2" />
                     {userInfo.role}
                   </Typography>
-                  <Typography variant="body1" color="gray" sx={{ fontSize: '1.1rem' }}>
+                  <Typography variant="body1" sx={{ fontSize: '1.1rem', color: '#7C7C7C' }}>
                     <FaEnvelope className="inline-block text-yellow-500 mr-2" />
                     {userInfo.email}
                   </Typography>
@@ -231,28 +231,28 @@ const PerfilUsuario = () => {
                 <>
                   <TextField
                     name="name"
-                    value={editInfo.name || ''}  // Asegurarse de que no sea undefined
+                    value={editInfo.name || ''} // Asegurarse de que no sea undefined
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
                     placeholder="Escribe tu nombre"
-                    sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
+                    sx={{ backgroundColor: '#EEE5E9', color: '#383D3B', borderRadius: '5px', mb: 2, input: { color: '#383D3B' } }}
                   />
                   <TextField
                     name="birthdate"
                     type="date"
-                    value={editInfo.birthdate || ''}  // Mostrará la fecha de nacimiento actual o vacío si no existe
+                    value={editInfo.birthdate || ''} // Mostrará la fecha de nacimiento actual o vacío si no existe
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
                     margin="dense"
                     placeholder="Fecha de nacimiento"
-                    sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
+                    sx={{ backgroundColor: '#EEE5E9', color: '#383D3B', borderRadius: '5px', mb: 2, input: { color: '#383D3B' } }}
                   />
                   <TextField
                     name="email"
-                    value={editInfo.email || ''}  // Asegurarse de que no sea undefined
+                    value={editInfo.email || ''} // Asegurarse de que no sea undefined
                     onChange={handleChange}
                     fullWidth
                     variant="outlined"
@@ -260,7 +260,7 @@ const PerfilUsuario = () => {
                     placeholder="Escribe tu correo"
                     error={!!errors.email}
                     helperText={errors.email}
-                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' }, color: 'black' }}
+                    sx={{ backgroundColor: '#EEE5E9', borderRadius: '5px', mb: 2, input: { color: '#383D3B' }, color: '#383D3B' }}
                   />
                   {/* Campo de contraseña */}
                   <TextField
@@ -281,7 +281,7 @@ const PerfilUsuario = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{ backgroundColor: 'white', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
+                    sx={{ backgroundColor: '#EEE5E9', borderRadius: '5px', mb: 2, input: { color: '#383D3B' } }}
                     error={!!errors.password}
                     helperText={errors.password}
                   />
@@ -291,7 +291,7 @@ const PerfilUsuario = () => {
           </Grid>
           <div className="mt-6">
             {!isEditing ? (
-              <Typography variant="body2" color="gray" gutterBottom sx={{ fontSize: '1.1rem' }}>
+              <Typography variant="body2" sx={{ fontSize: '1.1rem', color: '#7C7C7C' }}>
                 {userInfo.description}
               </Typography>
             ) : (
@@ -303,21 +303,23 @@ const PerfilUsuario = () => {
                 variant="outlined"
                 margin="dense"
                 placeholder="Agrega una descripción"
-                sx={{ backgroundColor: 'white', color: 'black', borderRadius: '5px', mb: 2, input: { color: 'black' } }}
+                sx={{ backgroundColor: '#EEE5E9', color: '#383D3B', borderRadius: '5px', mb: 2, input: { color: '#383D3B' } }}
               />
             )}
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
                 <>
                   <motion.button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-full"
+                    className="text-white px-4 py-2 rounded-full"
+                    style={{ backgroundColor: '#0097A7' }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={toggleEdit}>
                     <FaEdit />
                   </motion.button>
                   <motion.button
-                    className="bg-red-500 text-white px-4 py-2 rounded-full"
+                    className="text-white px-4 py-2 rounded-full"
+                    style={{ backgroundColor: '#E63946' }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={handleLogout}>
@@ -327,14 +329,16 @@ const PerfilUsuario = () => {
               ) : (
                 <div className="flex space-x-4">
                   <motion.button
-                    className="bg-green-500 text-white px-4 py-2 rounded-full"
+                    className="text-white px-4 py-2 rounded-full"
+                    style={{ backgroundColor: '#0097A7' }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={handleSave}>
                     Guardar
                   </motion.button>
                   <motion.button
-                    className="bg-red-500 text-white px-4 py-2 rounded-full"
+                    className="text-white px-4 py-2 rounded-full"
+                    style={{ backgroundColor: '#E63946' }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsEditing(false)}>

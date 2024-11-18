@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './componentes/theme'; 
+
 import Registro from './componentes/Registro';
 import Login from './componentes/Login';
 import DashboardAdmin from './componentes/dashboardAdmin';
@@ -11,11 +14,6 @@ import LandingPage from './componentes/index';
 import ResetPassword from './componentes/ResetPassword';
 import DashboardVoluntario from './componentes/dashboardVoluntario';
 import Donar from './componentes/Donar';
-import TeacherDashboard from './componentes/componentesVol/InterfazVoluntario';
-import ChatGlobal from './componentes/ChatGlobal';
-
-
-
 
 function App() {
   const location = useLocation();
@@ -29,7 +27,7 @@ function App() {
       const response = await fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
 
@@ -76,7 +74,7 @@ function App() {
         <Route path="/DonadorCrud" element={<DashboardDonante />} />
         <Route path="/BeneficiarioCrud" element={<DashboardBeneficiario />} />
         <Route path="/VoluntarioCrud" element={<DashboardVoluntario />} />
-        <Route path="/resetPassword/:token" element={<ResetPassword />} /> {/* Ruta para el restablecimiento */}
+        <Route path="/resetPassword/:token" element={<ResetPassword />} />
         <Route path="/index" element={<LandingPage />} />
       </Routes>
     </AnimatePresence>
@@ -85,8 +83,10 @@ function App() {
 
 export default function AnimatedApp() {
   return (
-    <Router>
-      <App />
-    </Router>
+    <ThemeProvider theme={theme}> {/* Envuelve toda tu app con el tema */}
+      <Router>
+        <App />
+      </Router>
+    </ThemeProvider>
   );
 }

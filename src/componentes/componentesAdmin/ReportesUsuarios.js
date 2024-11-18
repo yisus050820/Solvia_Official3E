@@ -161,18 +161,18 @@ const ReportesUsuarios = () => {
   return (
     <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
       {/* Título encima del contenido */}
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
+      <Typography variant="h3" align="center" style={{ color: "#EEE5E9" }} gutterBottom>
         Reporte Usuarios
       </Typography>
       {/* Resumen rápido - Total de usuarios, nuevos usuarios, usuarios por rol */}
       <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaUsers className="text-blue-500 mr-2" size={40} />
+                <FaUsers className="text-blue-400 mr-2" size={40} /> {/* Color original */}
                 <div>
-                  <Typography variant="h4">{totalUsuarios || 0}</Typography>  {/* Muestra totalUsuarios */}
+                  <Typography variant="h4">{totalUsuarios || 0}</Typography>
                   <Typography variant="subtitle1">Total de Usuarios Registrados</Typography>
                 </div>
               </div>
@@ -180,10 +180,10 @@ const ReportesUsuarios = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaUserPlus className="text-green-500 mr-2" size={40} />
+                <FaUserPlus className="text-green-400 mr-2" size={40} /> {/* Color original */}
                 <div>
                   <Typography variant="h4">{nuevosUsuarios}</Typography>
                   <Typography variant="subtitle1">Nuevos Usuarios</Typography>
@@ -192,14 +192,14 @@ const ReportesUsuarios = () => {
             </CardContent>
           </Card>
         </Grid>
-
+  
         <Grid item xs={12} md={4}>
-          <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+          <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', border: '1px solid #7C7C7C' }}>
             <CardContent>
               <div className="flex items-center">
-                <FaUserFriends className="text-purple-500 mr-2" size={40} />
+                <FaUserFriends className="text-purple-400 mr-2" size={40} /> {/* Color original */}
                 <div>
-                  <Typography variant="h4">{coordinadores || 0}</Typography>  {/* Muestra coordinadores */}
+                  <Typography variant="h4">{coordinadores || 0}</Typography>
                   <Typography variant="subtitle1">Coordinadores</Typography>
                 </div>
               </div>
@@ -207,56 +207,69 @@ const ReportesUsuarios = () => {
           </Card>
         </Grid>
       </Grid>
-
+  
       {/* Gráficas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
         {/* Gráfica de línea - Crecimiento de usuarios */}
         <motion.div
-          className="bg-gray-800 p-6 rounded-lg shadow-lg"
+          className="p-6 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: '#383D3B',
+            color: '#EEE5E9',
+            border: '1px solid #7C7C7C',
+          }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.02 }}
         >
           <div className="flex items-center mb-4">
-            <FaUsers className="text-blue-500 mr-2" size={24} />
-            <Typography variant="h6" color="white" gutterBottom>
+            <FaUsers className="text-blue-400 mr-2" size={24} /> {/* Color original */}
+            <Typography variant="h6" style={{ color: "#EEE5E9" }} gutterBottom>
               Crecimiento de Usuarios a lo largo del tiempo
             </Typography>
           </div>
           {crecimientoUsuarios.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={crecimientoUsuarios}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="month" stroke="#FFFFFF" tickFormatter={formatMonth} />
-                <YAxis stroke="#FFFFFF" />
-                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
-                <Legend /><Line
+                <CartesianGrid strokeDasharray="3 3" stroke="#7C7C7C" />
+                <XAxis dataKey="month" stroke="#EEE5E9" tickFormatter={formatMonth} />
+                <YAxis stroke="#EEE5E9" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+                />
+                <Legend />
+                <Line
                   type="monotone"
                   dataKey="Usuarios"
-                  stroke="#FFBB28"
+                  stroke="#FFBB28" // Color original
                   activeDot={{ r: 8 }}
                   strokeWidth={3}
-                  dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                  dot={{ stroke: '#FF8042', strokeWidth: 2 }} // Color original
                 />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <Typography color="white">Cargando datos de crecimiento...</Typography>
+            <Typography style={{ color: "#EEE5E9" }}>Cargando datos de crecimiento...</Typography>
           )}
         </motion.div>
-
+  
         {/* Gráfica de pastel - Distribución de roles */}
         <motion.div
-          className="bg-gray-800 p-6 rounded-lg shadow-lg"
+          className="p-6 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: '#383D3B',
+            color: '#EEE5E9',
+            border: '1px solid #7C7C7C',
+          }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.02 }}
         >
           <div className="flex items-center mb-4">
-            <FaUserFriends className="text-green-500 mr-2" size={24} />
-            <Typography variant="h6" color="white" gutterBottom>
+            <FaUserFriends className="text-green-400 mr-2" size={24} />
+            <Typography variant="h6" style={{ color: "#EEE5E9" }} gutterBottom>
               Distribución de Usuarios por Rol
             </Typography>
           </div>
@@ -267,32 +280,38 @@ const ReportesUsuarios = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, value }) => totalUsuarios > 0 ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%` : `${name}: 0%`}
+                label={({ name, value }) =>
+                  totalUsuarios > 0
+                    ? `${name}: ${(value / totalUsuarios * 100).toFixed(2)}%`
+                    : `${name}: 0%`
+                }
                 outerRadius={120}
-                fill="#8884d8"
+                fill="#8884d8" // Color original
                 dataKey="value"
               >
                 {usuariosPorRoles.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} /> 
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
-
+  
       {/* Botón para exportar en PDF */}
       <div className="flex justify-center mt-8">
         <button
-          className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600"
+          className="bg-92DCE5 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-7C7C7C"
           onClick={exportarPDF}
         >
           Exportar en PDF
         </button>
       </div>
     </div>
-  );
+  );  
 };
 
 export default ReportesUsuarios;

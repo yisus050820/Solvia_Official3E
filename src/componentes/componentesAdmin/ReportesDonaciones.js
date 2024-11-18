@@ -27,7 +27,7 @@ const ReportesDonaciones = () => {
       setLoading(false);
       return;
     }
-    
+
     const fetchData = async () => {
       try {
         const totalDonacionesRes = await axios.get('http://localhost:5000/donationsReports/totalDonaciones');
@@ -65,101 +65,101 @@ const ReportesDonaciones = () => {
   const exportarPDF = () => {
     const pdf = new jsPDF("portrait", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
-  
+
     // Colores personalizados
     const primaryColor = "#007BFF"; // Azul corporativo
     const secondaryColor = "#444"; // Gris oscuro
-  
+
     // Título "SOLVIA" como logo de empresa
     pdf.setFontSize(20); // Tamaño reducido
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(primaryColor);
     pdf.text("SOLVIA", 10, 15);
-  
+
     // Título "Reporte de Donaciones"
     pdf.setFontSize(24); // Tamaño reducido
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(secondaryColor);
     pdf.text("Reporte de Donaciones", pageWidth / 2, 30, { align: "center" });
-  
+
     // Línea divisoria
     pdf.setLineWidth(0.8);
     pdf.setDrawColor(primaryColor);
     pdf.line(10, 35, pageWidth - 10, 35);
-  
+
     // Datos del reporte
     pdf.setFontSize(12); // Tamaño reducido para compactar texto
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(secondaryColor);
-  
+
     let startY = 40;
     const lineSpacing = 8;
-  
+
     pdf.text(`Total de Donaciones:`, 10, startY);
     pdf.setFont("helvetica", "normal");
     pdf.text(`$${totalDonaciones.toFixed(2)}`, 10, startY + 5); // Monto debajo
     startY += lineSpacing * 2;
-  
+
     pdf.setFont("helvetica", "bold");
     pdf.text(`Total de Gastos:`, 10, startY);
     pdf.setFont("helvetica", "normal");
     pdf.text(`$${totalGastos.toFixed(2)}`, 10, startY + 5); // Monto debajo
     startY += lineSpacing * 2;
-  
+
     pdf.setFont("helvetica", "bold");
     pdf.text(`Promedio de Donaciones por Usuario:`, 10, startY);
     pdf.setFont("helvetica", "normal");
     pdf.text(`$${promedioPorUsuario.toFixed(2)}`, 10, startY + 5); // Monto debajo
     startY += lineSpacing * 3;
-  
+
     // Tablas y datos
     pdf.setFontSize(10); // Reducir tamaño de fuente para caber en una sola hoja
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(secondaryColor);
     pdf.text("Evolución de Donaciones:", 10, startY);
     startY += lineSpacing;
-  
+
     pdf.setFont("helvetica", "normal");
     evolucionDonaciones.forEach((data, index) => {
       pdf.text(`${data.month}`, 10, startY);
       pdf.text(`$${data.Donaciones}`, 60, startY);
       startY += lineSpacing;
     });
-  
+
     startY += lineSpacing;
     pdf.setFont("helvetica", "bold");
     pdf.text("Distribución de Donaciones por Donante:", 10, startY);
     startY += lineSpacing;
-  
+
     // Tabla para distribución por donantes
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(secondaryColor);
     pdf.setLineWidth(0.1);
     pdf.setDrawColor(secondaryColor);
-  
+
     pdf.rect(10, startY, pageWidth - 20, 8); // Cabecera
     pdf.text("Donante", 15, startY + 6);
     pdf.text("Monto", pageWidth - 50, startY + 6);
     startY += 10;
-  
+
     donacionesPorDonante.forEach((data, index) => {
       pdf.rect(10, startY, pageWidth - 20, 8); // Fila
       pdf.text(data.donor_name, 15, startY + 6);
       pdf.text(`$${data.total_donations}`, pageWidth - 50, startY + 6);
       startY += 10;
-  
+
       if (startY > 280) {
         // Si el contenido excede una hoja, detén la adición de más datos
         pdf.text("... Más datos omitidos", 10, startY + 6);
         return;
       }
     });
-  
+
     // Guardar el PDF
     pdf.save("reporteDonaciones.pdf");
   };
-  
-  
+
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
@@ -169,7 +169,7 @@ const ReportesDonaciones = () => {
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Reporte Donaciones
       </Typography>
-
+  
       {error && (
         <Snackbar
           open={snackbarOpen}
@@ -178,15 +178,15 @@ const ReportesDonaciones = () => {
           message={error}
         />
       )}
-
-      {/* Envolver todas las gráficas y el contenido de texto en el ref pdfRef */}
+  
       <div ref={pdfRef}>
+        {/* Tarjetas de métricas */}
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
-                  <FaDollarSign className="text-green-500 mr-2" size={40} />
+                  <FaDollarSign className="text-green-400 mr-2" size={40} />
                   <div>
                     <Typography variant="h4">${totalDonaciones}</Typography>
                     <Typography variant="subtitle1">Total de Donaciones</Typography>
@@ -195,12 +195,12 @@ const ReportesDonaciones = () => {
               </CardContent>
             </Card>
           </Grid>
-
+  
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
-                  <FaMoneyBillWave className="text-blue-500 mr-2" size={40} />
+                  <FaMoneyBillWave className="text-blue-400 mr-2" size={40} />
                   <div>
                     <Typography variant="h4">${totalGastos}</Typography>
                     <Typography variant="subtitle1">Total de Gastos</Typography>
@@ -209,12 +209,12 @@ const ReportesDonaciones = () => {
               </CardContent>
             </Card>
           </Grid>
-
+  
           <Grid item xs={12} md={4}>
-            <Card sx={{ backgroundColor: '#1e293b', color: '#fff' }}>
+            <Card sx={{ backgroundColor: '#1C1E22', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
                 <div className="flex items-center">
-                  <FaChartPie className="text-purple-500 mr-2" size={40} />
+                  <FaChartPie className="text-yellow-400 mr-2" size={40} />
                   <div>
                     <Typography variant="h4">${promedioPorUsuario.toFixed(2)}</Typography>
                     <Typography variant="subtitle1">Promedio de Donaciones por Usuario</Typography>
@@ -224,55 +224,66 @@ const ReportesDonaciones = () => {
             </Card>
           </Grid>
         </Grid>
-
+  
+        {/* Gráficas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg"
+            className="p-6 rounded-lg shadow-lg"
+            style={{
+              backgroundColor: '#1C1E22',
+              color: '#FFFFFF',
+              border: '1px solid #3A3B3F',
+            }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{ scale: 1.02 }}
           >
             <div className="flex items-center mb-4">
-              <FaDollarSign className="text-green-500 mr-2" size={24} />
-              <Typography variant="h6" color="white" gutterBottom>
-                Evolución de Donaciones a lo largo del tiempo
+              <FaDollarSign className="text-green-400 mr-2" size={24} />
+              <Typography variant="h6" gutterBottom>
+                Evolución de Donaciones
               </Typography>
             </div>
             {evolucionDonaciones.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={evolucionDonaciones}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#3A3B3F" />
                   <XAxis dataKey="month" stroke="#FFFFFF" />
                   <YAxis stroke="#FFFFFF" />
-                  <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#2C2F33', color: '#FFFFFF', borderRadius: '10px' }} />
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="Donaciones"  // Asegúrate de que coincida con la clave exacta en los datos de evolución
-                    stroke="#FFBB28"
+                    dataKey="Donaciones"
+                    stroke="#FFC107"
                     activeDot={{ r: 8 }}
                     strokeWidth={3}
-                    dot={{ stroke: '#FF8042', strokeWidth: 2 }}
+                    dot={{ stroke: '#FF5722', strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <Typography color="white">Cargando datos de evolucion...</Typography>
+              <Typography>Cargando datos de evolución...</Typography>
             )}
           </motion.div>
-
+  
           <motion.div
-            className="bg-gray-800 p-6 rounded-lg shadow-lg"
+            className="p-6 rounded-lg shadow-lg"
+            style={{
+              backgroundColor: '#1C1E22',
+              color: '#FFFFFF',
+              border: '1px solid #3A3B3F',
+            }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{ scale: 1.02 }}
           >
             <div className="flex items-center mb-4">
-              <FaChartPie className="text-green-500 mr-2" size={24} />
-              <Typography variant="h6" color="white" gutterBottom>
-                Distribución de Donaciones por Donante
+              <FaChartPie className="text-yellow-400 mr-2" size={24} />
+              <Typography variant="h6" gutterBottom>
+                Distribución de Donaciones
               </Typography>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -284,7 +295,6 @@ const ReportesDonaciones = () => {
                   labelLine={false}
                   label={({ donor_name, total_donations }) => `${donor_name}: ${total_donations}`}
                   outerRadius={120}
-                  fill="#8884d8"
                   dataKey="total_donations"
                 >
                   {donacionesPorDonante.map((entry, index) => (
@@ -294,23 +304,24 @@ const ReportesDonaciones = () => {
                 <Tooltip
                   formatter={(value, name, entry) => {
                     const { donor_name } = entry.payload;
-                    return [`${value}`, `${donor_name} `];
+                    return [`${value}`, `${donor_name}`];
                   }}
-                  contentStyle={{ backgroundColor: 'white', borderRadius: '10px' }}
+                  contentStyle={{ backgroundColor: '#2C2F33', color: '#FFFFFF', borderRadius: '10px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </motion.div>
         </div>
       </div>
-
+  
+      {/* Botón para exportar PDF */}
       <div className="flex justify-center mt-4">
-        <Button variant="contained" color="primary" onClick={exportarPDF}>
+        <Button variant="contained" sx={{ backgroundColor: '#007BFF', color: '#FFFFFF' }} onClick={exportarPDF}>
           Exportar a PDF
         </Button>
       </div>
     </div>
-  );
+  );  
 };
 
 export default ReportesDonaciones;

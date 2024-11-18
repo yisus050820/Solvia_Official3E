@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrashAlt, FaPlus, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
@@ -31,22 +31,7 @@ const CrudUsuarios = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [loading, setLoading] = useState(true);
-  const [atBottom, setAtBottom] = useState(true); 
-  const userListRef = useRef(null);
-
-  const handleScroll = () => {
-    const userListContainer = userListRef.current;
-    if (userListContainer) {
-      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
-    }
-  };  
-
-  useEffect(() => {
-    const userListContainer = userListRef.current;
-    if (userListContainer && atBottom) {
-      userListContainer.scrollTop = userListContainer.scrollHeight;
-    }
-  }, [user, atBottom]); // Solo desplazarse al fondo si estamos al final  
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -66,7 +51,7 @@ const CrudUsuarios = () => {
       setLoading(false);
       return;
     }
-    
+
     axios.get('http://localhost:5000/usuarios')
       .then(response => {
         if (Array.isArray(response.data)) {
@@ -327,12 +312,12 @@ const CrudUsuarios = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <label htmlFor="filtroRol" className="text-white mr-2">
+              <label htmlFor="filtroRol" className="text-'#383D3B' mr-2">
                 Filtrar por Rol:
               </label>
               <motion.select
                 id="filtroRol"
-                className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+                className="p-2 rounded bg-[#EEE5E9] text-[#383D3B] border border-[#7C7C7C]"
                 value={filtroRol}
                 onChange={(e) => setFiltroRol(e.target.value)}
                 initial={{ scale: 0.95 }}
@@ -353,25 +338,25 @@ const CrudUsuarios = () => {
               variant="outlined"
               sx={{
                 mb: 2,
-                backgroundColor: 'white',          // Fondo blanco
-                color: 'black',                     // Color del texto
-                borderRadius: '5px',                // Bordes redondeados
+                backgroundColor: '#EEE5E9',          // Fondo claro
+                color: '#383D3B',                     // Texto oscuro
+                borderRadius: '5px',
                 '& .MuiOutlinedInput-root': {
                   height: '36px',                   // Altura total del input
                   fontSize: '0.9rem',               // Tamaño del texto
                   '& input': {
-                    color: 'black',                 // Color del texto en el campo de entrada
+                    color: '#383D3B',               // Texto oscuro
                     padding: '8px 14px',            // Ajusta el padding interno
                   },
                   '& fieldset': {
-                    borderColor: '#ccc',            // Color del borde
+                    borderColor: '#7C7C7C',            // Color del borde gris oscuro
                   },
                   '&:hover fieldset': {
-                    borderColor: '#888',            // Color de borde al pasar el cursor
+                    borderColor: '#383D3B',            // Borde oscuro al pasar el cursor
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#888',                    // Color del texto de la etiqueta
+                  color: '#7C7C7C',                    // Etiqueta gris
                   fontSize: '0.9rem',
                   top: '-6px',                      // Ajusta la posición de la etiqueta
                 },
@@ -383,7 +368,7 @@ const CrudUsuarios = () => {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <Typography variant="body1" color="primary" className="mr-2">
+              <Typography variant="body1" sx={{ color: '#383D3B' }} className="mr-2">
                 Ver en tarjetas
               </Typography>
               <Switch
@@ -394,7 +379,7 @@ const CrudUsuarios = () => {
             </div>
 
             <motion.button
-              className="bg-green-500 text-white p-2 rounded-full"
+              className="bg-[#0097A7] text-[#EEE5E9] p-2 rounded-full"  // Botón de asignación
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleOpenModal}
@@ -406,54 +391,107 @@ const CrudUsuarios = () => {
 
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
-          <div
-          ref={userListRef} 
-          onScroll={handleScroll} 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 120px)' }} 
-        >
-            {Array.isArray(filteredUser) ? filteredUser.map((item) => (
-              <motion.div
-                key={item.id}
-                className="bg-gray-800 text-white p-6 rounded-lg shadow-md"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="flex justify-center items-center">
-                  <Avatar
-                    src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
-                    alt={item.name}
-                    sx={{
-                      width: 128,
-                      height: 128,
-                      marginBottom: 2,
-                      objectFit: 'cover',
-                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                    }}
-                  />
-                </div>
-                <Typography variant="h5" gutterBottom className="text-center">
+          <div className="flex justify-center flex-wrap mt-2">
+          {Array.isArray(filteredUser) ? filteredUser.map((item) => (
+            <motion.div
+              key={item.id}
+              className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro para las tarjetas
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {/* Contenedor centrado para la imagen */}
+              <div className="flex justify-center mt-4">  {/* Agregado un margin top para dar espacio */}
+                <Avatar
+                  src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
+                  alt={item.name}
+                  sx={{
+                    width: 160,  // Imagen más grande
+                    height: 160, // Imagen más grande
+                    objectFit: 'cover',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+              </div>
+              
+              <div className="p-4">
+                <h2 className="text-xl font-bold" style={{ color: '#EEE5E9' }}>
                   {item.name}
-                </Typography>
-                <Typography variant="body1" gutterBottom className="text-center">
-                  {item.role}
-                </Typography>
-                <Typography variant="body2" gutterBottom className="text-center">
-                  {item.email}
-                </Typography>
-                <Typography variant="body2" gutterBottom className="text-center">
-                  {item.birth_date}
-                </Typography>
-                <Typography variant="body2" className="flex text-center">
-                  {item.description}
-                </Typography>
-              </motion.div>
-            )) : <p>No hay usuarios disponibles</p>}
-          </div>
+                </h2>
+                <div className="flex items-center mt-2">
+                  <span
+                    className={`inline-block w-3 h-3 rounded-full ${item.role === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
+                  ></span>
+                  <span className="ml-2 capitalize" style={{ color: '#7C7C7C' }}>
+                    {item.role}
+                  </span>
+                </div>
+                <p className="mt-2" style={{ color: '#92DCE5' }}>
+                  {item.description && item.description.length > 100
+                    ? `${item.description.substring(0, 100)}...`
+                    : item.description}
+                </p>
+        
+                <div className="mt-2">
+                  <span style={{ color: '#4CAF50' }}>
+                    {item.email}
+                  </span>
+                </div>
+        
+                <div className="flex mt-4 justify-between">
+                  <motion.button
+                    className="px-4 py-2 rounded"
+                    style={{
+                      backgroundColor: '#0097A7',
+                      color: '#EEE5E9',
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setSelectedUser(item)}
+                  >
+                    Más info
+                  </motion.button>
+        
+                  <div className="flex space-x-2">
+                    {/* Botón de editar */}
+                    <motion.button
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#4A90E2',
+                        color: '#EEE5E9',
+                      }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleOpenEditModal(item)}
+                    >
+                      <FaEdit />
+                    </motion.button>
+        
+                    {/* Botón de eliminar */}
+                    <motion.button
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#E63946',
+                        color: '#EEE5E9',
+                      }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteClick(item.id)}
+                    >
+                      <FaTrashAlt />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )) : <p>No hay usuarios disponibles</p>}
+        </div>        
         ) : (
-          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-            <thead className="bg-gray-700">
+          <motion.table
+            className="w-full rounded-lg shadow-md"
+            style={{ backgroundColor: '#383D3B', color: '#EEE5E9' }}
+          >
+            <thead style={{ backgroundColor: '#2D2D2D' }}>
               <tr>
                 <th className="p-4">Nombre</th>
                 <th className="p-4">Correo</th>
@@ -466,7 +504,11 @@ const CrudUsuarios = () => {
             </thead>
             <motion.tbody layout>
               {Array.isArray(filteredUser) ? filteredUser.map((item) => (
-                <motion.tr key={item.id} className="border-b border-gray-700">
+                <motion.tr
+                  key={item.id}
+                  className="border-b"
+                  style={{ borderColor: '#7C7C7C' }}
+                >
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{item.email}</td>
                   <td className="p-4">{item.birth_date}</td>
@@ -475,7 +517,11 @@ const CrudUsuarios = () => {
                   <td className="p-4">{item.created_at}</td>
                   <td className="p-4 flex space-x-4">
                     <motion.button
-                      className="bg-blue-500 text-white p-2 rounded-full"
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#4A90E2',
+                        color: '#EEE5E9',
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleOpenEditModal(item)}
@@ -483,7 +529,11 @@ const CrudUsuarios = () => {
                       <FaEdit />
                     </motion.button>
                     <motion.button
-                      className="bg-red-500 text-white p-2 rounded-full"
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#E63946',
+                        color: '#EEE5E9',
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleDeleteClick(item.id)}
@@ -509,23 +559,36 @@ const CrudUsuarios = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Usuario</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#EEE5E9' }}>
+                Agregar Nuevo Usuario
+              </h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Nombre"
                   value={newUser.name}
                   onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                 />
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Correo"
                   value={newUser.email}
                   onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
@@ -535,7 +598,12 @@ const CrudUsuarios = () => {
                   onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   onKeyDown={(e) => {
                     // Permitir solo teclas numéricas (0-9) y el guion (-)
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
@@ -544,7 +612,12 @@ const CrudUsuarios = () => {
                   }}
                 />
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={newUser.role}
                   onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                 >
@@ -555,16 +628,26 @@ const CrudUsuarios = () => {
                   <option value="beneficiary">Beneficiario</option>
                 </select>
                 <textarea
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
                   placeholder="Descripción"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={newUser.description}
                   onChange={(e) => setNewUser({ ...newUser, description: e.target.value })}
                 />
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                    className="w-full p-2 border rounded"
                     placeholder="Contraseña"
+                    style={{
+                      borderColor: '#7C7C7C',
+                      backgroundColor: '#EEE5E9',
+                      color: '#383D3B',
+                    }}
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                   />
@@ -582,7 +665,8 @@ const CrudUsuarios = () => {
                   className="bg-green-500 text-white px-4 py-2 rounded"
                   whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={handleAddUser}>
+                  onClick={handleAddUser}
+                >
                   Agregar
                 </motion.button>
                 <motion.button
@@ -609,23 +693,36 @@ const CrudUsuarios = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-white text-2xl font-bold mb-4">Editar Usuario</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#EEE5E9' }}>
+                Editar Usuario
+              </h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Nombre"
                   value={editUser.name}
                   onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
                 />
                 <input
                   type="email"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Correo"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
@@ -635,7 +732,12 @@ const CrudUsuarios = () => {
                   onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   onKeyDown={(e) => {
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
                       e.preventDefault();
@@ -643,7 +745,12 @@ const CrudUsuarios = () => {
                   }}
                 />
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={editUser.role}
                   onChange={(e) => setEditUser({ ...editUser, role: e.target.value })}
                 >
@@ -656,7 +763,12 @@ const CrudUsuarios = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                    className="w-full p-2 border rounded"
+                    style={{
+                      borderColor: '#7C7C7C',
+                      backgroundColor: '#EEE5E9',
+                      color: '#383D3B',
+                    }}
                     placeholder="Nueva Contraseña (opcional)"
                     value={editUser.password || ''}
                     onChange={(e) => setEditUser({ ...editUser, password: e.target.value })}
@@ -670,7 +782,12 @@ const CrudUsuarios = () => {
                 </div>
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Descripción"
                   value={editUser.description}
                   onChange={(e) => setEditUser({ ...editUser, description: e.target.value })}
@@ -678,16 +795,18 @@ const CrudUsuarios = () => {
               </div>
               <div className="flex justify-between mt-4">
                 <motion.button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#0097A7', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditUser}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#E63946', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
@@ -699,41 +818,45 @@ const CrudUsuarios = () => {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {isDeleteConfirmOpen && (
-          <Dialog
-            open={isDeleteConfirmOpen}
-            onClose={() => setIsDeleteConfirmOpen(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+      {/* Confirmación de eliminar */}
+      <Dialog
+        open={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          },
+        }}
+      >
+        <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este programa?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
+            Esta acción no se puede deshacer. ¿Deseas continuar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <motion.button
+            className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsDeleteConfirmOpen(false)}
           >
-            <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este usuario?"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Esta acción no se puede deshacer. ¿Deseas continuar?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <motion.button
-                className="bg-gray-500 text-white px-4 py-2 rounded-full"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsDeleteConfirmOpen(false)}
-              >
-                Cancelar
-              </motion.button>
-              <motion.button
-                className="bg-red-500 text-white px-4 py-2 rounded-full"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={confirmDelete}
-              >
-                Eliminar
-              </motion.button>
-            </DialogActions>
-          </Dialog>
-        )}
-      </AnimatePresence>
+            Cancelar
+          </motion.button>
+          <motion.button
+            className="bg-red-500 text-white px-4 py-2 rounded-full"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={isDeleteConfirmOpen}
+          >
+            Eliminar
+          </motion.button>
+        </DialogActions>
+      </Dialog>
+      {/* Snackbar para errores */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -744,7 +867,6 @@ const CrudUsuarios = () => {
           {message}
         </Alert>
       </Snackbar>
-
       {/* Modal para mensajes de éxito */}
       <AnimatePresence>
         {successMessage && (
@@ -752,36 +874,51 @@ const CrudUsuarios = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
-              {/* Icono de palomita */}
-
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
+            >
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
                   variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>

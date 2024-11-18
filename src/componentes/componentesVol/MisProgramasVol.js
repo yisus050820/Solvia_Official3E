@@ -7,8 +7,8 @@ import TeacherDashboard from './InterfazVoluntario';
 const ProgramCard = ({ title, description, participants, donations, imageUrl, programId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
-  const modalContentRef = useRef(null); // Referencia para manejar el scroll
-  const [atBottom, setAtBottom] = useState(true); // Estado para verificar si estamos al final del scroll
+  const modalContentRef = useRef(null);
+  const [atBottom, setAtBottom] = useState(true);
 
   const handleOpenModal = (showDashboard = false) => {
     setShowDashboard(showDashboard);
@@ -39,9 +39,12 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
   return (
     <>
       <motion.div
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        style={{
+          backgroundColor: '#383D3B', // Fondo de la tarjeta
+        }}
       >
         <img
           className="w-full h-48 object-cover"
@@ -49,28 +52,38 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
           alt={title}
         />
         <div className="p-4">
-          <h2 className="text-white text-xl font-bold">{title}</h2>
-          <p className="text-gray-400 mt-2">
+          <h2 style={{ color: '#EEE5E9' }} className="text-xl font-bold">{title}</h2>
+          <p style={{ color: '#7C7C7C' }} className="mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
-            <span className="text-green-400">Participantes: {participants}</span>
+            <span style={{ color: '#92DCE5' }}>Participantes: {participants}</span>
           </div>
           <div className="mt-2">
-            <span className="text-green-600">Donaciones: ${donations}</span>
+            <span style={{ color: '#92DCE5' }}>Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
+              className="px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#7C7C7C' }}
               onClick={() => handleOpenModal(false)}
+              style={{
+                backgroundColor: '#92DCE5',
+                color: '#383D3B',
+                fontWeight: 'bold',
+              }}
             >
               Más info
             </motion.button>
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363' }}
+              className="px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#7C7C7C' }}
               onClick={() => handleOpenModal(true)}
+              style={{
+                backgroundColor: '#92DCE5',
+                color: '#383D3B',
+                fontWeight: 'bold',
+              }}
             >
               Gestionar
             </motion.button>
@@ -87,37 +100,41 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${
+              className={`text-white p-8 rounded-xl shadow-lg w-full ${
                 showDashboard ? 'max-w-3xl' : 'max-w-lg'
               }`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
-              ref={modalContentRef} // Referencia para manejar el scroll
-              onScroll={handleScroll} // Evento para detectar el scroll
+              ref={modalContentRef}
+              onScroll={handleScroll}
               style={{
+                backgroundColor: '#383D3B',
                 maxHeight: '90vh',
-                overflowY: 'auto', // Habilitar el scroll dentro del modal
+                overflowY: 'auto',
               }}
             >
               {showDashboard ? (
                 <TeacherDashboard programId={programId} />
               ) : (
                 <>
-                  <h2 className="text-white text-3xl font-bold">{title}</h2>
-                  <h4 className="text-white-900 mb-4 font-semibold"></h4>
+                  <h2 style={{ color: '#EEE5E9' }} className="text-3xl font-bold">{title}</h2>
                   <img
                     className="w-full h-48 object-cover shadow-md rounded"
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
                     alt={title}
                   />
-                  <p className="text-gray-400 mt-4">{description}</p>
+                  <p style={{ color: '#7C7C7C' }} className="mt-4">{description}</p>
                 </>
               )}
               <motion.button
-                className="mt-4 bg-red-600 text-white px-4 py-2 rounded transition duration-300 hover:bg-red-500 font-bold shadow-md"
+                className="mt-4 px-4 py-2 rounded transition duration-300 font-bold shadow-md"
                 whileHover={{ scale: 1.05 }}
                 onClick={handleCloseModal}
+                style={{
+                  backgroundColor: '#FF6347',
+                  color: '#FFF',
+                }}
               >
                 Cerrar
               </motion.button>
@@ -178,7 +195,12 @@ const MisProgramasVol = () => {
 
   return (
     <div className="mt-4">
-      <Typography variant="h3" align="center" color="primary" gutterBottom>
+      <Typography
+        variant="h3"
+        align="center"
+        gutterBottom
+        style={{ color: '#383D3B', fontWeight: 'bold' }}
+      >
         Mis Programas
       </Typography>
 

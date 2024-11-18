@@ -26,9 +26,9 @@ const CrudProgramas = () => {
   const [originalProgram, setOriginalProgram] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
-  const [loading, setLoading] = useState(true);const [atBottom, setAtBottom] = useState(true);
+  const [loading, setLoading] = useState(true); const [atBottom, setAtBottom] = useState(true);
   const userListRef = useRef(null);
-  
+
   // Manejador del evento de scroll
   const handleScroll = () => {
     const userListContainer = userListRef.current;
@@ -42,7 +42,7 @@ const CrudProgramas = () => {
       );
     }
   };
-  
+
   // Configuración del evento de scroll
   useEffect(() => {
     const userListContainer = userListRef.current;
@@ -50,8 +50,8 @@ const CrudProgramas = () => {
       userListContainer.addEventListener('scroll', handleScroll);
       return () => userListContainer.removeEventListener('scroll', handleScroll);
     }
-  }, []); 
-  
+  }, []);
+
   useEffect(() => {
     const userListContainer = userListRef.current;
     if (userListContainer && atBottom) {
@@ -404,13 +404,20 @@ const CrudProgramas = () => {
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <div className="flex items-center space-x-2">
-            <Typography variant="body1" color="primary" className="mr-2">
+            <Typography variant="body1" sx={{ color: '#383D3B' }} className="mr-2">
               Ver en tarjetas
             </Typography>
             <Switch
               checked={mostrarCards}
               onChange={() => setMostrarCards(!mostrarCards)}
-              color="primary"
+              sx={{
+                '& .MuiSwitch-thumb': {
+                  backgroundColor: '#92DCE5', // Aqua
+                },
+                '& .MuiSwitch-track': {
+                  backgroundColor: '#7C7C7C', // Gris oscuro
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -418,25 +425,24 @@ const CrudProgramas = () => {
               variant="outlined"
               sx={{
                 mb: 2,
-                backgroundColor: 'white',
-                color: 'black',
+                backgroundColor: '#EEE5E9', // Fondo claro
                 borderRadius: '5px',
                 '& .MuiOutlinedInput-root': {
                   height: '36px',
                   fontSize: '0.9rem',
                   '& input': {
-                    color: 'black',
+                    color: '#383D3B', // Texto oscuro
                     padding: '8px 14px',
                   },
                   '& fieldset': {
-                    borderColor: '#ccc',
+                    borderColor: '#7C7C7C', // Borde gris oscuro
                   },
                   '&:hover fieldset': {
-                    borderColor: '#888',
+                    borderColor: '#383D3B', // Borde más oscuro al pasar el cursor
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#888',
+                  color: '#7C7C7C', // Etiqueta gris
                   fontSize: '0.9rem',
                   top: '-6px',
                 },
@@ -445,9 +451,8 @@ const CrudProgramas = () => {
               onChange={handleSearchChange}
             />
           </div>
-
           <motion.button
-            className="bg-green-500 text-white p-2 rounded-full"
+            className="bg-[#0097A7] text-[#EEE5E9] px-4 py-2 rounded-full" // Botón de asignación
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleOpenModal}
@@ -457,11 +462,12 @@ const CrudProgramas = () => {
         </div>
 
         {mostrarCards ? (
-          <div ref={userListRef} className="overflow-auto" style={{ maxHeight: '400px' }}>
+          <div className="flex justify-center flex-wrap mt-2">
             {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
-                className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+                className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
+                style={{ backgroundColor: '#383D3B' }} // Fondo oscuro para las tarjetas
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -471,31 +477,50 @@ const CrudProgramas = () => {
                   alt={program.name}
                 />
                 <div className="p-4">
-                  <h2 className="text-white text-xl font-bold">{program.name}</h2>
+                  <h2 className="text-xl font-bold" style={{ color: '#EEE5E9' }}>
+                    {program.name}
+                  </h2>
                   <div className="flex items-center mt-2">
-                    <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
-                    <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
+                    <span
+                      className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}
+                    ></span>
+                    <span className="ml-2 capitalize" style={{ color: '#7C7C7C' }}>
+                      {program.status}
+                    </span>
                   </div>
-                  <p className="text-gray-400 mt-2">
-                    {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
+                  <p className="mt-2" style={{ color: '#92DCE5' }}>
+                    {program.description && program.description.length > 100
+                      ? `${program.description.substring(0, 100)}...`
+                      : program.description}
                   </p>
 
                   <div className="mt-2">
-                    <span className="text-green-600">Presupuesto: ${program.donations || 0}</span>
+                    <span style={{ color: '#4CAF50' }}>
+                      Presupuesto: ${program.donations || 0}
+                    </span>
                   </div>
                   <div className="flex mt-4 justify-between">
                     <motion.button
-                      className="bg-gray-700 text-white px-4 py-2 rounded"
-                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      className="px-4 py-2 rounded"
+                      style={{
+                        backgroundColor: '#0097A7',
+                        color: '#EEE5E9',
+                      }}
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setSelectedProgram(program)}
                     >
                       Más info
                     </motion.button>
 
-                    <div className='flex space-x-2'>
+                    <div className="flex space-x-2">
+                      {/* Botón de editar */}
                       <motion.button
-                        className="bg-blue-500 text-white p-2 rounded-full"
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#4A90E2',
+                          color: '#EEE5E9',
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleOpenEditModal(program)}
@@ -503,8 +528,13 @@ const CrudProgramas = () => {
                         <FaEdit />
                       </motion.button>
 
+                      {/* Botón de eliminar */}
                       <motion.button
-                        className="bg-red-500 text-white p-2 rounded-full"
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#E63946',
+                          color: '#EEE5E9',
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleDeleteConfirm(program.id)}
@@ -518,8 +548,11 @@ const CrudProgramas = () => {
             ))}
           </div>
         ) : (
-          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-            <thead className="bg-gray-700">
+          <motion.table
+            className="w-full rounded-lg shadow-md"
+            style={{ backgroundColor: '#383D3B', color: '#EEE5E9' }}
+          >
+            <thead style={{ backgroundColor: '#2D2D2D' }}>
               <tr>
                 <th className="p-4">Nombre</th>
                 <th className="p-4">Descripción</th>
@@ -531,30 +564,42 @@ const CrudProgramas = () => {
                 <th className="p-4">Acciones</th>
               </tr>
             </thead>
-            <motion.tbody layout className="bg-gray-900">
+            <motion.tbody layout>
               {filteredPrograms.map((item) => (
-                <motion.tr key={item.id} className="border-b border-gray-700">
+                <motion.tr
+                  key={item.id}
+                  className="border-b"
+                  style={{ borderColor: '#7C7C7C' }}
+                >
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">{item.start_date.split('T')[0]}</td>
                   <td className="p-4">{item.end_date.split('T')[0]}</td>
-                  <td className="p-4">{truncateDescription(truncateDescription(item.objectives))}</td>
+                  <td className="p-4">{truncateDescription(item.objectives)}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
                       className={`text-lg font-bold ${item.status === 'active'
-                        ? 'text-green-500'
-                        : item.status === 'pause'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
+                          ? 'text-green-500'
+                          : item.status === 'pause'
+                            ? 'text-yellow-500'
+                            : 'text-red-500'
                         }`}
                     >
-                      {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
+                      {item.status === 'active'
+                        ? 'Activo'
+                        : item.status === 'pause'
+                          ? 'Pausado'
+                          : 'Inactivo'}
                     </span>
                   </td>
                   <td className="p-4 flex space-x-4">
                     <motion.button
-                      className="bg-blue-500 text-white p-2 rounded-full"
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#4A90E2',
+                        color: '#EEE5E9',
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleOpenEditModal(item)}
@@ -562,7 +607,11 @@ const CrudProgramas = () => {
                       <FaEdit />
                     </motion.button>
                     <motion.button
-                      className="bg-red-500 text-white p-2 rounded-full"
+                      className="p-2 rounded-full"
+                      style={{
+                        backgroundColor: '#E63946',
+                        color: '#EEE5E9',
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleDeleteConfirm(item.id)}
@@ -587,16 +636,24 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-white text-2xl font-bold mb-4">Agregar Nuevo Programa</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#EEE5E9' }}>
+                Agregar Nuevo Programa
+              </h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Nombre"
                   value={newProgram.nombre}
                   onChange={(e) => setNewProgram({ ...newProgram, nombre: e.target.value })}
@@ -604,7 +661,12 @@ const CrudProgramas = () => {
 
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Descripción"
                   value={newProgram.descripcion}
                   onChange={(e) => setNewProgram({ ...newProgram, descripcion: e.target.value })}
@@ -614,8 +676,13 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaInicio}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
                   placeholderText="Fecha de Inicio"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   onKeyDown={(e) => {
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
                       e.preventDefault();
@@ -627,8 +694,13 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaFin}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
                   placeholderText="Fecha Final"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   onKeyDown={(e) => {
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
                       e.preventDefault();
@@ -638,14 +710,24 @@ const CrudProgramas = () => {
 
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Objetivos"
                   value={newProgram.objetivos}
                   onChange={(e) => setNewProgram({ ...newProgram, objetivos: e.target.value })}
                 />
 
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={newProgram.coordinador}
                   onChange={(e) => setNewProgram({ ...newProgram, coordinador: e.target.value })}
                 >
@@ -657,7 +739,12 @@ const CrudProgramas = () => {
                   ))}
                 </select>
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={newProgram.status || 'active'}
                   onChange={(e) => setNewProgram({ ...newProgram, status: e.target.value })}
                 >
@@ -667,23 +754,30 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'new')}
                 />
               </div>
               <div className="flex justify-between mt-4">
                 <motion.button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#38a169', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#0097A7', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleAddProgram}
                 >
                   Agregar
                 </motion.button>
                 <motion.button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#E63946', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleCloseModal}
                 >
@@ -703,26 +797,36 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
-              <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
+              <h2 className="text-3xl font-bold" style={{ color: '#EEE5E9' }}>
+                {selectedProgram.name}
+              </h2>
+              <h4 className="mb-4 font-semibold" style={{ color: '#92DCE5' }}>
+                Coordinador: {selectedProgram.coordinator_name}
+              </h4>
               <img
                 className="w-full h-48 object-cover shadow-md rounded"
                 src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+                alt="Program Image"
               />
-              <p className="text-gray-400 mt-4 ">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
+              <p className="mt-4" style={{ color: '#7C7C7C' }}>
+                {selectedProgram.description}
+              </p>
               <div className="mt-2">
-                <span className="text-green-700">Donaciones: ${selectedProgram.donations || 0}</span>
+                <span style={{ color: '#92DCE5' }}>Donaciones: ${selectedProgram.donations || 0}</span>
               </div>
               {/* Botón para cerrar la ventana */}
               <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2' }}
-                onClick={() => setSelectedProgram(null)}  // Cierra el modal
+                className="mt-4 px-4 py-2 rounded"
+                style={{ backgroundColor: '#E63946', color: '#EEE5E9' }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedProgram(null)} // Cierra el modal
               >
                 Cerrar
               </motion.button>
@@ -730,7 +834,6 @@ const CrudProgramas = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
 
       {/* Ventana emergente para editar un registro existente */}
       <AnimatePresence>
@@ -742,16 +845,24 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
             >
-              <h2 className="text-white text-2xl font-bold mb-4">Editar Programa</h2>
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#EEE5E9' }}>
+                Editar Programa
+              </h2>
               <div className="space-y-4">
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Nombre"
                   value={editProgram.nombre || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, nombre: e.target.value })}
@@ -759,7 +870,12 @@ const CrudProgramas = () => {
 
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Descripción"
                   value={editProgram.descripcion || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, descripcion: e.target.value })}
@@ -769,7 +885,12 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaInicio}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-300 text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholderText="Fecha de Inicio"
                   disabled
                 />
@@ -778,26 +899,40 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaFin}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholderText="Fecha Final"
                   onKeyDown={(e) => {
-                    // Permitir solo números (0-9), guion (-) y la tecla Backspace
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
-                      e.preventDefault(); // Bloquea cualquier tecla que no sea un número, guion o Backspace
+                      e.preventDefault();
                     }
                   }}
                 />
 
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   placeholder="Objetivos"
                   value={editProgram.objetivos || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, objetivos: e.target.value })}
                 />
 
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={editProgram.coordinador || ''}
                   onChange={(e) => setEditProgram({ ...editProgram, coordinador: e.target.value })}
                 >
@@ -809,7 +944,12 @@ const CrudProgramas = () => {
                   ))}
                 </select>
                 <select
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   value={editProgram.status || 'active'}
                   onChange={(e) => setEditProgram({ ...editProgram, status: e.target.value })}
                 >
@@ -819,23 +959,30 @@ const CrudProgramas = () => {
                 </select>
                 <input
                   type="file"
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+                  className="w-full p-2 border rounded"
+                  style={{
+                    borderColor: '#7C7C7C',
+                    backgroundColor: '#EEE5E9',
+                    color: '#383D3B',
+                  }}
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, 'edit')}
                 />
               </div>
               <div className="flex justify-between mt-4">
                 <motion.button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#0097A7', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditProgram}
                 >
                   Guardar Cambios
                 </motion.button>
                 <motion.button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                  className="px-4 py-2 rounded"
+                  style={{ backgroundColor: '#E63946', color: '#EEE5E9' }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleCloseEditModal}
                 >
@@ -847,21 +994,28 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
 
+      {/* Confirmación de eliminar */}
       <Dialog
         open={isDeleteConfirmOpen}
         onClose={() => setIsDeleteConfirmOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este programa?"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
             Esta acción no se puede deshacer. ¿Deseas continuar?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <motion.button
-            className="bg-gray-500 text-white px-4 py-2 rounded-full"
+            className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsDeleteConfirmOpen(false)}
@@ -872,15 +1026,17 @@ const CrudProgramas = () => {
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={handleDelete}
+            onClick={isDeleteConfirmOpen}
           >
             Eliminar
           </motion.button>
         </DialogActions>
       </Dialog>
+      {/* Snackbar para errores */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000} onClose={handleCloseSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
@@ -894,36 +1050,51 @@ const CrudProgramas = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
-              {/* Icono de palomita */}
-
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
+            >
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
                   variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>

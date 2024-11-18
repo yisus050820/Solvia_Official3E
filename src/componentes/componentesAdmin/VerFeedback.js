@@ -115,7 +115,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
           </div>
         </div>
       </motion.div>
-
+  
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -163,7 +163,7 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
         )}
       </AnimatePresence>
     </>
-  );
+  );  
 };
 
 const VerFeedback = () => {

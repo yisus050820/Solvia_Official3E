@@ -246,29 +246,45 @@ function TeacherDashboard({ programId }) {
   }));
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Paper sx={{ p: 2, mb: 2 }}>
+    <Box sx={{ flexGrow: 1, backgroundColor: "#EEE5E9", minHeight: "100vh", overflow: "hidden", p: 3 }}>
+      <Paper sx={{ p: 2, mb: 2, backgroundColor: "#FFF", borderColor: "#7C7C7C", borderWidth: 1, borderStyle: "solid" }}>
         <TextField
           fullWidth
           label="Buscar..."
           variant="outlined"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: "#FFF",
+              "& fieldset": { borderColor: "#7C7C7C" },
+              "&:hover fieldset": { borderColor: "#383D3B" },
+              "&.Mui-focused fieldset": { borderColor: "#92DCE5" },
+            },
+          }}
         />
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="sort-select-label">Ordenar por</InputLabel>
+          <InputLabel id="sort-select-label" sx={{ color: "#383D3B" }}>Ordenar por</InputLabel>
           <Select
             labelId="sort-select-label"
             value={sortBy}
             label="Ordenar por"
             onChange={(e) => setSortBy(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#FFF",
+                "& fieldset": { borderColor: "#7C7C7C" },
+                "&:hover fieldset": { borderColor: "#383D3B" },
+                "&.Mui-focused fieldset": { borderColor: "#92DCE5" },
+              },
+            }}
           >
             <MenuItem value="name">Nombre</MenuItem>
             <MenuItem value="dueDate">Fecha de entrega</MenuItem>
           </Select>
         </FormControl>
-
+  
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Button
             variant={view === "table" ? "contained" : "outlined"}
@@ -293,7 +309,7 @@ function TeacherDashboard({ programId }) {
             <FaPlus />
           </motion.button>
         </Box>
-
+  
         <AnimatePresence mode="wait">
           {view === "table" ? (
             <motion.div
@@ -302,17 +318,18 @@ function TeacherDashboard({ programId }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
+              style={{ overflow: "hidden" }}
             >
-              <TableContainer component={Paper}>
+              <TableContainer component={Paper} sx={{ maxHeight: "none", overflow: "hidden" }}>
                 <Table>
-                  <TableHead>
+                  <TableHead sx={{ backgroundColor: "#383D3B" }}>
                     <TableRow>
-                      <TableCell>Nombre de la Tarea</TableCell>
-                      <TableCell>Descripción</TableCell>
-                      <TableCell>Fecha de Entrega</TableCell>
-                      <TableCell>Estudiantes Completados</TableCell>
-                      <TableCell>Materiales</TableCell>
-                      <TableCell>Acciones</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Nombre de la Tarea</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Descripción</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Fecha de Entrega</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Estudiantes Completados</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Materiales</TableCell>
+                      <TableCell sx={{ color: "#EEE5E9" }}>Acciones</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -322,10 +339,15 @@ function TeacherDashboard({ programId }) {
                         <TableCell>{task.description}</TableCell>
                         <TableCell>{task.end_date}</TableCell>
                         <TableCell>
-                          <LinearProgress variant="determinate" value={getCompletionPercentage(task)} />
-                          <Typography variant="body2">
-                            {`${getCompletionPercentage(task).toFixed(1)}%`}
-                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={getCompletionPercentage(task)}
+                            sx={{
+                              backgroundColor: "#7C7C7C",
+                              "& .MuiLinearProgress-bar": { backgroundColor: "#92DCE5" },
+                            }}
+                          />
+                          <Typography variant="body2">{`${getCompletionPercentage(task).toFixed(1)}%`}</Typography>
                         </TableCell>
                         <TableCell>
                           {task.image && (
@@ -339,36 +361,6 @@ function TeacherDashboard({ programId }) {
                             </IconButton>
                           )}
                         </TableCell>
-                        {/* Confirmación de eliminar */}
-                        <Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                          <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
-                          <DialogContent>
-                            <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
-                          </DialogContent>
-                          <DialogActions>
-                            <motion.button
-                              className="bg-gray-500 text-white px-4 py-2 rounded-full"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => setIsDeleteConfirmOpen(false)}>
-                              Cancelar
-                            </motion.button>
-                            <motion.button
-                              className="bg-red-500 text-white px-4 py-2 rounded-full"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => {
-                                handleDeleteTask(currentTask.id);
-                                setIsDeleteConfirmOpen(false);
-                                setSuccessMessage('Tarea eliminada con éxito'); // Establecer el mensaje de éxito al eliminar
-
-                              }}>
-                              Eliminar
-                            </motion.button>
-                          </DialogActions>
-                        </Dialog>
-
-                        {/* Acciones de la tarea, incluyendo eliminar */}
                         <TableCell>
                           <motion.button
                             className="bg-blue-500 text-white p-2 rounded-full"
@@ -383,14 +375,13 @@ function TeacherDashboard({ programId }) {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => {
-                              setCurrentTask(task);  // Establece la tarea actual para eliminar
-                              setIsDeleteConfirmOpen(true);  // Muestra el diálogo de confirmación
+                              setCurrentTask(task);
+                              setIsDeleteConfirmOpen(true);
                             }}
                           >
                             <FaTrashAlt />
                           </motion.button>
                         </TableCell>
-
                       </TableRow>
                     ))}
                   </TableBody>
@@ -404,6 +395,7 @@ function TeacherDashboard({ programId }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
+              style={{ overflow: "hidden" }}
             >
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={chartData}>
@@ -412,7 +404,7 @@ function TeacherDashboard({ programId }) {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="completionPercentage" name="Porcentaje Completado (%)" fill="#8884d8" />
+                  <Bar dataKey="completionPercentage" name="Porcentaje Completado (%)" fill="#92DCE5" />
                 </BarChart>
               </ResponsiveContainer>
             </motion.div>
@@ -599,8 +591,6 @@ function TeacherDashboard({ programId }) {
         </Box>
       </Modal>
     </Box>
-
-
   );
 }
 
