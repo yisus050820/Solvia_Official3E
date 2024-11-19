@@ -49,7 +49,7 @@ const ProgramCard = ({ program }) => {
   return (
     <>
       <motion.div
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        className="max-w-sm bg-[#383D3B] rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -64,7 +64,7 @@ const ProgramCard = ({ program }) => {
             <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
             <span className="ml-2 text-gray-400 capitalize">{status}</span>
           </div>
-          <p className="text-gray-400 mt-2">
+          <p className="text-white mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
@@ -75,8 +75,8 @@ const ProgramCard = ({ program }) => {
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+              className="bg-[#0097A7] text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#0097A7', scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleOpenModal}
             >
@@ -95,7 +95,7 @@ const ProgramCard = ({ program }) => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-[#383D3B] text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -104,7 +104,7 @@ const ProgramCard = ({ program }) => {
               style={{ maxHeight: '90vh', overflowY: 'auto' }}
             >
               <h2 className="text-white text-3xl font-bold">{name}</h2>
-              <h4 className="text-white-900 mb-4 font-semibold">
+              <h4 className="text-[#92DCE5] mb-4 font-semibold">
                 Coordinador: {coordinator_name ? coordinator_name : 'No disponible'}
               </h4>
               <img
@@ -112,10 +112,10 @@ const ProgramCard = ({ program }) => {
                 src={program_image ? `http://localhost:5000${program_image}` : "https://via.placeholder.com/150"}
                 alt={name}
               />
-              <p className="text-gray-400 mt-4">{description}</p>
+              <p className="text-white mt-4">{description}</p>
               <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                className="mt-4 bg-[#E63946] text-white px-4 py-2 rounded"
+                whileHover={{ backgroundColor: '#E63946', scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleCloseModal}
               >

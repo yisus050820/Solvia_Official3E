@@ -54,17 +54,9 @@ const UsuariosTarjeta = () => {
   return (
     <>
       <div className="w-full px-6 py-4 mx-auto mt-2">
-        <Typography
-          variant="h3"
-          align="center"
-          gutterBottom
-          style={{
-            color: '#383D3B', // Color principal
-            fontWeight: 'bold',
-          }}
-        >
-          Usuarios
-        </Typography>
+      <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
+        Usuarios
+      </Typography>
 
         <div className="flex justify-between mb-4 space-x-4">
           <motion.div

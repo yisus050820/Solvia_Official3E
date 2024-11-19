@@ -107,21 +107,21 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   return (
     <>
       {/* Vista de la tarjeta del programa */}
-      <motion.div className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-4"
+      <motion.div className="max-w-sm bg-[#383D3B] rounded-xl shadow-lg overflow-hidden m-4"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <img className="w-full h-48 object-cover" src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"} alt={title} />
 
         <div className="p-4">
-          <h2 className="text-white text-xl font-bold">{title}</h2>
-          <p className="text-gray-400 mt-2">{description}</p>
+          <h2 className="text-[#92DCE5] text-xl font-bold">{title}</h2>
+          <p className="text-white mt-2">{description}</p>
           <div className="mt-4">
-            <span className="text-green-400">Participantes: {participants}</span>
+            <span className="text-[#92DCE5]">Participantes: {participants}</span>
           </div>
           <motion.button
-            className="bg-gray-700 text-white px-4 py-2 rounded mt-4"
-            whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+            className="bg-[#0097A7] text-white px-4 py-2 rounded"
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={initialFeedback.hasFeedback ? handleOpenViewModal : handleOpenAddModal}
           >
@@ -139,7 +139,7 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+            <motion.div className="bg-[#383d3b] text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -157,15 +157,15 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
               </div>
               <textarea value={feedback} onChange={handleFeedbackChange} className="w-full p-2 border border-gray-500 rounded bg-white text-black" rows="4" placeholder="Escribe tu comentario aquí..." />
               <div className="flex justify-between mt-4">
-                <motion.button className="bg-gray-500 text-white px-4 py-2 rounded"
+                <motion.button className="bg-[#E63946] text-white px-4 py-2 rounded"
                   onClick={handleCloseModal}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >Cancelar
                 </motion.button>
                 <motion.button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                  className="bg-[#0097A7] text-white px-4 py-2 rounded"
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleSubmitFeedback}
                 >Enviar Feedback

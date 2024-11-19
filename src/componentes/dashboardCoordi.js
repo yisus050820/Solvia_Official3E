@@ -33,10 +33,7 @@ import VerFeedback from './componentesAdmin/VerFeedback';
 import ChatGlobal from './ChatGlobal';
 
 const NAVIGATION = [
-  {
-    kind: 'header',
-    title: 'Opciones',
-  },
+
   {
     segment: 'configuracion-perfil',
     title: 'Mi perfil',
@@ -121,17 +118,34 @@ const NAVIGATION = [
 ];
 
 const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+  palette: {
+    primary: {
+      main: '#383D3B', // Color principal oscuro
+    },
+    secondary: {
+      main: '#92DCE5', // Color secundario
+    },
+    background: {
+      default: '#EEE5E9', // Fondo principal claro
+      paper: '#7C7C7C',   // Fondo de componentes
+    },
   },
-  colorSchemes: { light: true, dark: true },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
+  components: {
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#383D3B', // Color de la barra lateral
+          color: '#EEE5E9',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#383D3B', // Color de la barra superior
+          color: '#EEE5E9', // Color del texto en la barra superior
+        },
+      },
     },
   },
 });
@@ -141,13 +155,14 @@ function DemoPageContent({ pathname }) {
     <Box
       sx={{
         py: 4,
-        px: 6, // Ajustamos el padding horizontal
+        px: 6,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-start', // Aseguramos que los items estén hacia el inicio
-        alignItems: 'flex-start', // Los alineamos a la izquierda
-        textAlign: 'left', // El texto alineado a la izquierda
-        width: '100%', // Aseguramos que ocupe todo el ancho disponible
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        width: '100%',
+        backgroundColor: '#EEE5E9', // Usa el color del tema
       }}
     >
         {pathname === '/configuracion-perfil' && <PerfilUsuario />}

@@ -443,10 +443,10 @@ export default function Donar() {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
-      <div className="w-full max-w-[1000px] bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="w-full max-w-[1000px] bg-[#383D3B] rounded-xl shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Left Column */}
-          <div className="md:w-1/2 p-8 bg-gray-700">
+          <div className="md:w-1/2 p-8 bg-[#505552]">
             <div className="mb-8">
               <div className="flex items-center gap-4">
                 <button className="text-gray-400 hover:text-gray-300">
@@ -467,16 +467,16 @@ export default function Donar() {
             <div className="text-3xl font-bold mb-8">
               ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
             </div>
-            <div className="bg-gray-600 p-6 rounded-lg shadow-md">
+            <div className="bg-[#EEE5E9] p-6 rounded-lg shadow-md">
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-8 w-8 text-primary" />
+                  <DollarSign className="h-8 w-8 text-black" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">Tu donación</h3>
-                  <div className="text-sm text-gray-400">Ayuda a nuestra causa</div>
+                  <h3 className="font-medium text-black">Tu donación</h3>
+                  <div className="text-sm text-black">Ayuda a nuestra causa</div>
                 </div>
-                <div className="font-medium">${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}</div>
+                <div className="font-medium text-black">${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}</div>
               </div>
             </div>
           </div>
@@ -495,7 +495,7 @@ export default function Donar() {
                   onChange={handleDonationChange}
                   className={`w-full px-4 py-2 border ${
                     errors.amount ? 'border-red-600' : 'border-gray-600'
-                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  } bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
                 />
                 {errors.amount && (
                   <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
@@ -513,7 +513,7 @@ export default function Donar() {
                   onChange={handleInputChange}
                   className={`w-full px-4 py-2 border ${
                     errors.email ? 'border-red-600' : 'border-gray-600'
-                  } bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+                  } bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -529,7 +529,7 @@ export default function Donar() {
     placeholder="1234 1234 1234 1234"
     value={formData.card}
     onChange={handleCardChange}
-    className={`w-full px-4 py-2 border ${errors.card ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+    className={`w-full px-4 py-2 border ${errors.card ? 'border-red-600' : 'border-gray-600'} bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
   />
   {errors.card && <p className="text-red-500 text-sm mt-1">{errors.card}</p>}
                 
@@ -541,7 +541,7 @@ export default function Donar() {
         value={formData.cardExpiry || ''}
         onBlur={validateCardExpiry}
         onChange={handleCardExpiryChange}
-        className={`w-full px-4 py-2 border ${errors.cardExpiry ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+        className={`w-full px-4 py-2 border ${errors.cardExpiry ? 'border-red-600' : 'border-gray-600'} bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
       />
       {errors.cardExpiry && <p className="text-red-500 text-sm">{errors.cardExpiry}</p>}
     </div>
@@ -551,7 +551,7 @@ export default function Donar() {
         placeholder="CVC"
         value={formData.cvv}
         onChange={handleCvvChange}
-        className={`w-full px-4 py-2 border ${errors.cvv ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+        className={`w-full px-4 py-2 border ${errors.cvv ? 'border-red-600' : 'border-gray-600'} bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
       />
       {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
     </div>
@@ -569,7 +569,7 @@ export default function Donar() {
       setFormData(prev => ({ ...prev, name: e.target.value }));
       validateName(e.target.value);
     }}
-    className={`w-full px-4 py-2 border ${errors.name ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+    className={`w-full px-4 py-2 border ${errors.name ? 'border-red-600' : 'border-gray-600'} bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
   />
   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
 </div>
@@ -577,7 +577,7 @@ export default function Donar() {
 <div className="space-y-2">
   <label className="block text-sm font-medium text-gray-300">País o región</label>
   <select
-    className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
+    className="w-full px-4 py-2 border border-gray-600 bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
     name="country"
     value={formData.country}
     onChange={handleInputChange}
@@ -594,7 +594,7 @@ export default function Donar() {
       value={formData.postalCode}
       name="postalCode"
       onChange={handlePostalCodeChange}
-      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
+      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-600' : 'border-gray-600'} bg-[#EEE5E9] text-black rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:outline-none`}
     />
     {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>}
   </div>
@@ -602,7 +602,7 @@ export default function Donar() {
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
+                className="w-full px-4 py-2 bg-[#92DcE5] text-black rounded-md shadow-sm hover:bg-white focus:ring-2 focus:ring-gray-400 focus:outline-none"
               >
 Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
 </button>

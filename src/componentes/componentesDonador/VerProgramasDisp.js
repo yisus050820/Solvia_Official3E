@@ -111,7 +111,7 @@ const ProgramasDisp = () => {
     <>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
-          Gestionar Programas
+          Programas
         </Typography>
         <div className="flex justify-between mb-4 space-x-4">
           <div className="flex items-center space-x-2">
@@ -119,42 +119,42 @@ const ProgramasDisp = () => {
               Ver en tarjetas
             </Typography>
             <Switch
-              checked={mostrarCards}
-              onChange={() => setMostrarCards(!mostrarCards)}
-              color="primary"
-            />
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                sx={{
+                  '& .MuiSwitch-thumb': {
+                    backgroundColor: '#92DCE5', // Aqua
+                  },
+                  '& .MuiSwitch-track': {
+                    backgroundColor: '#7C7C7C', // Gris oscuro
+                  },
+                }}
+              />
           </div>
           <div className="flex items-center space-x-2">
-            <TextField
+          <TextField
               fullWidth
               label="Buscar..."
               variant="outlined"
               sx={{
-                mb: 2,
-                backgroundColor: 'white',
-                color: 'black',
+                backgroundColor: '#EEE5E9', // Fondo de input
+                color: '#383D3B', // Texto del input
                 borderRadius: '5px',
                 '& .MuiOutlinedInput-root': {
                   height: '36px',
                   fontSize: '0.9rem',
-                  '& input': {
-                    color: 'black',
-                    padding: '8px 14px',
-                  },
-                  '& fieldset': {
-                    borderColor: '#ccc',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#888',
-                  },
+                  '& input': { color: '#383D3B', padding: '8px 14px' },
+                  '& fieldset': { borderColor: '#7C7C7C' },
+                  '&:hover fieldset': { borderColor: '#383D3B' },
+                  '&.Mui-focused fieldset': { borderColor: '#92DCE5' },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#888',
+                  color: '#7C7C7C',
                   fontSize: '0.9rem',
                   top: '-6px',
                 },
               }}
-              value={searchTerm}
+              
               onChange={handleSearchChange}
             />
           </div>
@@ -206,19 +206,22 @@ const ProgramasDisp = () => {
             ))}
           </div>
         ) : (
-          <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-            <thead className="bg-gray-700">
+          <motion.table
+            className="w-full rounded-lg shadow-md"
+            style={{ backgroundColor: '#383D3B', color: '#EEE5E9' }}
+          >
+            <thead style={{ backgroundColor: '#2D2D2D' }}>
               <tr>
                 <th className="p-4">Nombre</th>
+                <th className="p-4">Correo</th>
+                <th className="p-4">Fecha de nacimiento</th>
+                <th className="p-4">Rol</th>
                 <th className="p-4">Descripción</th>
-                <th className="p-4">Fecha Inicio</th>
-                <th className="p-4">Fecha Fin</th>
-                <th className="p-4">Objetivos</th>
-                <th className="p-4">Coordinador</th>
+                <th className="p-4">Fecha Creación</th>
                 <th className="p-4">Estado</th>
               </tr>
             </thead>
-            <motion.tbody layout className="bg-gray-900">
+            <motion.tbody layout className="bg-383D3B">
               {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>

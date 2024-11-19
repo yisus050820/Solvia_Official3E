@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Card, CardContent, Typography, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Button } from '@mui/material';
 import { FaUsers, FaUserPlus, FaUserFriends } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
@@ -303,12 +303,9 @@ const ReportesUsuarios = () => {
   
       {/* Botón para exportar en PDF */}
       <div className="flex justify-center mt-8">
-        <button
-          className="bg-92DCE5 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-7C7C7C"
-          onClick={exportarPDF}
-        >
-          Exportar en PDF
-        </button>
+        <Button variant="contained" sx={{ backgroundColor: '#007BFF', color: '#FFFFFF' }} onClick={exportarPDF}>
+          Exportar a PDF
+        </Button>
       </div>
     </div>
   );  

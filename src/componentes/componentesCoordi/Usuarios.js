@@ -89,12 +89,12 @@ const CrudUsuariosCoordi = () => {
       <div className="flex justify-between mb-4 space-x-4">
         <div className="flex space-x-4">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <label htmlFor="filtroRol" className="text-white mr-2">
+            <label htmlFor="filtroRol" className="text-black mr-2">
               Filtrar por Rol:
             </label>
             <motion.select
               id="filtroRol"
-              className="p-2 rounded bg-gray-800 text-white border border-gray-700"
+              className="p-2 rounded bg-[#EEE5E9] text-black border border-gray-700"
               value={filtroRol}
               onChange={(e) => setFiltroRol(e.target.value)}
               initial={{ scale: 0.95 }}
@@ -111,32 +111,54 @@ const CrudUsuariosCoordi = () => {
           </motion.div>
 
           <TextField
-            label="Buscar..."
-            variant="outlined"
-            sx={{
-              mb: 2,
-              backgroundColor: 'white',
-              color: 'black',
-              borderRadius: '5px',
-              '& .MuiOutlinedInput-root': {
-                height: '36px',
-                fontSize: '0.9rem',
-                '& input': { color: 'black', padding: '8px 14px' },
-                '& fieldset': { borderColor: '#ccc' },
-                '&:hover fieldset': { borderColor: '#888' },
-              },
-              '& .MuiInputLabel-root': { color: '#888', fontSize: '0.9rem', top: '-6px' },
-            }}
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
+              label="Buscar..."
+              variant="outlined"
+              sx={{
+                mb: 2,
+                backgroundColor: '#EEE5E9',          // Fondo claro
+                color: '#383D3B',                     // Texto oscuro
+                borderRadius: '5px',
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',                   // Altura total del input
+                  fontSize: '0.9rem',               // Tamaño del texto
+                  '& input': {
+                    color: '#383D3B',               // Texto oscuro
+                    padding: '8px 14px',            // Ajusta el padding interno
+                  },
+                  '& fieldset': {
+                    borderColor: '#7C7C7C',            // Color del borde gris oscuro
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#383D3B',            // Borde oscuro al pasar el cursor
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#7C7C7C',                    // Etiqueta gris
+                  fontSize: '0.9rem',
+                  top: '-6px',                      // Ajusta la posición de la etiqueta
+                },
+              }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
         </div>
 
         <div className="flex items-center">
           <Typography variant="body1" color="primary" className="mr-2">
             Ver en tarjetas
           </Typography>
-          <Switch checked={mostrarCards} onChange={() => setMostrarCards(!mostrarCards)} color="primary" />
+          <Switch
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                sx={{
+                  '& .MuiSwitch-thumb': {
+                    backgroundColor: '#92DCE5', // Aqua
+                  },
+                  '& .MuiSwitch-track': {
+                    backgroundColor: '#7C7C7C', // Gris oscuro
+                  },
+                }}
+              />
         </div>
       </div>
       {mostrarCards ? (
@@ -182,8 +204,8 @@ const CrudUsuariosCoordi = () => {
           ))}
         </div>
       ) : (
-        <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-          <thead className="bg-gray-700">
+        <motion.table className="w-full bg-[#383D3B] text-white rounded-lg shadow-md">
+          <thead style={{ backgroundColor: '#2D2D2D' }}>
             <tr>
               <th className="p-4">Nombre</th>
               <th className="p-4">Correo</th>

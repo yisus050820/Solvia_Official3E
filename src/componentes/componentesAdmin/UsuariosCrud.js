@@ -312,7 +312,7 @@ const CrudUsuarios = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <label htmlFor="filtroRol" className="text-'#383D3B' mr-2">
+              <label htmlFor="filtroRol" className="text-black mr-2">
                 Filtrar por Rol:
               </label>
               <motion.select
@@ -433,7 +433,7 @@ const CrudUsuarios = () => {
                     {item.role}
                   </span>
                 </div>
-                <p className="mt-2" style={{ color: '#92DCE5' }}>
+                <p className="mt-2" style={{ color: 'white' }}>
                   {item.description && item.description.length > 100
                     ? `${item.description.substring(0, 100)}...`
                     : item.description}
@@ -446,18 +446,7 @@ const CrudUsuarios = () => {
                 </div>
         
                 <div className="flex mt-4 justify-between">
-                  <motion.button
-                    className="px-4 py-2 rounded"
-                    style={{
-                      backgroundColor: '#0097A7',
-                      color: '#EEE5E9',
-                    }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setSelectedUser(item)}
-                  >
-                    Más info
-                  </motion.button>
+
         
                   <div className="flex space-x-2">
                     {/* Botón de editar */}
@@ -605,11 +594,11 @@ const CrudUsuarios = () => {
                   onChange={(date) => setNewUser({ ...newUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-gray-200 text-black"
                   style={{
                     borderColor: '#7C7C7C',
                     backgroundColor: '#EEE5E9',
-                    color: '#383D3B',
+                    color: 'black',
                   }}
                   onKeyDown={(e) => {
                     // Permitir solo teclas numéricas (0-9) y el guion (-)
@@ -739,7 +728,7 @@ const CrudUsuarios = () => {
                   onChange={(date) => setEditUser({ ...editUser, birth_date: date })}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Fecha de nacimiento"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-gray-200 text-black"
                   style={{
                     borderColor: '#7C7C7C',
                     backgroundColor: '#EEE5E9',

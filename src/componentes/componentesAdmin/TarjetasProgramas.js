@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { Typography } from '@mui/material';  // Importando Typography para el título
+import { Typography, Button } from '@mui/material';  // Importando Typography para el título
 
 const ProgramCard = ({ title, description, participants, donations, status, imageUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

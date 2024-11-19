@@ -136,7 +136,7 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        backgroundImage: `url('https://img.freepik.com/foto-gratis/superficie-azul-herramientas-estudio_23-2147864592.jpg')`,
+        backgroundColor: '#EEE5E9', // Fondo claro
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         p: 2,
@@ -152,13 +152,13 @@ const Login = () => {
           elevation={10}
           sx={{
             padding: { xs: 2, sm: 4 },
-            backgroundColor: '#2b2b2b',
+            backgroundColor: '#383D3B',
             borderRadius: '16px',
             width: { xs: '100%', sm: '400px', md: '450px' },
             marginRight: { xs: 0, sm: 3, md: 35 },
           }}
         >
-          <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ color: '#ffffff' }}>
+          <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ color: '#EEE5E9' }}>
             Inicio de Sesión
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -170,17 +170,17 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              InputLabelProps={{ style: { color: '#b0b0b0' } }}
+              InputLabelProps={{ style: { color: '#EEE5E9' } }} // Letras claras
               InputProps={{
-                style: { color: '#ffffff' },
+                style: { color: '#EEE5E9' },
                 sx: {
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
                       borderRadius: '12px',
-                      borderColor: '#1a73e8',
+                      borderColor: '#92DCE5',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#1a73e8',
+                      borderColor: '#92DCE5',
                     },
                   },
                 },
@@ -194,15 +194,15 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              InputLabelProps={{ style: { color: '#b0b0b0' } }}
+              InputLabelProps={{ style: { color: '#EEE5E9' } }}
               InputProps={{
-                style: { color: '#ffffff' },
+                style: { color: '#EEE5E9' },
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={handleClickShowPassword}
                       edge="end"
-                      sx={{ color: '#b0b0b0' }}
+                      sx={{ color: '#EEE5E9' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -212,10 +212,10 @@ const Login = () => {
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
                       borderRadius: '12px',
-                      borderColor: '#1a73e8',
+                      borderColor: '#92DCE5',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#1a73e8',
+                      borderColor: '#92DCE5',
                     },
                   },
                 },
@@ -225,32 +225,36 @@ const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 2, backgroundColor: '#1a73e8', borderRadius: '12px', '&:hover': { backgroundColor: '#1664c1' } }}
+              sx={{
+                mt: 2,
+                backgroundColor: '#92DCE5',
+                borderRadius: '12px',
+                color: '#383D3B', // Letras oscuras
+                '&:hover': { backgroundColor: '#7C7C7C' }, // Hover oscuro
+              }}
             >
               Iniciar Sesión
             </Button>
           </Box>
           <Box mt={2} textAlign="center">
-            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
-              <Button onClick={() => setShowResetForm(true)} sx={{ color: '#1a73e8' }}>
+            <Typography variant="body2" sx={{ color: '#EEE5E9' }}>
+              <Button onClick={() => setShowResetForm(true)} sx={{ color: '#92DCE5' }}>
                 ¿Olvidaste tu contraseña?
               </Button>
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
+            <Typography variant="body2" sx={{ color: '#EEE5E9' }}>
               ¿No tienes una cuenta?{' '}
-              <Link to="/register" style={{ color: '#1a73e8', textDecoration: 'none' }}>
+              <Link to="/register" style={{ color: '#92DCE5', textDecoration: 'none' }}>
                 Regístrate aquí
               </Link>
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b0b0b0' }}>
-              <Button onClick={() => navigate('/')} sx={{ color: '#1a73e8' }}>
+            <Typography variant="body2" sx={{ color: '#EEE5E9' }}>
+              <Button onClick={() => navigate('/')} sx={{ color: '#92DCE5' }}>
                 Regresar
               </Button>
             </Typography>
           </Box>
         </Paper>
-
-        {/* Modal para el formulario de restablecimiento de contraseña */}
         {showResetForm && (
           <Box
             sx={{
@@ -258,36 +262,51 @@ const Login = () => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              bgcolor: 'background.paper',
+              bgcolor: '#383D3B',
               p: 4,
               boxShadow: 24,
               zIndex: 1000,
               borderRadius: '10px',
+              color: '#EEE5E9',
             }}
           >
             <Typography variant="h6" align="center">
               Restablecer Contraseña
             </Typography>
             <form onSubmit={handleResetPassword}>
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Correo Electrónico"
-                type="email"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                required
-              />
-              <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+            <TextField
+              margin="normal"
+              fullWidth
+              label="Correo Electrónico"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
+              InputLabelProps={{
+                style: { color: '#FFFFFF' }, // Cambia el color del label a blanco
+              }}
+              InputProps={{
+                style: { color: '#FFFFFF' }, // Cambia el color del texto ingresado a blanco
+              }}
+            />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  backgroundColor: '#92DCE5',
+                  color: '#383D3B', // Letras oscuras
+                  '&:hover': { backgroundColor: '#7C7C7C' },
+                }}
+              >
                 Enviar correo de restablecimiento
               </Button>
-              <Button onClick={() => setShowResetForm(false)} sx={{ mt: 2 }}>
+              <Button onClick={() => setShowResetForm(false)} sx={{ mt: 2, color: '#92DCE5' }}>
                 Cerrar
               </Button>
             </form>
           </Box>
         )}
-
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
@@ -301,6 +320,5 @@ const Login = () => {
       </motion.div>
     </Box>
   );
-};
-
+}  
 export default Login;

@@ -104,16 +104,16 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
             <span style={{ color: '#92DCE5' }}>Participantes: {participants}</span> {/* Azul claro */}
           </div>
           <div className="mt-2">
-            <span style={{ color: '#7C7C7C' }}>Presupuesto: {donations ? `$${donations}` : "No asignado"}</span> {/* Gris medio */}
+            <span style={{ color: 'green' }}>Presupuesto: {donations ? `$${donations}` : "No asignado"}</span> {/* Gris medio */}
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
               className="px-4 py-2 rounded"
               style={{
-                backgroundColor: '#7C7C7C', // Fondo gris medio
+                backgroundColor: '#0097A7', // Fondo gris medio
                 color: '#EEE5E9', // Texto claro
               }}
-              whileHover={{ backgroundColor: '#92DCE5', scale: 1.1 }} // Cambia a azul claro al hover
+              whileHover={{ scale: 1.1 }} // Cambia a azul claro al hover
               whileTap={{ scale: 0.9 }}
               onClick={handleOpenModal}
             >

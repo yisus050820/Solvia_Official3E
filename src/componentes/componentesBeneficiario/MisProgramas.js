@@ -52,7 +52,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
   return (
     <>
       <motion.div
-        className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+        className="max-w-sm bg-[#383D3B] rounded-xl shadow-lg overflow-hidden m-2"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -63,12 +63,13 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
         />
         <div className="p-4">
           <h2 className="text-white text-xl font-bold">{name}</h2>
+          <h2 className="text-white text-xl font-bold">{title}</h2>
           <div className="flex items-center mt-2">
             <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
             <span className="ml-2 text-gray-400 capitalize">{status}</span>
           </div>
-          <h2 className="text-white text-xl font-bold">{title}</h2>
-          <p className="text-gray-400 mt-2">
+          
+          <p className="text-white mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
@@ -78,15 +79,18 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
-            <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
-              onClick={() => handleOpenModal(false)}
+          <motion.button
+              className="bg-[#0097A7] text-white px-4 py-2 rounded"
+              whileHover={{ backgroundColor: '#0097A7', scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleOpenModal}
             >
               Más info
             </motion.button>
             <motion.button
-              className="bg-gray-700 text-white px-4 py-2 rounded transition duration-300 hover:bg-gray-600"
+              className="bg-[#EEE5E9] text-black px-4 py-2 rounded"
               onClick={() => handleOpenModal(true)}
+              whileHover={{scale: 1.1}}
             >
               Tareas
             </motion.button>
@@ -104,7 +108,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             style={{ paddingTop: '5rem', left: document.querySelector('aside')?.offsetWidth || '250px' }}
           >
             <motion.div
-              className={`bg-gray-800 text-white p-8 rounded-xl shadow-lg w-full ${showDashboard ? 'max-w-3xl' : 'max-w-lg'}`}
+              className={`bg-[#383D3B] text-white p-8 rounded-xl shadow-lg w-full ${showDashboard ? 'max-w-3xl' : 'max-w-lg'}`}
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -128,7 +132,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
                     alt={name}
                   />
-                  <p className="text-gray-400 mt-4">{description}</p>
+                  <p className="text-white mt-4">{description}</p>
                 </>
               )}
               <motion.button

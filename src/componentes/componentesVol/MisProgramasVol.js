@@ -53,7 +53,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
         />
         <div className="p-4">
           <h2 style={{ color: '#EEE5E9' }} className="text-xl font-bold">{title}</h2>
-          <p style={{ color: '#7C7C7C' }} className="mt-2">
+          <p style={{ color: 'white' }} className="mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
@@ -124,7 +124,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
                     alt={title}
                   />
-                  <p style={{ color: '#7C7C7C' }} className="mt-4">{description}</p>
+                  <p style={{ color: 'white' }} className="mt-4">{description}</p>
                 </>
               )}
               <motion.button
@@ -195,15 +195,9 @@ const MisProgramasVol = () => {
 
   return (
     <div className="mt-4">
-      <Typography
-        variant="h3"
-        align="center"
-        gutterBottom
-        style={{ color: '#383D3B', fontWeight: 'bold' }}
-      >
-        Mis Programas
+      <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
+        Mis programas
       </Typography>
-
       <div className="flex justify-center flex-wrap mt-2">
         {programs.map((program) => (
           <ProgramCard

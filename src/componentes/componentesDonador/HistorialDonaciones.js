@@ -46,12 +46,12 @@ const HistorialDonaciones = () => {
         </Typography>
 
         <motion.table
-          className="w-full bg-gray-800 text-white rounded-lg shadow-md"
+          className="w-full bg-[#383D3B] text-white rounded-lg shadow-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <thead className="bg-gray-700">
+          <thead className="bg-[#2D2D2D]">
             <tr>
               <th className="p-4 text-left">Cantidad (MXN)</th>
               <th className="p-4 text-left">Fecha</th>

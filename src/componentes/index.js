@@ -74,8 +74,8 @@ export default function LandingPage() {
   }, [controls]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800 p-4">
+    <div className="min-h-screen bg-[#383D3B] text-[#EEE5E9]">
+      <header className="bg-[#383D3B] p-4">
         <nav className="container mx-auto flex justify-between items-center">
           <motion.h1
             className="text-2xl font-bold"
@@ -86,22 +86,22 @@ export default function LandingPage() {
             SOLVIA
           </motion.h1>
           <ul className="flex space-x-4">
-          <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <a href="/donar" className="hover:text-purple-400">Donar</a>
+            <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <a href="/donar" className="hover:text-[#92DCE5]">Donar</a>
             </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <a href="/" className="hover:text-purple-400">Home</a>
+              <a href="/" className="hover:text-[#92DCE5]">Home</a>
             </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <a href="/login" className="hover:text-purple-400">Iniciar sesión</a>
+              <a href="/login" className="hover:text-[#92DCE5]">Iniciar sesión</a>
             </motion.li>
             <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <a href="/register" className="hover:text-purple-400">Registrate</a>
+              <a href="/register" className="hover:text-[#92DCE5]">Registrate</a>
             </motion.li>
           </ul>
         </nav>
       </header>
-
+  
       <section className="relative h-96 overflow-hidden">
         <motion.img
           key={currentImage}
@@ -126,8 +126,8 @@ export default function LandingPage() {
           <ChevronRight className="text-white" />
         </button>
       </section>
-
-      <section className="py-16 bg-gray-800">
+  
+      <section className="py-16 bg-[#EEE5E9] text-[#383D3B]">
         <div className="container mx-auto px-4">
           <motion.h2
             className="text-3xl font-bold mb-8 text-center"
@@ -141,14 +141,14 @@ export default function LandingPage() {
             {infoCards.map((card, index) => (
               <motion.div
                 key={index}
-                className="bg-gray-700 rounded-lg shadow-lg overflow-hidden"
+                className="bg-[#7C7C7C] rounded-lg shadow-lg overflow-hidden"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
                 <img src={card.image} alt={card.title} className="w-full h-48 object-cover" />
-                <div className="p-6">
+                <div className="p-6 text-[#EEE5E9]">
                   <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
                   <p>{card.description}</p>
                 </div>
@@ -157,11 +157,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <section className="py-16 bg-gray-900 overflow-hidden">
+  
+      <section className="py-16 bg-[#7C7C7C]">
         <div className="container mx-auto px-4">
           <motion.h2
-            className="text-3xl font-bold mb-8 text-center"
+            className="text-3xl font-bold mb-8 text-center text-[#EEE5E9]"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -184,13 +184,13 @@ export default function LandingPage() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1 }}
                   >
-                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center h-full">
+                    <div className="bg-[#383D3B] p-6 rounded-lg shadow-lg flex flex-col items-center h-full">
                       <Avatar
                         src={`http://localhost:5000${testimonial.image}`}
                         alt={testimonial.name}
                         className="w-20 h-20 object-cover rounded-full mb-4"
                       />
-                      <p className="text-center mb-2 flex-grow">{testimonial.comment}</p>
+                      <p className="text-center mb-2 flex-grow text-[#EEE5E9]">{testimonial.comment}</p>
                       <p className="font-semibold">{testimonial.name}</p>
                       <div className="flex mt-2">
                         {[...Array(5)].map((_, i) => (
@@ -205,8 +205,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <section className="py-16 bg-gray-800">
+  
+      <section className="py-16 bg-[#383D3B] text-[#EEE5E9]">
         <div className="container mx-auto px-4">
           <motion.h2
             className="text-3xl font-bold mb-8 text-center"
@@ -226,12 +226,12 @@ export default function LandingPage() {
           </motion.p>
         </div>
       </section>
-
-      <footer className="bg-gray-900 py-8">
+  
+      <footer className="bg-[#383D3B] py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <motion.p
-              className="text-sm"
+              className="text-sm text-[#EEE5E9]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -241,15 +241,15 @@ export default function LandingPage() {
             <motion.div
               className="flex space-x-4 mt-4 md:mt-0"
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <a href="/login" className="hover:text-purple-400">Iniciar sesión</a>
-              <a href="/register" className="hover:text-purple-400">Registrarse</a>
+              <a href="/login" className="hover:text-[#92DCE5]">Iniciar sesión</a>
+              <a href="/register" className="hover:text-[#92DCE5]">Registrarse</a>
             </motion.div>
           </div>
         </div>
       </footer>
     </div>
   )
-}
+}  

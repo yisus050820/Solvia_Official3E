@@ -488,7 +488,7 @@ const CrudProgramas = () => {
                       {program.status}
                     </span>
                   </div>
-                  <p className="mt-2" style={{ color: '#92DCE5' }}>
+                  <p className="mt-2" style={{ color: 'white' }}>
                     {program.description && program.description.length > 100
                       ? `${program.description.substring(0, 100)}...`
                       : program.description}
@@ -676,12 +676,12 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaInicio}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaInicio: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-gray-200 text-black"
                   placeholderText="Fecha de Inicio"
                   style={{
                     borderColor: '#7C7C7C',
                     backgroundColor: '#EEE5E9',
-                    color: '#383D3B',
+                    color: 'black',
                   }}
                   onKeyDown={(e) => {
                     if (!/[0-9\-]/.test(e.key) && e.key !== 'Backspace') {
@@ -694,7 +694,7 @@ const CrudProgramas = () => {
                   selected={newProgram.fechaFin}
                   onChange={(date) => setNewProgram({ ...newProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-gray-200 text-black"
                   placeholderText="Fecha Final"
                   style={{
                     borderColor: '#7C7C7C',
@@ -814,7 +814,7 @@ const CrudProgramas = () => {
                 src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
                 alt="Program Image"
               />
-              <p className="mt-4" style={{ color: '#7C7C7C' }}>
+              <p className="mt-4" style={{ color: 'white' }}>
                 {selectedProgram.description}
               </p>
               <div className="mt-2">
@@ -899,7 +899,7 @@ const CrudProgramas = () => {
                   selected={editProgram.fechaFin}
                   onChange={(date) => setEditProgram({ ...editProgram, fechaFin: date })}
                   dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-gray-200 text-black"
                   style={{
                     borderColor: '#7C7C7C',
                     backgroundColor: '#EEE5E9',

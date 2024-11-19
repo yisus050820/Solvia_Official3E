@@ -401,35 +401,41 @@ const CrudProgramas = () => {
               Ver en tarjetas
             </Typography>
             <Switch
-              checked={mostrarCards}
-              onChange={() => setMostrarCards(!mostrarCards)}
-              color="primary"
-            />
-            <TextField
-              fullWidth
+                checked={mostrarCards}
+                onChange={() => setMostrarCards(!mostrarCards)}
+                sx={{
+                  '& .MuiSwitch-thumb': {
+                    backgroundColor: '#92DCE5', // Aqua
+                  },
+                  '& .MuiSwitch-track': {
+                    backgroundColor: '#7C7C7C', // Gris oscuro
+                  },
+                }}
+              />
+                        <TextField
               label="Buscar..."
               variant="outlined"
               sx={{
                 mb: 2,
-                backgroundColor: 'white',          // Fondo blanco
-                color: 'black',                     // Color del texto
-                borderRadius: '5px',                // Bordes redondeados
+                backgroundColor: '#EEE5E9',          // Fondo claro
+                color: '#383D3B',                     // Texto oscuro
+                borderRadius: '5px',
                 '& .MuiOutlinedInput-root': {
                   height: '36px',                   // Altura total del input
                   fontSize: '0.9rem',               // Tamaño del texto
                   '& input': {
-                    color: 'black',                 // Color del texto en el campo de entrada
+                    color: '#383D3B',               // Texto oscuro
                     padding: '8px 14px',            // Ajusta el padding interno
                   },
                   '& fieldset': {
-                    borderColor: '#ccc',            // Color del borde
+                    borderColor: '#7C7C7C',            // Color del borde gris oscuro
                   },
                   '&:hover fieldset': {
-                    borderColor: '#888',            // Color de borde al pasar el cursor
+                    borderColor: '#383D3B',            // Borde oscuro al pasar el cursor
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  color: '#888',                    // Color del texto de la etiqueta
+                  color: '#7C7C7C',                    // Etiqueta gris
                   fontSize: '0.9rem',
                   top: '-6px',                      // Ajusta la posición de la etiqueta
                 },
@@ -519,7 +525,7 @@ const CrudProgramas = () => {
         ) : (
 
           <motion.table className="w-full bg-gray-800 text-white rounded-lg shadow-md">
-            <thead className="bg-gray-700">
+            <thead style={{ backgroundColor: '#2D2D2D' }}>
               <tr>
                 <th className="p-4">Nombre</th>
                 <th className="p-4">Descripción</th>
@@ -532,7 +538,7 @@ const CrudProgramas = () => {
                 <th className="p-4">Acciones</th>
               </tr>
             </thead>
-            <motion.tbody layout className="bg-gray-900">
+            <motion.tbody layout className="bg-[#383D3B]">
             {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
@@ -590,7 +596,7 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-[#383D3B] p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -735,7 +741,7 @@ const CrudProgramas = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-lg w-full"
+              className="bg-[#383D3B] p-8 rounded-xl shadow-lg max-w-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -832,10 +838,16 @@ const CrudProgramas = () => {
         onClose={() => setIsDeleteConfirmOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          },
+        }}
       >
         <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este programa?"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id="alert-dialog-description " sx={{ color: '#EEE5E9' }}>
             Esta acción no se puede deshacer. ¿Deseas continuar?
           </DialogContentText>
         </DialogContent>
