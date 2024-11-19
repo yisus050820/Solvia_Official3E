@@ -57,30 +57,30 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
           <div className="mt-4">
-            <span style={{ color: '#92DCE5' }}>Participantes: {participants}</span>
+            <span className="text-green-400">Participantes: {participants}</span>
           </div>
           <div className="mt-2">
-            <span style={{ color: '#92DCE5' }}>Donaciones: ${donations}</span>
+            <span className="text-green-600">Donaciones: ${donations}</span>  
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
               className="px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#7C7C7C' }}
+              whileHover={{ scale: 1.1 }}
               onClick={() => handleOpenModal(false)}
               style={{
-                backgroundColor: '#92DCE5',
-                color: '#383D3B',
+                backgroundColor: '#0097A7',
+                color: 'white',
                 fontWeight: 'bold',
               }}
             >
               Más info
             </motion.button>
             <motion.button
-              className="px-4 py-2 rounded"
-              whileHover={{ backgroundColor: '#7C7C7C' }}
+              className="px-4 py-2 rounded bg-[#EEE5E9]"
+              whileHover={{ scale: 1.1 }}
               onClick={() => handleOpenModal(true)}
               style={{
-                backgroundColor: '#92DCE5',
+                backgroundColor: '#EEE5E9',
                 color: '#383D3B',
                 fontWeight: 'bold',
               }}
@@ -100,9 +100,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className={`text-white p-8 rounded-xl shadow-lg w-full ${
-                showDashboard ? 'max-w-3xl' : 'max-w-lg'
-              }`}
+              className="text-white p-8 rounded-xl shadow-lg w-full"
               initial={{ y: "-100vh" }}
               animate={{ y: "0" }}
               exit={{ y: "-100vh" }}
@@ -111,9 +109,11 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
               style={{
                 backgroundColor: '#383D3B',
                 maxHeight: '90vh',
+                maxWidth: '800Px', // Ajusta el ancho intermedio entre 3xl (768px) y 4xl (1024px)
                 overflowY: 'auto',
               }}
             >
+
               {showDashboard ? (
                 <TeacherDashboard programId={programId} />
               ) : (

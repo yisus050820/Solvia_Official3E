@@ -170,7 +170,7 @@ const ProgramasDisp = () => {
             {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
-                className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+                className="max-w-sm bg-[#383d3b] rounded-xl shadow-lg overflow-hidden m-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -185,7 +185,7 @@ const ProgramasDisp = () => {
                     <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
                     <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
                   </div>
-                  <p className="text-gray-400 mt-2">
+                  <p className="text-white mt-2">
                     {truncateDescription(program.description)}
                   </p>
                   <div className="mt-2">
@@ -193,8 +193,8 @@ const ProgramasDisp = () => {
                   </div>
                   <div className="flex mt-4 justify-between">
                     <motion.button
-                      className="bg-gray-700 text-white px-4 py-2 rounded"
-                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      className="bg-[#0097A7] text-white px-4 py-2 rounded"
+                      whileHover={{  scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setSelectedProgram(program)}
                     >
@@ -252,46 +252,47 @@ const ProgramasDisp = () => {
 
       {/* Modal para más información */}
       <AnimatePresence>
-        {selectedProgram && (
-          <motion.div
-          className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-          initial={{ y: "-100vh" }}
-          animate={{ y: "0" }}
-          exit={{ y: "-100vh" }}
-          ref={modalContentRef}
-          onScroll={handleScroll}
-          style={{ maxHeight: '90vh', overflowY: 'auto' }}
+  {selectedProgram && (
+    <motion.div
+      className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-[#383d3b] text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+        initial={{ y: "-100vh" }}
+        animate={{ y: "0" }}
+        exit={{ y: "-100vh" }}
+        ref={modalContentRef}
+        onScroll={handleScroll}
+        style={{ maxHeight: '90vh', overflowY: 'auto' }}
+      >
+        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+        <h4 className="text-white-900 mb-4 font-semibold">
+          Coordinador: {selectedProgram.coordinator_name}
+        </h4>
+        <img
+          className="w-full h-48 object-cover shadow-md rounded"
+          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : defaultProgramPicture}
+          alt={selectedProgram.name}
+        />
+        <p className="text-white">{selectedProgram.description}</p>
+        <div className="mt-2">
+          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
+        </div>
+        <motion.button
+          className="mt-4 bg-[#E63946] text-white px-4 py-2 rounded"
+          whileHover={{ scale: 1.1 }}
+          onClick={() => setSelectedProgram(null)}
         >
-            <motion.div
-              className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-              initial={{ y: "-100vh" }}
-              animate={{ y: "0" }}
-              exit={{ y: "-100vh" }}
-            >
-              <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
-              <h4 className="text-white-900 mb-4 font-semibold">
-                Coordinador: {selectedProgram.coordinator_name}
-              </h4>
-              <img
-                className="w-full h-48 object-cover shadow-md rounded"
-                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : defaultProgramPicture}
-                alt={selectedProgram.name}
-              />
-              <p className="text-gray-400">{selectedProgram.description}</p>
-              <div className="mt-2">
-                <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
-              </div>
-              <motion.button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                whileHover={{ backgroundColor: '#4A90E2' }}
-                onClick={() => setSelectedProgram(null)}
-              >
-                Cerrar
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          Cerrar
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
 
       <Snackbar
         open={openSnackbar}

@@ -274,14 +274,21 @@ function TeacherDashboard({ programId }) {
             sx={{
               "& .MuiOutlinedInput-root": {
                 backgroundColor: "#FFF",
-                "& fieldset": { borderColor: "#7C7C7C" },
+                "& fieldset": { borderColor: "#92DCE5" },
                 "&:hover fieldset": { borderColor: "#383D3B" },
                 "&.Mui-focused fieldset": { borderColor: "#92DCE5" },
               },
+              "& .MuiSelect-select": {
+                color: "#383D3B", // Cambia el color del texto seleccionado
+              },
+              "& .MuiMenuItem-root": {
+                color: "#383D3B", // Cambia el color de las opciones del menú
+              },
             }}
           >
-            <MenuItem value="name">Nombre</MenuItem>
-            <MenuItem value="dueDate">Fecha de entrega</MenuItem>
+            <MenuItem value="name" sx={{ color: '#92DCE5' }}>Nombre</MenuItem>
+            <MenuItem value="dueDate" sx={{ color: '#92DCE5' }}>Fecha de entrega</MenuItem>
+
           </Select>
         </FormControl>
   
@@ -402,9 +409,18 @@ function TeacherDashboard({ programId }) {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#383D3B", // Fondo del tooltip
+                      borderColor: "#92DCE5", // Color del borde
+                    }}
+                    itemStyle={{
+                      color: "#EEE5E9", // Color del texto dentro del tooltip
+                    }}
+                    cursor={{ fill: "rgba(146, 220, 229, 0.2)" }} // Color del fondo hover en la gráfica
+                  />
                   <Legend />
-                  <Bar dataKey="completionPercentage" name="Porcentaje Completado (%)" fill="#92DCE5" />
+                  <Bar dataKey="completionPercentage" name="Porcentaje Completado (%)" fill="black" />
                 </BarChart>
               </ResponsiveContainer>
             </motion.div>
@@ -494,6 +510,9 @@ function TeacherDashboard({ programId }) {
               defaultValue={currentTask?.title || ""}
               error={!!errors.name}
               helperText={errors.name}
+              InputLabelProps={{
+                style: { color: "#383D3B" }, // Color del label
+              }}
             />
             <TextField
               margin="dense"
@@ -505,6 +524,9 @@ function TeacherDashboard({ programId }) {
               defaultValue={currentTask?.description || ""}
               error={!!errors.description}
               helperText={errors.description}
+              InputLabelProps={{
+                style: { color: "#383D3B" }, // Color del label
+              }}
             />
             <TextField
               margin="dense"
@@ -514,9 +536,13 @@ function TeacherDashboard({ programId }) {
               fullWidth
               variant="outlined"
               defaultValue={currentTask?.end_date || ""}
-              InputLabelProps={{ shrink: true }}
+              InputLabelProps={{
+                shrink: true,
+                style: { color: "#383D3B" },
+              }}
               error={!!errors.dueDate}
               helperText={errors.dueDate}
+              
             />
             <TextField
               margin="dense"
@@ -525,6 +551,9 @@ function TeacherDashboard({ programId }) {
               type="url"
               fullWidth
               variant="outlined"
+              InputLabelProps={{
+                style: { color: "#383D3B" }, // Color del label
+              }}
             />
             <TextField
               margin="dense"
@@ -533,10 +562,21 @@ function TeacherDashboard({ programId }) {
               type="url"
               fullWidth
               variant="outlined"
+              InputLabelProps={{
+                style: { color: "#383D3B" }, // Color del label
+              }}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancelar</Button>
+            <Button onClick={handleCloseDialog}
+                    sx={{
+                      color: "#FFFFFF", // Color del texto
+                      backgroundColor: "#FF6347", // Color de fondo
+                      "&:hover": {
+                        backgroundColor: "#FF4500", // Color de fondo al pasar el mouse
+                      },
+                    }}
+                  >Cancelar</Button>
             <Button type="submit" variant="contained" color="primary">
               Guardar
             </Button>
@@ -556,7 +596,7 @@ function TeacherDashboard({ programId }) {
           p: 4,
         }}>
           <IconButton
-            aria-label="close"
+            aria-label="close"  
             onClick={handleCloseMaterial}
             sx={{
               position: 'absolute',

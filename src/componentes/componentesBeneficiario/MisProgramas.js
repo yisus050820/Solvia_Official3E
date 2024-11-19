@@ -68,7 +68,6 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
             <span className="ml-2 text-gray-400 capitalize">{status}</span>
           </div>
-          
           <p className="text-white mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
@@ -79,18 +78,18 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <span className="text-green-600">Donaciones: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
-          <motion.button
+            <motion.button
               className="bg-[#0097A7] text-white px-4 py-2 rounded"
               whileHover={{ backgroundColor: '#0097A7', scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={handleOpenModal}
+              onClick={() => handleOpenModal(false)}
             >
               Más info
             </motion.button>
             <motion.button
               className="bg-[#EEE5E9] text-black px-4 py-2 rounded"
               onClick={() => handleOpenModal(true)}
-              whileHover={{scale: 1.1}}
+              whileHover={{ scale: 1.1 }}
             >
               Tareas
             </motion.button>
@@ -125,8 +124,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
               ) : (
                 <>
                   <h2 className="text-white text-3xl font-bold">{title}</h2>
-                  <h4 className="text-white-900 mb-4 font-semibold">
-                  </h4>
+                  <h4 className="text-gray-400 mb-4 font-semibold">{coordinator_name}</h4>
                   <img
                     className="w-full h-48 object-cover shadow-md rounded"
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
@@ -205,7 +203,7 @@ const MisProgramas = () => {
           <ProgramCard
             key={program.id}
             title={program.name}
-            coordinator_name={program.coordinator_name || 'No disponible'}
+            
             description={program.description}
             participants={program.participants}
             donations={program.donations}
