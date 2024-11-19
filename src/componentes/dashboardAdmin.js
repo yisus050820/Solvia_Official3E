@@ -15,8 +15,9 @@ import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import { Feedback } from '@mui/icons-material';
+import { Feedback, Logout } from '@mui/icons-material';
 import ArticleIcon from '@mui/icons-material/Article';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // Importaciones de los formularios hijos
 import ProgramasCrud from './componentesAdmin/ProgramasCrud';
@@ -30,6 +31,7 @@ import AsignacionPresupuesto_Pro from './componentesAdmin/AsignacionesPresupuest
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ChatGlobal from './ChatGlobal';
+import CerrarSesion from './logout';
 
 const NAVIGATION = [
 
@@ -109,6 +111,11 @@ const NAVIGATION = [
       },
     ],
   },
+  {
+    segment: 'logout',
+    title: 'Cerrar sesión',
+    icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
+  },
 ];
 
 const demoTheme = createTheme({
@@ -172,6 +179,8 @@ function DemoPageContent({ pathname }) {
       {pathname === '/configuracion-perfil' && <PerfilUsuario />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
       {pathname === '/comunicacion/mensajes' && <ChatGlobal />}
+      {pathname === '/logout' && <CerrarSesion />}
+      
     </Box>
   );
 }

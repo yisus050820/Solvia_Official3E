@@ -12,6 +12,7 @@ import { FaIconName } from 'react-icons/fa';
 import { ChatBubbleOutline, Feedback } from '@mui/icons-material';
 import MessageIcon from '@mui/icons-material/Message';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
@@ -21,6 +22,7 @@ import VerFeedback from './componentesAdmin/VerFeedback';
 import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
 import ChatGlobal from './ChatGlobal';
+import CerrarSesion from './logout';
 
 
 
@@ -77,6 +79,11 @@ const NAVIGATION = [
         icon: <Feedback />,
       },
     ],
+  },
+  {
+    segment: 'logout',
+    title: 'Cerrar sesión',
+    icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
   },
 
     
@@ -138,6 +145,7 @@ function DemoPageContent({ pathname }) {
     {pathname === '/comunicacion/feedback' && <Calificar />}
     {pathname === '/comunicacion/contacto' && <ChatGlobal />}
     {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+    {pathname === '/logout' && <CerrarSesion />}
 
     
       

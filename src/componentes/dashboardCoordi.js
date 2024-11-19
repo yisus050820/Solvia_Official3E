@@ -19,6 +19,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import { Feedback } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
+
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import CrudPrograms from './componentesCoordi/ProgramasCrud';
 import ReportesUsuarios from './componentesAdmin/ReportesUsuarios';
@@ -31,6 +32,7 @@ import CrudUsuariosCoordi from './componentesCoordi/Usuarios';
 import Comunicacion from './componentesAdmin/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ChatGlobal from './ChatGlobal';
+import CerrarSesion from './logout';
 
 const NAVIGATION = [
 
@@ -113,7 +115,13 @@ const NAVIGATION = [
         icon: <Feedback />,
       },
     ],
-  }
+  },
+  {
+    segment: 'logout',
+    title: 'Cerrar sesión',
+    icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
+  },
+  
     
 ];
 
@@ -176,6 +184,7 @@ function DemoPageContent({ pathname }) {
         {pathname === '/asignaciones/presupuesto-programa' && <AsignacionesPresupuesto_Pro />}
         {pathname === '/comunicacion/contacto' && <ChatGlobal />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+        {pathname === '/logout' && <CerrarSesion />}
         
     </Box>
   );

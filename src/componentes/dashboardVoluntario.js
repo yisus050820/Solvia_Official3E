@@ -17,6 +17,7 @@ import EmojiPeople from '@mui/icons-material/EmojiPeople';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import MessageIcon from '@mui/icons-material/Message'
 import { Feedback } from '@mui/icons-material';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 
@@ -28,6 +29,7 @@ import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasDisp from './componentesDonador/VerProgramasDisp';
 import ChatGlobal from './ChatGlobal';
+import CerrarSesion from './logout';
 
 
 
@@ -83,6 +85,11 @@ const NAVIGATION = [
         icon: <Feedback />,
       },
     ],
+  },
+  {
+    segment: 'logout',
+    title: 'Cerrar sesión',
+    icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
   },
     
 ];
@@ -142,6 +149,7 @@ function DemoPageContent({ pathname }) {
       {pathname === '/comunicacion/contacto' && <ChatGlobal />}
       {pathname === '/comunicacion/feedback' && <Calificar />}
       {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+      {pathname === '/logout' && <CerrarSesion />}
     </Box>
   );
 }

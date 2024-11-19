@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import MessageIcon from '@mui/icons-material/Message';
 import { createTheme } from '@mui/material/styles';
 import { Feedback } from '@mui/icons-material';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 import Donar from './componentesDonador/Donar';
@@ -27,6 +28,7 @@ import Comunicacion from './componentesDonador/Comunicacion';
 import VerFeedback from './componentesAdmin/VerFeedback';
 import ProgramasDisp from './componentesDonador/VerProgramasDisp';
 import ChatGlobal from './ChatGlobal';
+import CerrarSesion from './logout';
 
 
   const NAVIGATION = [
@@ -99,6 +101,11 @@ import ChatGlobal from './ChatGlobal';
         },
       ],
     },
+    {
+      segment: 'logout',
+      title: 'Cerrar sesión',
+      icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
+    },
   ];
 
   const demoTheme = createTheme({
@@ -158,6 +165,7 @@ import ChatGlobal from './ChatGlobal';
         {pathname === '/comunicacion/feedback' && <Calificar />}
         {pathname === '/comunicacion/contacto' && <ChatGlobal />}
         {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
+        {pathname === '/logout' && <CerrarSesion />}
       </Box>
     );
   }
