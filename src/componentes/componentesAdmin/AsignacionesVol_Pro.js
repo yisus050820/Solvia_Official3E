@@ -147,7 +147,6 @@ const AsignacionesVol_Pro = () => {
   };
   
   const confirmEdit = () => {
-    // Validar si los campos están vacíos
     if (!voluntarioSeleccionado) {
       setErrorVoluntario(true);
       setMessage('Debes seleccionar un voluntario.');
@@ -178,25 +177,25 @@ const AsignacionesVol_Pro = () => {
     axios
       .put(`http://localhost:5000/asigVolProg/voluntarios/${currentId}`, datosEditados)
       .then((res) => {
-        const updatedData = res.data.updatedData;
+        const updatedData = res.data.updatedData; // Datos actualizados desde el backend.
   
+        // Actualiza el estado de las asignaciones usando los datos recibidos del backend.
         const updatedAsignaciones = asignaciones.map((asignacion) =>
           asignacion.id === currentId
             ? {
                 ...asignacion,
                 voluntario: voluntarios.find((v) => v.id === updatedData.user_id)?.name || asignacion.voluntario,
                 programa: programas.find((p) => p.id === updatedData.program_id)?.name || asignacion.programa,
-                task_status: updatedData.task_status,
-                user_id: updatedData.user_id,
-                program_id: updatedData.program_id,
+                task_status: updatedData.estado, // Usa el estado actualizado del backend.
               }
             : asignacion
         );
         setAsignaciones(updatedAsignaciones);
   
+        // Limpia los valores seleccionados y cierra el modal.
         setVoluntarioSeleccionado('');
         setProgramaSeleccionado('');
-        setTaskStatusSeleccionado('');
+        setTaskStatusSeleccionado('active'); // O un estado por defecto.
         setIsEditModalOpen(false);
         setSuccessMessage('Asignación actualizada exitosamente.');
       })
@@ -213,8 +212,8 @@ const AsignacionesVol_Pro = () => {
         setSnackbarSeverity('error');
         setOpenSnackbar(true);
       });
-  };  
-
+  };
+  
   // Manejar la edición de una asignación
   const handleEditar = (asignacion) => {
     setVoluntarioSeleccionado(asignacion.user_id);

@@ -580,10 +580,10 @@ const CrudProgramas = () => {
                   <td className="p-4">
                     <span
                       className={`text-lg font-bold ${item.status === 'active'
-                          ? 'text-green-500'
-                          : item.status === 'pause'
-                            ? 'text-yellow-500'
-                            : 'text-red-500'
+                        ? 'text-green-500'
+                        : item.status === 'pause'
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
                         }`}
                     >
                       {item.status === 'active'
@@ -1007,7 +1007,9 @@ const CrudProgramas = () => {
           },
         }}
       >
-        <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este programa?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"¿Estás seguro de eliminar este usuario?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
             Esta acción no se puede deshacer. ¿Deseas continuar?
@@ -1018,7 +1020,7 @@ const CrudProgramas = () => {
             className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsDeleteConfirmOpen(false)}
+            onClick={() => setIsDeleteConfirmOpen(false)} // Cierra el diálogo
           >
             Cancelar
           </motion.button>
@@ -1026,7 +1028,7 @@ const CrudProgramas = () => {
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={isDeleteConfirmOpen}
+            onClick={handleDelete} // Ejecuta la función para confirmar la eliminación
           >
             Eliminar
           </motion.button>

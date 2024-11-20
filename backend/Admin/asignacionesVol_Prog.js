@@ -154,6 +154,7 @@ router.put('/voluntarios/:id', [
                     message: 'Asignación actualizada con éxito.',
                     updatedData: updatedResult[0]
                 });
+                console.log(res)
             });
         });
     });

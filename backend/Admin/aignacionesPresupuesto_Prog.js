@@ -15,16 +15,17 @@ router.get('/asignaciones', (req, res) => {
       console.error('Error fetching assignments:', err);
       return res.status(500).json({ message: 'Error al obtener asignaciones.' });
     }
+    console.log('Asignaciones obtenidas:', results); // Depuración
     res.json(results);
   });
 });
 
 // Obtener presupuesto disponible
 router.get('/disponible', (req, res) => {
-  console.log('Llego al back.');
   const query = `
     SELECT 
-      (SELECT SUM(amount) FROM donations) - COALESCE((SELECT SUM(amount) FROM expenses), 0) AS dineroDisponible
+      (SELECT COALESCE(SUM(amount), 0) FROM donations) 
+      - COALESCE((SELECT SUM(amount) FROM expenses), 0) AS dineroDisponible
   `;
 
   db.query(query, (err, results) => {
@@ -33,7 +34,6 @@ router.get('/disponible', (req, res) => {
       return res.status(500).json({ message: 'Error al obtener el dinero disponible.' });
     }
     
-    console.log('Results:', results); // Para depuración
     if (results.length === 0) {
       return res.status(404).json({ message: 'No se encontraron resultados.' });
     }
@@ -42,7 +42,7 @@ router.get('/disponible', (req, res) => {
   });
 });
 
-/// Asignar presupuesto a un programa
+// Asignar presupuesto a un programa
 router.post('/asignacion', (req, res) => {
   const { program_id, amount, date } = req.body;
 
@@ -82,6 +82,10 @@ router.put('/asignacion/:id', (req, res) => {
   const { id } = req.params;
   const { amount } = req.body;
 
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: 'El presupuesto debe ser mayor a 0.' });
+  }
+
   const updateQuery = `
     UPDATE expenses
     SET amount = ?
@@ -97,18 +101,22 @@ router.put('/asignacion/:id', (req, res) => {
   });
 });
 
-
 // Eliminar asignación de presupuesto
 router.delete('/asignacion/:id', (req, res) => {
   const { id } = req.params;
 
   const query = `DELETE FROM expenses WHERE id = ?`;
-  
+
   db.query(query, [id], (err, result) => {
     if (err) {
       console.error('Error deleting expense:', err);
       return res.status(500).json({ message: 'Error al eliminar el presupuesto.' });
     }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'No se encontró la asignación.' });
+    }
+
     res.json({ message: 'Asignación eliminada con éxito.' });
   });
 });

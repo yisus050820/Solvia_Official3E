@@ -399,89 +399,89 @@ const CrudUsuarios = () => {
         {/* Mostrar contenido dependiendo del estado del switch */}
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
-          {Array.isArray(filteredUser) ? filteredUser.map((item) => (
-            <motion.div
-              key={item.id}
-              className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
-              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro para las tarjetas
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {/* Contenedor centrado para la imagen */}
-              <div className="flex justify-center mt-4">  {/* Agregado un margin top para dar espacio */}
-                <Avatar
-                  src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
-                  alt={item.name}
-                  sx={{
-                    width: 160,  // Imagen más grande
-                    height: 160, // Imagen más grande
-                    objectFit: 'cover',
-                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                  }}
-                />
-              </div>
-              
-              <div className="p-4">
-                <h2 className="text-xl font-bold" style={{ color: '#EEE5E9' }}>
-                  {item.name}
-                </h2>
-                <div className="flex items-center mt-2">
-                  <span
-                    className={`inline-block w-3 h-3 rounded-full ${item.role === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
-                  ></span>
-                  <span className="ml-2 capitalize" style={{ color: '#7C7C7C' }}>
-                    {item.role}
-                  </span>
+            {Array.isArray(filteredUser) ? filteredUser.map((item) => (
+              <motion.div
+                key={item.id}
+                className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
+                style={{ backgroundColor: '#383D3B' }} // Fondo oscuro para las tarjetas
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {/* Contenedor centrado para la imagen */}
+                <div className="flex justify-center mt-4">  {/* Agregado un margin top para dar espacio */}
+                  <Avatar
+                    src={`http://localhost:5000${item.profile_picture}?${new Date().getTime()}`}
+                    alt={item.name}
+                    sx={{
+                      width: 160,  // Imagen más grande
+                      height: 160, // Imagen más grande
+                      objectFit: 'cover',
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}
+                  />
                 </div>
-                <p className="mt-2" style={{ color: 'white' }}>
-                  {item.description && item.description.length > 100
-                    ? `${item.description.substring(0, 100)}...`
-                    : item.description}
-                </p>
-        
-                <div className="mt-2">
-                  <span style={{ color: '#4CAF50' }}>
-                    {item.email}
-                  </span>
-                </div>
-        
-                <div className="flex mt-4 justify-between">
 
-        
-                  <div className="flex space-x-2">
-                    {/* Botón de editar */}
-                    <motion.button
-                      className="p-2 rounded-full"
-                      style={{
-                        backgroundColor: '#4A90E2',
-                        color: '#EEE5E9',
-                      }}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleOpenEditModal(item)}
-                    >
-                      <FaEdit />
-                    </motion.button>
-        
-                    {/* Botón de eliminar */}
-                    <motion.button
-                      className="p-2 rounded-full"
-                      style={{
-                        backgroundColor: '#E63946',
-                        color: '#EEE5E9',
-                      }}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDeleteClick(item.id)}
-                    >
-                      <FaTrashAlt />
-                    </motion.button>
+                <div className="p-4">
+                  <h2 className="text-xl font-bold" style={{ color: '#EEE5E9' }}>
+                    {item.name}
+                  </h2>
+                  <div className="flex items-center mt-2">
+                    <span
+                      className={`inline-block w-3 h-3 rounded-full ${item.role === 'active' ? 'bg-green-500' : 'bg-red-500'}`}
+                    ></span>
+                    <span className="ml-2 capitalize" style={{ color: '#7C7C7C' }}>
+                      {item.role}
+                    </span>
+                  </div>
+                  <p className="mt-2" style={{ color: 'white' }}>
+                    {item.description && item.description.length > 100
+                      ? `${item.description.substring(0, 100)}...`
+                      : item.description}
+                  </p>
+
+                  <div className="mt-2">
+                    <span style={{ color: '#4CAF50' }}>
+                      {item.email}
+                    </span>
+                  </div>
+
+                  <div className="flex mt-4 justify-between">
+
+
+                    <div className="flex space-x-2">
+                      {/* Botón de editar */}
+                      <motion.button
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#4A90E2',
+                          color: '#EEE5E9',
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleOpenEditModal(item)}
+                      >
+                        <FaEdit />
+                      </motion.button>
+
+                      {/* Botón de eliminar */}
+                      <motion.button
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#E63946',
+                          color: '#EEE5E9',
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDeleteClick(item.id)}
+                      >
+                        <FaTrashAlt />
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )) : <p>No hay usuarios disponibles</p>}
-        </div>        
+              </motion.div>
+            )) : <p>No hay usuarios disponibles</p>}
+          </div>
         ) : (
           <motion.table
             className="w-full rounded-lg shadow-md"
@@ -827,7 +827,9 @@ const CrudUsuarios = () => {
           },
         }}
       >
-        <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar este programa?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"¿Estás seguro de eliminar este usuario?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
             Esta acción no se puede deshacer. ¿Deseas continuar?
@@ -838,7 +840,7 @@ const CrudUsuarios = () => {
             className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsDeleteConfirmOpen(false)}
+            onClick={() => setIsDeleteConfirmOpen(false)} // Cierra el diálogo
           >
             Cancelar
           </motion.button>
@@ -846,7 +848,7 @@ const CrudUsuarios = () => {
             className="bg-red-500 text-white px-4 py-2 rounded-full"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={isDeleteConfirmOpen}
+            onClick={confirmDelete} // Ejecuta la función para confirmar la eliminación
           >
             Eliminar
           </motion.button>

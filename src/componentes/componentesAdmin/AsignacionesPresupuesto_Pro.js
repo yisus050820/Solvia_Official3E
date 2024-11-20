@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, MenuItem, Select, FormControl, InputLabel, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,23 +22,6 @@ const AsignacionesPresupuesto_Pro = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [atBottom, setAtBottom] = useState(true);
-  const userListRef = useRef(null);
-
-  const handleScroll = () => {
-    const userListContainer = userListRef.current;
-    if (userListContainer) {
-      setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
-    }
-  };
-
-
-  useEffect(() => {
-    const userListContainer = userListRef.current;
-    if (userListContainer && atBottom) {
-      userListContainer.scrollTop = userListContainer.scrollHeight;
-    }
-  }, [asignaciones, atBottom]); // Solo desplazarse al fondo si estamos al final  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -228,29 +211,42 @@ const AsignacionesPresupuesto_Pro = () => {
         Asignación
       </Typography>
 
-      <Card sx={{ backgroundColor: '#383D3B', color: '#EEE5E9', padding: '20px', borderRadius: '15px' }}>
+      <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
-          <Typography variant="h4" color="#EEE5E9" gutterBottom>
+          <Typography variant="h4" color="white" gutterBottom>
             Asignar Presupuesto a Programas
           </Typography>
-          <Typography variant="h6" color="#EEE5E9">
+          <Typography variant="h6" color="white">
             Dinero Disponible: ${dineroDisponible ? dineroDisponible.toLocaleString() : 'Cargando...'}
           </Typography>
 
           <Grid container spacing={4} sx={{ marginTop: '20px' }}>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth sx={{ backgroundColor: '#EEE5E9', borderRadius: '5px' }}>
-                <InputLabel id="programa-label" sx={{ color: '#383D3B' }}>Selecciona un Programa</InputLabel>
+              <FormControl fullWidth sx={{ backgroundColor: '#fff', borderRadius: '5px' }}>
+                <InputLabel id="programa-label" sx={{ color: 'black' }}>Selecciona un Programa</InputLabel>
                 <Select
                   labelId="programa-label"
                   value={programaSeleccionado}
                   onChange={(e) => setProgramaSeleccionado(e.target.value)}
+                  label="Selecciona un Programa"
                   sx={{
-                    '.MuiSelect-select': { color: programaSeleccionado ? '#383D3B' : 'inherit' }
+                    '.MuiSelect-select': {
+                      color: programaSeleccionado ? 'black' : 'inherit',
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 48 * 5 + 8,
+                        width: 250,
+                      }
+                    }
                   }}
                 >
-                  {programas.map((programa) => (
-                    <MenuItem key={programa.id} value={programa.id}>{programa.name}</MenuItem>
+                  {programas.map(programa => (
+                    <MenuItem key={programa.id} value={programa.id}>
+                      {programa.name}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -263,53 +259,42 @@ const AsignacionesPresupuesto_Pro = () => {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 fullWidth
-                sx={{ backgroundColor: '#EEE5E9', borderRadius: '5px' }}
-                InputLabelProps={{ style: { color: '#383D3B' } }}
-                inputProps={{ style: { color: '#383D3B' } }}
+                sx={{ backgroundColor: '#fff', borderRadius: '5px' }}
+                InputLabelProps={{
+                  style: { color: 'black' },
+                }}
+                inputProps={{
+                  style: { color: 'black' },
+                }}
               />
             </Grid>
           </Grid>
 
           <div className="mt-6 flex justify-end">
-            <motion.button
-              className="bg-[#0097A7] text-[#EEE5E9] px-4 py-2 rounded-full" // Botón de asignación
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleAsignar}
-            >
+            <motion.button className="bg-green-500 text-white px-4 py-2 rounded-full" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleAsignar}>
               <FaPlus />
             </motion.button>
           </div>
 
-          <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#383D3B' }}>
+          <TableContainer component={Paper} sx={{ marginTop: '20px', backgroundColor: '#2d3748' }}>
             <Table>
-              <TableHead sx={{ backgroundColor: '#7C7C7C' }}>
+              <TableHead sx={{ backgroundColor: '#4a5568' }}>
                 <TableRow>
-                  <TableCell sx={{ color: '#EEE5E9' }}>Programa</TableCell>
-                  <TableCell sx={{ color: '#EEE5E9' }}>Presupuesto</TableCell>
-                  <TableCell sx={{ color: '#EEE5E9' }}>Acciones</TableCell>
+                  <TableCell sx={{ color: '#fff' }}>Programa</TableCell>
+                  <TableCell sx={{ color: '#fff' }}>Presupuesto</TableCell>
+                  <TableCell sx={{ color: '#fff' }}>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {asignaciones.map((asignacion) => (
-                  <TableRow key={asignacion.id} style={{ borderBottom: '1px solid #7C7C7C' }}>
-                    <TableCell sx={{ color: '#EEE5E9' }}>{asignacion.programa}</TableCell>
-                    <TableCell sx={{ color: '#EEE5E9' }}>${asignacion.presupuesto}</TableCell>
-                    <TableCell sx={{ color: '#EEE5E9' }}>
-                      <motion.button
-                        className="bg-[#0097A7] text-[#EEE5E9] px-2 py-1 rounded-full" // Botón de editar
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleEditar(asignacion)}
-                      >
+                {asignaciones.map(asignacion => (
+                  <TableRow key={asignacion.id} style={{ borderBottom: '1px solid #4a5568' }}>
+                    <TableCell sx={{ color: '#fff' }}>{asignacion.programa}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>${asignacion.presupuesto}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>
+                      <motion.button className="bg-blue-500 text-white px-2 py-1 rounded-full" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => handleEditar(asignacion)}>
                         <FaEdit />
                       </motion.button>
-                      <motion.button
-                        className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" // Botón de eliminar
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleEliminar(asignacion.id)}
-                      >
+                      <motion.button className="bg-red-500 text-white px-2 py-1 rounded-full ml-2" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => handleEliminar(asignacion.id)}>
                         <FaTrashAlt />
                       </motion.button>
                     </TableCell>
@@ -318,112 +303,134 @@ const AsignacionesPresupuesto_Pro = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <AnimatePresence>
+            {editModalOpen && (
+              <motion.div
+                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+                  initial={{ y: '-100vh' }}
+                  animate={{ y: '0' }}
+                  exit={{ y: '-100vh' }}
+                >
+                  <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
+                  <DialogContent className="space-y-4">
+                    <TextField
+                      label="Programa"
+                      value={currentEditAsignacion?.programa || ''}
+                      fullWidth
+                      InputProps={{ style: { color: 'black' } }}
+                      sx={{ backgroundColor: '#FFF', borderRadius: '5px' }}
+                      disabled
+                    />
+                    <TextField
+                      label="Cantidad"
+                      type="number"
+                      value={editCantidad}
+                      onChange={(e) => setEditCantidad(Number(e.target.value))}
+                      fullWidth
+                      InputLabelProps={{ style: { color: 'white' } }}
+                      inputProps={{ style: { color: 'white' } }}
+                      sx={{ backgroundColor: '#2D3748', borderRadius: '5px' }}
+                    />
+                  </DialogContent>
+                  <div className="flex justify-between mt-4">
+                    <motion.button
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#4A90E2', scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleGuardarEdicion}
+                    >
+                      Guardar
+                    </motion.button>
+                    <motion.button
+                      className="bg-gray-500 text-white px-4 py-2 rounded"
+                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setEditModalOpen(false)}
+                    >
+                      Cerrar
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <Dialog open={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+            <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">Esta acción no se puede deshacer. ¿Deseas continuar?</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <motion.button
+                className="bg-gray-500 text-white px-4 py-2 rounded-full"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsDeleteConfirmOpen(false)}
+              >
+                Cancelar
+              </motion.button>
+              <motion.button
+                className="bg-red-500 text-white px-4 py-2 rounded-full"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={confirmDelete}
+              >
+                Eliminar
+              </motion.button>
+            </DialogActions>
+          </Dialog>
+
+          <AnimatePresence>
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2, ease: "easeIn" }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+              >
+                <motion.div
+                  initial={{ y: -50 }}
+                  animate={{ y: 0 }}
+                  exit={{ y: 50 }}
+                  transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                  className="bg-gray-800 p-6 rounded-xl shadow-lg"
+                >
+                  <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+                  <div className='flex justify-center items-center'>
+                    <motion.div
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={checkmarkVariants}
+                      transition={{ duration: 1, ease: "easeInOut" }}
+                      className='flex justify-center items-center'
+                      style={{
+                        borderRadius: '50%',
+                        backgroundColor: '#4CAF50',
+                        width: '80px',
+                        height: '80px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <FaCheck size={50} className="text-white" />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
-      <AnimatePresence>
-        {editModalOpen && (
-          <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
-              style={{ backgroundColor: '#383D3B', color: '#EEE5E9' }}
-              initial={{ y: '-100vh' }}
-              animate={{ y: '0' }}
-              exit={{ y: '-100vh' }}
-            >
-              <h2 className="text-2xl font-bold mb-4">Editar Asignación</h2>
-              <DialogContent className="space-y-4">
-                <TextField
-                  label="Programa"
-                  value={currentEditAsignacion?.programa || ''}
-                  fullWidth
-                  InputProps={{ style: { color: '#383D3B' } }}
-                  sx={{ backgroundColor: '#EEE5E9', borderRadius: '5px' }}
-                  disabled
-                />
-                <TextField
-                  label="Cantidad"
-                  type="number"
-                  value={editCantidad}
-                  onChange={(e) => setEditCantidad(Number(e.target.value))}
-                  fullWidth
-                  InputLabelProps={{ style: { color: '#EEE5E9' } }}
-                  inputProps={{ style: { color: '#EEE5E9' } }}
-                  sx={{ backgroundColor: '#7C7C7C', borderRadius: '5px' }}
-                />
-              </DialogContent>
-              <div className="flex justify-between mt-4">
-                <motion.button
-                  className="text-white px-4 py-2 rounded-full"
-                  style={{ backgroundColor: '#0097A7' }} // Azul aqua para "Guardar Cambios"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    handleEditar();
-                  }}
-                >
-                  Guardar Cambios
-                </motion.button>
-                <motion.button
-                  className="text-white px-4 py-2 rounded-full"
-                  style={{ backgroundColor: '#E63946' }} // Rojo para "Cerrar"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    setEditModalOpen(false);
-                  }}
-                >
-                  Cerrar
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Confirmación de eliminar */}
-      <Dialog
-        open={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        PaperProps={{
-          style: {
-            backgroundColor: '#383D3B', // Fondo oscuro
-            color: '#EEE5E9', // Texto claro
-          },
-        }}
-      >
-        <DialogTitle id="alert-dialog-title">{"¿Estás seguro de eliminar esta asignación?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
-            Esta acción no se puede deshacer. ¿Deseas continuar?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <motion.button
-            className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsDeleteConfirmOpen(false)}
-          >
-            Cancelar
-          </motion.button>
-          <motion.button
-            className="bg-red-500 text-white px-4 py-2 rounded-full"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={confirmDelete}
-          >
-            Eliminar
-          </motion.button>
-        </DialogActions>
-      </Dialog>
-      {/* Snackbar para errores */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -434,64 +441,6 @@ const AsignacionesPresupuesto_Pro = () => {
           {message}
         </Alert>
       </Snackbar>
-      {/* Modal para mensajes de éxito */}
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          >
-            <motion.div
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="p-6 rounded-xl shadow-lg"
-              style={{
-                backgroundColor: '#003f5c', // Fondo azul oscuro
-                color: '#ffffff', // Texto blanco puro
-              }}
-            >
-              <h2
-                style={{
-                  color: '#ffffff', // Texto blanco puro
-                  fontWeight: 'bold',
-                  fontSize: '1.5rem',
-                  marginBottom: '20px',
-                  textAlign: 'center',
-                }}
-              >
-                {successMessage}
-              </h2>
-              <div className="flex justify-center items-center">
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={checkmarkVariants}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                  className="flex justify-center items-center"
-                  style={{
-                    borderRadius: '50%', // Hace que sea un círculo
-                    backgroundColor: '#0097A7', // Aqua oscuro
-                    width: '80px', // Tamaño del círculo
-                    height: '80px', // Tamaño del círculo
-                    display: 'flex', // Para alinear el contenido
-                    justifyContent: 'center', // Centra horizontalmente
-                    alignItems: 'center', // Centra verticalmente
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
-                  }}
-                >
-                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };
