@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); 
+const db = require('../db');
 
 // Ruta para obtener el total de donaciones
 router.get('/totalDonaciones', (req, res) => {
@@ -29,10 +29,11 @@ router.get('/totalGastos', (req, res) => {
 // Ruta para obtener la distribución de donaciones por donante
 router.get('/distribucionDonaciones', (req, res) => {
   const query = `
-    SELECT u.name AS donor_name, COALESCE(SUM(d.amount), 0) AS total_donations
-    FROM users u
-    INNER JOIN donations d ON u.id = d.donor_id
-    WHERE u.role = 'donor'
+    SELECT 
+      COALESCE(u.name, 'Anónimo') AS donor_name, 
+      COALESCE(SUM(d.amount), 0) AS total_donations
+    FROM donations d
+    LEFT JOIN users u ON d.donor_id = u.id
     GROUP BY u.name;
   `;
   db.query(query, (err, results) => {
@@ -46,7 +47,7 @@ router.get('/distribucionDonaciones', (req, res) => {
 
 // Ruta para obtener la evolucion de las donaciones
 router.get('/evolucionDonaciones', (req, res) => {
-    const query = `
+  const query = `
       SELECT 
         MONTHNAME(d.date) AS month, 
         SUM(d.amount) AS Donaciones 
@@ -54,14 +55,14 @@ router.get('/evolucionDonaciones', (req, res) => {
       GROUP BY month
       ORDER BY MONTH(d.date)
     `;
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching donations evolution:', err);
-        return res.status(500).json({ message: 'Error en el servidor.' });
-      }
-      res.json(results);
-    });
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching donations evolution:', err);
+      return res.status(500).json({ message: 'Error en el servidor.' });
+    }
+    res.json(results);
   });
-  
+});
+
 
 module.exports = router;

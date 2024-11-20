@@ -37,6 +37,7 @@ const ReportesDonaciones = () => {
         setTotalGastos(totalGastosRes.data);
 
         const donacionesPorDonanteRes = await axios.get('http://localhost:5000/donationsReports/distribucionDonaciones');
+        console.log('Datos de donaciones por donante:', donacionesPorDonanteRes.data);
         setDonacionesPorDonante(donacionesPorDonanteRes.data);
 
         const totalUsuarios = donacionesPorDonanteRes.data.length;
@@ -169,7 +170,7 @@ const ReportesDonaciones = () => {
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Reporte Donaciones
       </Typography>
-  
+
       {error && (
         <Snackbar
           open={snackbarOpen}
@@ -178,7 +179,7 @@ const ReportesDonaciones = () => {
           message={error}
         />
       )}
-  
+
       <div ref={pdfRef}>
         {/* Tarjetas de métricas */}
         <Grid container spacing={4}>
@@ -195,7 +196,7 @@ const ReportesDonaciones = () => {
               </CardContent>
             </Card>
           </Grid>
-  
+
           <Grid item xs={12} md={4}>
             <Card sx={{ backgroundColor: '#383D3B', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
@@ -209,7 +210,7 @@ const ReportesDonaciones = () => {
               </CardContent>
             </Card>
           </Grid>
-  
+
           <Grid item xs={12} md={4}>
             <Card sx={{ backgroundColor: '#383D3B', color: '#FFFFFF', border: '1px solid #3A3B3F' }}>
               <CardContent>
@@ -224,7 +225,7 @@ const ReportesDonaciones = () => {
             </Card>
           </Grid>
         </Grid>
-  
+
         {/* Gráficas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           <motion.div
@@ -267,7 +268,7 @@ const ReportesDonaciones = () => {
               <Typography>Cargando datos de evolución...</Typography>
             )}
           </motion.div>
-  
+
           <motion.div
             className="p-6 rounded-lg shadow-lg"
             style={{
@@ -293,9 +294,13 @@ const ReportesDonaciones = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ donor_name, total_donations }) => `${donor_name}: ${total_donations}`}
+                  label={({ donor_name }) => {
+                    // Mostrar solo el nombre del donante
+                    const name = typeof donor_name === 'string' && donor_name.trim() ? donor_name : 'Anónimo';
+                    return name;
+                  }}
                   outerRadius={120}
-                  dataKey="total_donations"
+                  dataKey="total_donations" // Clave de datos para la cantidad
                 >
                   {donacionesPorDonante.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -303,8 +308,8 @@ const ReportesDonaciones = () => {
                 </Pie>
                 <Tooltip
                   formatter={(value, name, entry) => {
-                    const { donor_name } = entry.payload;
-                    return [`${value}`, `${donor_name}`];
+                    const donorName = entry.payload.donor_name || 'Anónimo';
+                    return [`$${value}`, `${donorName}`];
                   }}
                   contentStyle={{ backgroundColor: 'white', color: 'black', borderRadius: '10px' }}
                 />
@@ -313,7 +318,7 @@ const ReportesDonaciones = () => {
           </motion.div>
         </div>
       </div>
-  
+
       {/* Botón para exportar PDF */}
       <div className="flex justify-center mt-4">
         <Button variant="contained" sx={{ backgroundColor: '#007BFF', color: '#FFFFFF' }} onClick={exportarPDF}>
@@ -321,7 +326,7 @@ const ReportesDonaciones = () => {
         </Button>
       </div>
     </div>
-  );  
+  );
 };
 
 export default ReportesDonaciones;
