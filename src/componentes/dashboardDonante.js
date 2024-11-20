@@ -63,11 +63,6 @@ import CerrarSesion from './logout';
       ],
     },
     {
-      segment: 'informes-generales',
-      title: 'Reporte General',
-      icon: <DescriptionIcon />,
-    },      
-    {
       segment: 'usuarios-programas',
       title: 'Usuarios y Programas',
       icon: <GroupIcon />,

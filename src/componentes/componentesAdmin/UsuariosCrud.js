@@ -104,6 +104,11 @@ const CrudUsuarios = () => {
   const validateUser = (user, originalUser = {}, isEditing = false) => {
     const validationErrors = {};
     const age = user.birth_date ? calculateAge(user.birth_date) : 0;
+    const trimmedName = user.name.trim();
+
+    if (trimmedName.length < 3) {
+      validationErrors.name = 'En nombre debe de tener un minimo de 3 caracteres';
+    }
 
     if (!isEditing || (isEditing && user.email && user.email !== originalUser.email)) {
       if (!isValidEmail(user.email)) {
@@ -575,7 +580,12 @@ const CrudUsuarios = () => {
                   }}
                   placeholder="Nombre"
                   value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^[a-zA-Z\s]*$/.test(value)) {
+                      setNewUser({ ...newUser, name: e.target.value })
+                    }
+                  }}
                 />
                 <input
                   type="email"
@@ -709,7 +719,12 @@ const CrudUsuarios = () => {
                   }}
                   placeholder="Nombre"
                   value={editUser.name}
-                  onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^[a-zA-Z\s]*$/.test(value)) {
+                      setEditUser({ ...editUser, name: e.target.value });
+                    }
+                  }}
                 />
                 <input
                   type="email"

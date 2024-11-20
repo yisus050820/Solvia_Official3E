@@ -2,10 +2,10 @@ const mysql = require('mysql');
 
 // Opciones de configuración para la conexión MySQL
 const db_config = {
-  host: 'bzpptqeoux1gmgpq7htr-mysql.services.clever-cloud.com',
-  user: 'un9cmicovuufs4ab',
-  password: 'kDHdJxIMfn34jNeUllfD',
-  database: 'bzpptqeoux1gmgpq7htr'
+  host: 'bpxqggqrrmrfnvahmelg-mysql.services.clever-cloud.com',
+  user: 'umomai2qvitbrwfs',
+  password: '6jEsbYlmDV0dF6PNEi04',
+  database: 'bpxqggqrrmrfnvahmelg'
 };
 
 let connection;

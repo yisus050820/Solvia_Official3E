@@ -36,6 +36,7 @@ router.post('/', (req, res) => {
 
     // Enviar el token y el rol del usuario al frontend
     res.json({ token, role: user.role });
+    console.log('Bien')
   });
 });
 

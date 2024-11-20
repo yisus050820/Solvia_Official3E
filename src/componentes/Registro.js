@@ -75,6 +75,14 @@ const Registro = () => {
       return;
     }
 
+    const trimmedName = name.trim();
+    if (trimmedName.length < 3) {
+      setMessage('El nombre debe tener un mínimo de 3 caracteres.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+    
     // Validación de formato de correo electrónico
     if (!isValidEmail(email)) {
       setMessage('Por favor, introduce un correo electrónico válido.');
@@ -103,7 +111,7 @@ const Registro = () => {
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
-    } else if ( age > 90) {
+    } else if (age > 90) {
       setMessage('Por favor ingrese una fecha de nacimiento válida.');
       setSnackbarSeverity('error');
       setOpenSnackbar(true)
@@ -204,7 +212,12 @@ const Registro = () => {
               fullWidth
               label="Nombre"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^[a-zA-Z\s]*$/.test(value)) {
+                  setName(value);
+                }
+              }}
               required
               InputLabelProps={{ style: { color: '#EEE5E9' } }}
               InputProps={{
@@ -446,7 +459,7 @@ const Registro = () => {
             </Button>
           </Box>
         </Paper>
-  
+
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
@@ -461,7 +474,7 @@ const Registro = () => {
             {message}
           </Alert>
         </Snackbar>
-  
+
         <Dialog
           open={openTermsDialog}
           keepMounted
@@ -496,50 +509,50 @@ const Registro = () => {
               <ol style={{ paddingLeft: '1.5em' }}>
                 <li><strong>Aceptación:</strong> Descripción completa.</li>
                 <li>
-                <strong>Aceptación de los Términos:</strong> Al acceder y
-                utilizar nuestra plataforma, aceptas cumplir con estos términos
-                y condiciones. Si no estás de acuerdo con alguno de ellos, te
-                recomendamos no utilizar nuestros servicios.
-              </li>
-              <li>
-                <strong>Registro de Usuario:</strong> Para registrarte, debes
-                proporcionar información precisa y veraz. Nos reservamos el
-                derecho de suspender o cancelar tu cuenta si se detecta
-                cualquier irregularidad o falsedad en los datos proporcionados.
-              </li>
-              <li>
-                <strong>Protección de Datos:</strong> Nos comprometemos a
-                proteger tu privacidad y tus datos personales. La información
-                que proporciones será utilizada únicamente para fines
-                relacionados con el servicio, conforme a nuestra Política de
-                Privacidad.
-              </li>
-              <li>
-                <strong>Uso Aceptable:</strong> Te comprometes a utilizar
-                nuestra plataforma de manera responsable, sin realizar
-                actividades ilegales, dañinas o que infrinjan los derechos de
-                terceros. Nos reservamos el derecho de suspender cuentas que no
-                cumplan con esta política.
-              </li>
-              <li>
-                <strong>Responsabilidad:</strong> Aunque nos esforzamos por
-                ofrecer un servicio de calidad, no garantizamos la disponibilidad
-                continua de la plataforma ni la ausencia de errores. No nos
-                hacemos responsables por cualquier daño o pérdida derivada del
-                uso de nuestros servicios.
-              </li>
-              <li>
-                <strong>Modificaciones de los Términos:</strong> Nos reservamos
-                el derecho de actualizar o modificar estos términos en cualquier
-                momento. Te notificaremos sobre cualquier cambio relevante. El
-                uso continuado de nuestros servicios tras una modificación
-                implica la aceptación de los nuevos términos.
-              </li>
-              <li>
-                <strong>Contacto:</strong> Si tienes alguna duda sobre estos
-                términos, puedes contactarnos a través de los medios
-                proporcionados en la plataforma.
-              </li>
+                  <strong>Aceptación de los Términos:</strong> Al acceder y
+                  utilizar nuestra plataforma, aceptas cumplir con estos términos
+                  y condiciones. Si no estás de acuerdo con alguno de ellos, te
+                  recomendamos no utilizar nuestros servicios.
+                </li>
+                <li>
+                  <strong>Registro de Usuario:</strong> Para registrarte, debes
+                  proporcionar información precisa y veraz. Nos reservamos el
+                  derecho de suspender o cancelar tu cuenta si se detecta
+                  cualquier irregularidad o falsedad en los datos proporcionados.
+                </li>
+                <li>
+                  <strong>Protección de Datos:</strong> Nos comprometemos a
+                  proteger tu privacidad y tus datos personales. La información
+                  que proporciones será utilizada únicamente para fines
+                  relacionados con el servicio, conforme a nuestra Política de
+                  Privacidad.
+                </li>
+                <li>
+                  <strong>Uso Aceptable:</strong> Te comprometes a utilizar
+                  nuestra plataforma de manera responsable, sin realizar
+                  actividades ilegales, dañinas o que infrinjan los derechos de
+                  terceros. Nos reservamos el derecho de suspender cuentas que no
+                  cumplan con esta política.
+                </li>
+                <li>
+                  <strong>Responsabilidad:</strong> Aunque nos esforzamos por
+                  ofrecer un servicio de calidad, no garantizamos la disponibilidad
+                  continua de la plataforma ni la ausencia de errores. No nos
+                  hacemos responsables por cualquier daño o pérdida derivada del
+                  uso de nuestros servicios.
+                </li>
+                <li>
+                  <strong>Modificaciones de los Términos:</strong> Nos reservamos
+                  el derecho de actualizar o modificar estos términos en cualquier
+                  momento. Te notificaremos sobre cualquier cambio relevante. El
+                  uso continuado de nuestros servicios tras una modificación
+                  implica la aceptación de los nuevos términos.
+                </li>
+                <li>
+                  <strong>Contacto:</strong> Si tienes alguna duda sobre estos
+                  términos, puedes contactarnos a través de los medios
+                  proporcionados en la plataforma.
+                </li>
               </ol>
             </Typography>
           </DialogContent>
@@ -552,6 +565,6 @@ const Registro = () => {
       </motion.div>
     </Box>
   );
-}  
+}
 
 export default Registro;

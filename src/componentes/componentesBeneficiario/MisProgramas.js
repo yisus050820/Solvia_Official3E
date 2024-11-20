@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Typography } from '@mui/material';
 import StudentDashboard from './InterfazBeneficiario';
 
-const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name }) => {
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name, objetive, end_date, start_date }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [atBottom, setAtBottom] = useState(true);
@@ -75,7 +75,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <span className="text-green-400">Participantes: {participants}</span>
           </div>
           <div className="mt-2">
-            <span className="text-green-600">Donaciones: ${donations}</span>
+            <span className="text-green-600">Presupuesto: ${donations}</span>
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
@@ -130,7 +130,21 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                     src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
                     alt={name}
                   />
-                  <p className="text-white mt-4">{description}</p>
+                  <p className="mt-4" style={{ color: 'white' }}>
+                    Descripción: {description}
+                  </p>
+                  <p className="mt-4" style={{ color: 'white' }}>
+                    Objetivo: {objetive}
+                  </p>
+                  <p className="mt-4" style={{ color: 'white' }}>
+                    Fecha de Inicio:  {start_date.split('T')[0]}
+                  </p>
+                  <p className="mt-4" style={{ color: 'white' }}>
+                    Fecha de Inicio:  {end_date.split('T')[0]}
+                  </p>
+                  <div className="mt-2">
+                    <span style={{ color: '#92DCE5' }}>Presupuesto: ${donations || 0}</span>
+                  </div> 
                 </>
               )}
               <motion.button
@@ -178,7 +192,10 @@ const MisProgramas = () => {
               participants: participantsRes.data.count,
               donations: donationsRes.data.total,
               imageUrl: program.program_image,
-              coordinator_name: program.coordinator_name || 'No disponible'
+              coordinator_name: program.coordinator_name || 'No disponible',
+              objetive: program.objetives,
+              start_date: program.start_date,
+              end_date: program.end_date
             };
           })
         );
@@ -203,13 +220,16 @@ const MisProgramas = () => {
           <ProgramCard
             key={program.id}
             title={program.name}
-            
+
             description={program.description}
             participants={program.participants}
             donations={program.donations}
             status={program.status}
             imageUrl={program.imageUrl}
             programId={program.id}
+            objetive={program.objetive}
+            start_date={program.start_date}
+            end_date ={program.end_date}
           />
         ))}
       </div>

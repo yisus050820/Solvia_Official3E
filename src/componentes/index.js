@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
@@ -20,12 +18,6 @@ const infoCards = [
   { title: "Programas Educativos", description: "Brindamos apoyo a estudiantes de todo el mundo con programas diseñados para garantizar el acceso a la educación.", image: "https://utdelmayab.edu.mx/wp-content/uploads/2024/03/campana-de-promocion-de-nuestros-programas-educativos-5.jpg" },
   { title: "Lucha contra la Desigualdad", description: "Nuestras iniciativas se centran en reducir la desigualdad en comunidades vulnerables a través de la educación y el empoderamiento.", image: "https://global.unitednations.entermediadb.net/assets/mediadb/services/module/asset/downloads/preset/Libraries/Production+Library/11-10-2021-balqees-2.jpeg/image1170x530cropped.jpg" },
   { title: "Apoyo Integral", description: "Ofrecemos ayudas integrales a personas y familias en situación de riesgo social para mejorar su calidad de vida.", image: "https://www.comunicaciontucuman.gob.ar/fotos/cache/notas/2022/03/07/818x460_220307172330_17848.jpg" },
-]
-
-const testimonials = [
-  { name: "Juan Pérez", comment: "Gracias a Solvia, pude continuar con mis estudios y mejorar mi futuro.", image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { name: "Ana López", comment: "El programa de igualdad de Solvia transformó mi comunidad. Hoy tenemos más oportunidades que antes.", image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { name: "Carlos Martínez", comment: "El apoyo que recibí de Solvia me permitió cumplir mi sueño de terminar la universidad.", image: "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=600" }
 ]
 
 export default function LandingPage() {
@@ -59,7 +51,7 @@ export default function LandingPage() {
     const animateCarousel = async () => {
       if (isMounted) {
         await controls.start({ x: `-${100 / 3}%`, transition: { duration: 10, ease: 'linear' } });
-        if (isMounted) controls.set({ x: '0%' });  // Asegurarse de que controls.set() solo se ejecute cuando esté montado
+        if (isMounted) controls.set({ x: '0%' });  
         animateCarousel();
       }
     };

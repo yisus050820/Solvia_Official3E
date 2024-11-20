@@ -558,7 +558,6 @@ const CrudProgramas = () => {
                 <th className="p-4">Descripción</th>
                 <th className="p-4">Fecha Inicio</th>
                 <th className="p-4">Fecha Fin</th>
-                <th className="p-4">Objetivos</th>
                 <th className="p-4">Coordinador</th>
                 <th className="p-4">Estado</th>
                 <th className="p-4">Acciones</th>
@@ -575,7 +574,6 @@ const CrudProgramas = () => {
                   <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">{item.start_date.split('T')[0]}</td>
                   <td className="p-4">{item.end_date.split('T')[0]}</td>
-                  <td className="p-4">{truncateDescription(item.objectives)}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
@@ -815,10 +813,19 @@ const CrudProgramas = () => {
                 alt="Program Image"
               />
               <p className="mt-4" style={{ color: 'white' }}>
-                {selectedProgram.description}
+                Descripción: {selectedProgram.description}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Objetivo: {selectedProgram.objetivos}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio:  {selectedProgram.start_date.split('T')[0]}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio:  {selectedProgram.end_date.split('T')[0]}
               </p>
               <div className="mt-2">
-                <span style={{ color: '#92DCE5' }}>Donaciones: ${selectedProgram.donations || 0}</span>
+                <span style={{ color: '#92DCE5' }}>Presupuesto: ${selectedProgram.donations || 0}</span>
               </div>
               {/* Botón para cerrar la ventana */}
               <motion.button
