@@ -427,43 +427,58 @@ function TeacherDashboard({ programId }) {
           )}
         </AnimatePresence>
       </Paper>
-      {/* Modal para mensajes de éxito */}
-      <AnimatePresence>
+{/* Modal para mensajes de éxito */}
+<AnimatePresence>
         {successMessage && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
-              {/* Icono de palomita */}
-
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
+            >
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
                   variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>
@@ -481,6 +496,51 @@ function TeacherDashboard({ programId }) {
           {message}
         </Alert>
       </Snackbar>
+      
+      <Dialog
+        open={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: '#383D3B', // Fondo oscuro
+            color: '#EEE5E9', // Texto claro
+          },
+        }}
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"¿Estás seguro de eliminar esta tarea?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ color: '#EEE5E9' }}>
+            Esta acción no se puede deshacer. ¿Deseas continuar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <motion.button
+            className="bg-[#7C7C7C] text-[#EEE5E9] px-4 py-2 rounded-full"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsDeleteConfirmOpen(false)} // Cierra el diálogo
+          >
+            Cancelar
+          </motion.button>
+          <motion.button
+            className="bg-red-500 text-white px-4 py-2 rounded-full"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={async () => {
+              await handleDeleteTask(currentTask.id);
+              setIsDeleteConfirmOpen(false);
+              setSuccessMessage("Tarea eliminada con éxito"); // Mostrar mensaje de éxito
+            }}
+          >
+            Eliminar
+          </motion.button>
+        </DialogActions>
+      </Dialog>
+
 
       <Modal open={openDialog} onClose={handleCloseDialog}>
         <Box

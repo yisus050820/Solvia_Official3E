@@ -306,7 +306,7 @@ const ReportesDonaciones = () => {
                     const { donor_name } = entry.payload;
                     return [`${value}`, `${donor_name}`];
                   }}
-                  contentStyle={{ backgroundColor: '#2C2F33', color: '#FFFFFF', borderRadius: '10px' }}
+                  contentStyle={{ backgroundColor: 'white', color: 'black', borderRadius: '10px' }}
                 />
               </PieChart>
             </ResponsiveContainer>

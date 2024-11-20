@@ -27,6 +27,12 @@ export default function Donar() {
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
 
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
+
   const handleCvvChange = (e) => {
     let value = e.target.value.replace(/\D/g, '');
     if (value.length > 3) {
@@ -617,38 +623,51 @@ Donar ${donationAmount ? parseFloat(donationAmount).toFixed(2) : '0.00'}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}  // Animaciones de entrada/salida
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            transition={{ duration: 0.2, ease: "easeIn" }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
             <motion.div
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               exit={{ y: 50 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}  // Efecto de resorte en la entrada/salida
-              className="bg-gray-800 p-6 rounded-xl shadow-lg">
-              {/* Icono de palomita */}
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
-              <div className='flex justify-center items-center'>
+              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
+            >
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
+              <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  variants={{
-                    hidden: { opacity: 0, pathLength: 0 },
-                    visible: { opacity: 1, pathLength: 1 },
-                  }}
+                  variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className='flex justify-center items-center'
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',        // Hace que sea un círculo
-                    backgroundColor: '#4CAF50', // Color de fondo verde
-                    width: '80px',              // Tamaño del círculo
-                    height: '80px',             // Tamaño del círculo
-                    display: 'flex',            // Para alinear el contenido
-                    justifyContent: 'center',   // Centra horizontalmente
-                    alignItems: 'center'        // Centra verticalmente
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>

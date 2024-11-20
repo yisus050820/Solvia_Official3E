@@ -14,7 +14,7 @@ const ProgramCard = ({ title, description, programId, participants, imageUrl, fe
   const [loading, setLoading] = useState(true);
   const [atBottom, setAtBottom] = useState(true);
   const feedbackListRef = useRef(null);
-
+   
   const handleScroll = () => {
     const feedbackListContainer = feedbackListRef.current;
     if (feedbackListContainer) {
@@ -244,6 +244,12 @@ const Calificar = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Variantes de animación para la palomita
+  const checkmarkVariants = {
+    hidden: { opacity: 0, pathLength: 0 },
+    visible: { opacity: 1, pathLength: 1 },
+  };
+
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
@@ -337,6 +343,7 @@ const Calificar = () => {
         </Alert>
       </Snackbar>
 
+      {/* Modal para mensajes de éxito */}
       <AnimatePresence>
         {successMessage && (
           <motion.div
@@ -351,26 +358,43 @@ const Calificar = () => {
               animate={{ y: 0 }}
               exit={{ y: 50 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="bg-gray-800 p-6 rounded-xl shadow-lg"
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                backgroundColor: '#003f5c', // Fondo azul oscuro
+                color: '#ffffff', // Texto blanco puro
+              }}
             >
-              <h2 className="text-white text-2xl font-bold mb-4">{successMessage}</h2>
+              <h2
+                style={{
+                  color: '#ffffff', // Texto blanco puro
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                {successMessage}
+              </h2>
               <div className="flex justify-center items-center">
                 <motion.div
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
+                  variants={checkmarkVariants}
                   transition={{ duration: 1, ease: "easeInOut" }}
+                  className="flex justify-center items-center"
                   style={{
-                    borderRadius: '50%',
-                    backgroundColor: '#4CAF50',
-                    width: '80px',
-                    height: '80px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                    borderRadius: '50%', // Hace que sea un círculo
+                    backgroundColor: '#0097A7', // Aqua oscuro
+                    width: '80px', // Tamaño del círculo
+                    height: '80px', // Tamaño del círculo
+                    display: 'flex', // Para alinear el contenido
+                    justifyContent: 'center', // Centra horizontalmente
+                    alignItems: 'center', // Centra verticalmente
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Sombra suave
                   }}
                 >
-                  <FaCheck size={50} className="text-white" />
+                  <FaCheck size={50} style={{ color: '#ffffff' }} /> {/* Palomita blanca */}
                 </motion.div>
               </div>
             </motion.div>

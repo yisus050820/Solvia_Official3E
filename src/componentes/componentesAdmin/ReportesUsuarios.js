@@ -294,7 +294,7 @@ const ReportesUsuarios = () => {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+                contentStyle={{ backgroundColor: 'white', color: 'black', borderRadius: '10px' }}
               />
             </PieChart>
           </ResponsiveContainer>

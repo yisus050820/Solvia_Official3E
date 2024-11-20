@@ -264,7 +264,7 @@ const ReportesProgramasAyuda = () => {
                 <XAxis dataKey="month" stroke="#EEE5E9" />
                 <YAxis stroke="#EEE5E9" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+                  contentStyle={{ backgroundColor: '#383D3B ', color: '#EEE5E9', borderRadius: '10px' }}
                 />
                 <Legend />
                 <Line
@@ -321,7 +321,7 @@ const ReportesProgramasAyuda = () => {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: '#383D3B', color: '#EEE5E9', borderRadius: '10px' }}
+                contentStyle={{ backgroundColor: 'white', color: 'black', borderRadius: '10px' }}
               />
             </PieChart>
           </ResponsiveContainer>
