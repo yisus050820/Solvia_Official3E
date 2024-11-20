@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Typography } from '@mui/material';
 
 const ProgramCard = ({ program }) => {
-  const { name, description, participants, donations, status, program_image, coordinator_name } = program;
+  const { name, description, participants, donations, status, program_image, coordinator_name, objective, start, end } = program;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [atBottom, setAtBottom] = useState(true);
   const modalContentRef = useRef(null);
@@ -112,7 +112,21 @@ const ProgramCard = ({ program }) => {
                 src={program_image ? `http://localhost:5000${program_image}` : "https://via.placeholder.com/150"}
                 alt={name}
               />
-              <p className="text-white mt-4">{description}</p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Descripción: {description}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Objetivo: {objective}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio:  {start.split('T')[0]}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio:  {end.split('T')[0]}
+              </p>
+              <div className="mt-2">
+                <span style={{ color: '#92DCE5' }}>Presupuesto: {donations ? `$${donations}` : "No asignado"}</span>
+              </div>
               <motion.button
                 className="mt-4 bg-[#E63946] text-white px-4 py-2 rounded"
                 whileHover={{ backgroundColor: '#E63946', scale: 1.1 }}
@@ -154,8 +168,11 @@ const ProgramasActivos = () => {
                 ...program,
                 participants: participantsRes.data.count,
                 donations: donationsRes.data.total,
-                program_image: program.program_image,
+                imageUrl: program.program_image,
                 coordinator_name: program.coordinator_name || 'No disponible',
+                objective: program.objectives,
+                start: program.start_date,
+                end: program.end_date
               };
             })
         );

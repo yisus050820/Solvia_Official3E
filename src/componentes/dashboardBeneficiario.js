@@ -19,7 +19,6 @@ import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
 import MisProgramas from './componentesBeneficiario/MisProgramas';
 import Calificar from './componentesBeneficiario/Feedback';
 import VerFeedback from './componentesAdmin/VerFeedback';
-import ReportesDonaciones from './componentesAdmin/ReportesDonaciones';
 import ProgramasActivos from './componentesBeneficiario/ProgramasDisponiblesActivos';
 import ChatGlobal from './ChatGlobal';
 import CerrarSesion from './logout';
@@ -141,7 +140,6 @@ function DemoPageContent({ pathname }) {
     {pathname === '/configuracion-perfil' && <PerfilUsuario />}
     {pathname === '/programas/disponibles' && <ProgramasActivos />}
     {pathname === '/programas/actuales' && <MisProgramas />}
-    {pathname === '/ayuda' && <ReportesDonaciones />}
     {pathname === '/comunicacion/feedback' && <Calificar />}
     {pathname === '/comunicacion/contacto' && <ChatGlobal />}
     {pathname === '/comunicacion/ver-feedback' && <VerFeedback />}
