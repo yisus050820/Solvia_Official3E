@@ -87,11 +87,6 @@ const NAVIGATION = [
       },
     ],
   },
-  {
-    segment: 'logout',
-    title: 'Cerrar sesión',
-    icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
-  },
     
 ];
 

@@ -190,6 +190,14 @@ const CrudProgramas = () => {
       }
     }
 
+    if (!isEditing && !program.fechaInicio) {
+      validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
+    } 
+
+    if (new Date(program.fechaInicio) < todayDate && !isEditing) {
+      validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
+    }
+
     if (!program.fechaFin || new Date(program.fechaFin) < new Date(program.fechaInicio)) {
       validationErrors.fechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
     }

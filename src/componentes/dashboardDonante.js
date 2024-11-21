@@ -97,11 +97,6 @@ import CerrarSesion from './logout';
         },
       ],
     },
-    {
-      segment: 'logout',
-      title: 'Cerrar sesión',
-      icon: <SettingsIcon />, // Puedes cambiar el icono si lo deseas
-    },
   ];
 
   const demoTheme = createTheme({

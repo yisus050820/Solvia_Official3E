@@ -91,10 +91,6 @@ const CrudProgramas = () => {
       });
   };
 
-  //useEffect(() => {
-  //  console.log(program); 
-  //}, [program]);  
-
   //Alerta se cierra automaticamente despues de 5 segundos
   useEffect(() => {
     if (successMessage) {
@@ -192,7 +188,9 @@ const CrudProgramas = () => {
 
     if (!isEditing && !program.fechaInicio) {
       validationErrors.fechaInicio = 'La fecha de inicio es obligatoria.';
-    } else if (new Date(program.fechaInicio) < todayDate && !isEditing) {
+    } 
+
+    if (new Date(program.fechaInicio) < todayDate && !isEditing) {
       validationErrors.fechaInicio = 'La fecha de inicio no puede ser anterior a la fecha actual.';
     }
 

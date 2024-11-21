@@ -115,18 +115,6 @@ const NAVIGATION = [
       },
     ],
   },
-  {
-    segment: 'logout',
-    title: 'Cerrar sesión',
-    icon: <SettingsIcon />, // Cambia el icono si lo deseas
-    sx: {
-      color: '#FF5722', // Color del texto
-      backgroundColor: '#FFC107', // Fondo (opcional)
-      '&:hover': {
-        backgroundColor: 'black', // Fondo al pasar el mouse
-      },
-    },
-  },
   
 ];
 
