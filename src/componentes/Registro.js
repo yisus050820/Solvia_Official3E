@@ -179,9 +179,10 @@ const Registro = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        backgroundColor: '#EEE5E9', // Fondo claro
-        p: 2,
-      }}
+        backgroundImage: 'url("/fondo1.jpg")', // Desde la raíz de la carpeta public
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        p: 2,      }}
     >
       <motion.div
         initial={{ opacity: 0, y: -50 }}

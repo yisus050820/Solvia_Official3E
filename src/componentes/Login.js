@@ -136,7 +136,7 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        backgroundColor: '#EEE5E9', // Fondo claro
+        backgroundImage: 'url("/fondo1.jpg")', // Desde la raíz de la carpeta public
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         p: 2,
