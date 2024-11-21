@@ -120,11 +120,9 @@ const CrudUsuarios = () => {
       validationErrors.birth_date = 'El beneficiario debe tener al menos 9 años.';
     } else if (!isEditing && user.role !== 'beneficiary' && age < 18 || isEditing && user.role !== 'beneficiary' && age < 18) {
       validationErrors.birth_date = 'Los usuarios deben tener al menos 18 años.';
-    } else if (!isEditing && age > 90 || isEditing && age > 90) {
-      validationErrors.birth_date = 'Por favor ingrese una fecha de nacimiento válida.';
-    }
-
-    if (!isEditing && age > 90 || isEditing && age > 90) {
+    } 
+    
+    if (!isEditing && age > 100 || isEditing && age > 100) {
       validationErrors.birth_date = 'Por favor introduzca una fecha de nacimiento valida.';
     }
 

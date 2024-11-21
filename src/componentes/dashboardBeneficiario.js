@@ -54,12 +54,6 @@ const NAVIGATION = [
   },
  
   {
-    segment: 'ayuda',
-    title: 'Donaciones',
-    icon: <VolunteerActivism />,
-    
-  },
-  {
     segment: 'comunicacion',
     title: 'Comunicación', // Título actualizado
     icon: <ChatBubbleIcon />,

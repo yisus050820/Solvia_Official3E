@@ -22,11 +22,11 @@ function authenticateToken(req, res, next) {
 router.get('/', (req, res) => {
   const { role } = req.query;
   let query = 'SELECT id, name, email, DATE_FORMAT(birth_date, "%Y-%m-%d") AS birth_date , role, description, profile_picture, DATE_FORMAT(created_at, "%Y-%m-%d") AS created_at FROM users';
-  
+
   if (role) {
     query += ' WHERE role = ?';
   }
-  
+
   db.query(query, role ? [role] : [], (err, results) => {
     if (err) {
       console.error('Error fetching users:', err);
@@ -39,7 +39,7 @@ router.get('/', (req, res) => {
 // Obtener todos los coordinadores
 router.get('/coordinadores', (req, res) => {
   const query = 'SELECT id, name FROM users WHERE role = "coordinator"';
-  
+
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching coordinators:', err);
@@ -51,47 +51,46 @@ router.get('/coordinadores', (req, res) => {
 
 // Obtener programas inscritos para todos los usuarios
 router.get('/asignaciones', authenticateToken, (req, res) => {
-    const query = `
-      SELECT 
-        u.id AS user_id,
-        u.name AS user_name,
-        u.role AS user_role,
-        p.id AS program_id,
-        p.name AS program_name
-      FROM users u
-      LEFT JOIN volunteers v ON u.id = v.user_id
-      LEFT JOIN beneficiaries b ON u.id = b.user_id
-      LEFT JOIN programs p
-        ON (v.program_id = p.id OR b.program_id = p.id OR p.coordinator_charge = u.id)
-      WHERE u.role IN ('volunteer', 'beneficiary', 'coordinator')
-      ORDER BY u.id, p.id`;
-  
-      db.query(query, (err, results) => {
-        if (err) {
-          console.error('Error fetching enrolled programs for all users:', err);
-          return res.status(500).json({ message: 'Error al obtener programas inscritos.' });
-        }
-      
-        const asignaciones = results.reduce((acc, row) => {
-          if (!acc[row.user_id]) {
-            acc[row.user_id] = {
-              user_name: row.user_name,
-              user_role: row.user_role,
-              programas: [],
-            };
-          }
-          if (row.program_id && row.program_name) {
-            acc[row.user_id].programas.push({
-              program_id: row.program_id,
-              program_name: row.program_name,
-            });
-          }
-          return acc;
-        }, {});
-      
-        res.json(asignaciones);
-        console.log(JSON.stringify(asignaciones, null, 2));
-      });      
-  });  
+  const query = `
+    SELECT 
+      u.id AS user_id,
+      u.name AS user_name,
+      u.role AS user_role,
+      p.id AS program_id,
+      p.name AS program_name
+    FROM users u
+    LEFT JOIN volunteers v ON u.id = v.user_id
+    LEFT JOIN beneficiaries b ON u.id = b.user_id
+    LEFT JOIN programs p
+      ON (v.program_id = p.id OR b.program_id = p.id OR p.coordinator_charge = u.id)
+    WHERE u.role IN ('volunteer', 'beneficiary', 'coordinator')
+    ORDER BY u.id, p.id`;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching enrolled programs for all users:', err);
+      return res.status(500).json({ message: 'Error al obtener programas inscritos.' });
+    }
+
+    const asignaciones = results.reduce((acc, row) => {
+      if (!acc[row.user_id]) {
+        acc[row.user_id] = {
+          user_name: row.user_name,
+          user_role: row.user_role,
+          programas: [],
+        };
+      }
+      if (row.program_id && row.program_name) {
+        acc[row.user_id].programas.push({
+          program_id: row.program_id,
+          program_name: row.program_name,
+        });
+      }
+      return acc;
+    }, {});
+
+    res.json(asignaciones);
+  });
+});
 
 module.exports = router;

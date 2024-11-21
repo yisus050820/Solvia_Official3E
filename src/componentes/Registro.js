@@ -107,11 +107,13 @@ const Registro = () => {
       setOpenSnackbar(true);
       return;
     } else if (role !== 'beneficiary' && age < 18) {
-      setMessage('Los usuarios deben tener al menos 18 años.');
+      setMessage('Debes tener al menos 18 años.');
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
       return;
-    } else if (age > 90) {
+    }
+    
+    if (age > 100) {
       setMessage('Por favor ingrese una fecha de nacimiento válida.');
       setSnackbarSeverity('error');
       setOpenSnackbar(true)

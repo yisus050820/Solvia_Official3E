@@ -178,6 +178,12 @@ const CrudProgramas = () => {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
+    if (!isEditing || (isEditing && program.nombre !== originalProgram.nombre)) {
+      if (!program.nombre || program.nombre.trim().length < 5) {
+        validationErrors.nombre = 'El nombre es obligatorio y debe tener al menos 5 caracteres.';
+      }
+    }
+
     if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
       if (!program.descripcion || program.descripcion.length < 10) {
         validationErrors.descripcion = 'La descripción debe tener al menos 10 caracteres.';
@@ -496,7 +502,7 @@ const CrudProgramas = () => {
 
                   <div className="mt-2">
                     <span style={{ color: '#4CAF50' }}>
-                      Presupuesto: ${program.donations || 0}
+                      Presupuesto: ${program.budget || 0}
                     </span>
                   </div>
                   <div className="flex mt-4 justify-between">

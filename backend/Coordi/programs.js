@@ -33,19 +33,21 @@ const upload = multer({ storage: storage });
 
 // Obtener programas
 router.get('/', (req, res) => {
-    let query = `
-        SELECT p.*, u.name as coordinator_name 
-        FROM programs p
-        JOIN users u ON p.coordinator_charge = u.id
-    `;
+  let query = `
+      SELECT p.*, 
+             u.name AS coordinator_name, 
+             (SELECT SUM(e.amount) FROM expenses e WHERE e.program_id = p.id) AS budget
+      FROM programs p
+      JOIN users u ON p.coordinator_charge = u.id
+  `;
 
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching programs:', err);
-            return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
-        }
-        res.json(results);
-    });
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching programs:', err);
+          return res.status(500).json({ message: 'Error en el servidor. Inténtelo más tarde.' });
+      }
+      res.json(results);
+  });
 });
 
 // Crear programa

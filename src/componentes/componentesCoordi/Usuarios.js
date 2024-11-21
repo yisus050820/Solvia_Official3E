@@ -64,22 +64,36 @@ const CrudUsuariosCoordi = () => {
   };
 
   const sortedUser = [...user].sort((a, b) => {
-    if (sortBy === 'name') return a.name.localeCompare(b.name);
-    if (sortBy === 'email') return a.email.localeCompare(b.email);
-    if (sortBy === 'created_at') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return a.email.localeCompare(b.email);
+    if (sortBy === "birth_date") return new Date(a.birth_date).getTime() - new Date(b.birth_date).getTime();
+    if (sortBy === "role") return a.role.localeCompare(b.role);
+    if (sortBy === "description") return (a.description || "").localeCompare(b.description || "");
+    if (sortBy === "created_at") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (sortBy === "programasInscritos") {
+      const programasA = programasInscritos[a.id]?.join(", ") || "";
+      const programasB = programasInscritos[b.id]?.join(", ") || "";
+      return programasA.localeCompare(programasB);
+    }
     return 0;
   });
-
+  
   const filteredUser = sortedUser.filter((user) => {
-    const matchesSearchQuery = (
+    const matchesSearchQuery =
       user.name.toLowerCase().includes(searchQuery) ||
       user.email.toLowerCase().includes(searchQuery) ||
-      (user.description && user.description.toLowerCase().includes(searchQuery))
-    );
-    const matchesRole = filtroRol === '' || user.role === filtroRol;
-
+      (user.birth_date && user.birth_date.toLowerCase().includes(searchQuery)) ||
+      user.role.toLowerCase().includes(searchQuery) ||
+      (user.description && user.description.toLowerCase().includes(searchQuery)) ||
+      (user.created_at && user.created_at.toLowerCase().includes(searchQuery)) ||
+      (programasInscritos[user.id]?.some((program) =>
+        program.toLowerCase().includes(searchQuery)
+      ) ?? false); // Verifica si algún programa incluye la búsqueda
+  
+    const matchesRole = filtroRol === '' || user.role === filtroRol; // Condición de filtro de rol
+  
     return matchesSearchQuery && matchesRole;
-  });
+  });  
 
   return (
     <div className="w-full px-6 py-0.1 mx-auto mt-2">

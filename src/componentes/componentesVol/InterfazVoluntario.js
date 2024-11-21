@@ -131,58 +131,75 @@ function TeacherDashboard({ programId }) {
 
   const handleSaveTask = async (event) => {
     event.preventDefault();
+  
     const formData = new FormData(event.currentTarget);
     const newTask = {
-      title: formData.get("name"),
-      description: formData.get("description"),
+      title: formData.get("name")?.trim(),
+      description: formData.get("description")?.trim(),
       end_date: formData.get("dueDate"),
       image: formData.get("imageUrl"),
       video: formData.get("videoUrl"),
-      id_program: programId
+      id_program: programId,
     };
-
-    const { end_date } = newTask;
-    const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0);
-
-    if (new Date(end_date) < todayDate) {
-      setMessage('La fecha de entrega no puede ser anterior a la fecha actual.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
+  
+    const errors = {};
+  
+    // Validación de campos
+    if (!newTask.title || newTask.title.length < 5) {
+      errors.name = "El nombre de la tarea debe tener al menos 5 caracteres.";
+    }
+  
+    if (!newTask.description || newTask.description.length < 10) {
+      errors.description = "La descripción debe tener al menos 10 caracteres.";
+    }
+  
+    if (!newTask.end_date) {
+      errors.dueDate = "La fecha de entrega es obligatoria.";
+    } else {
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      if (new Date(newTask.end_date) < todayDate) {
+        errors.dueDate = "La fecha de entrega no puede ser anterior a hoy.";
+      }
+    }
+  
+    // Si hay errores, actualiza el estado y detén la ejecución
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors);
       return;
     }
-
+  
     try {
       if (currentTask) {
         await axios.put(`http://localhost:5000/taskVol/tasks/${currentTask.id}`, newTask, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
       } else {
         await axios.post("http://localhost:5000/taskVol/tasks", newTask, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
       }
-
+  
       const response = await axios.get(`http://localhost:5000/taskVol/tasks/${programId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
+  
       setTasks(response.data);
       handleCloseDialog();
-      setSuccessMessage('Tarea guardada con éxito'); // Establecer el mensaje de éxito al guardar
+      setErrors({}); // Limpia los errores después de guardar
+      setSuccessMessage("Tarea guardada con éxito");
     } catch (error) {
       console.error("Error saving task:", error);
       const errorMessage = error.response?.data?.message || "Error al guardar la tarea.";
       setMessage(errorMessage);
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
     }
-  };
+  };  
 
   const handleDeleteTask = async (id) => {
     try {
@@ -291,7 +308,7 @@ function TeacherDashboard({ programId }) {
 
           </Select>
         </FormControl>
-  
+
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Button
             variant={view === "table" ? "contained" : "outlined"}
@@ -316,7 +333,7 @@ function TeacherDashboard({ programId }) {
             <FaPlus />
           </motion.button>
         </Box>
-  
+
         <AnimatePresence mode="wait">
           {view === "table" ? (
             <motion.div
@@ -427,8 +444,8 @@ function TeacherDashboard({ programId }) {
           )}
         </AnimatePresence>
       </Paper>
-{/* Modal para mensajes de éxito */}
-<AnimatePresence>
+      {/* Modal para mensajes de éxito */}
+      <AnimatePresence>
         {successMessage && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -486,17 +503,6 @@ function TeacherDashboard({ programId }) {
         )}
       </AnimatePresence>
 
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: "100%" }}>
-          {message}
-        </Alert>
-      </Snackbar>
-      
       <Dialog
         open={isDeleteConfirmOpen}
         onClose={() => setIsDeleteConfirmOpen(false)}
@@ -569,11 +575,14 @@ function TeacherDashboard({ programId }) {
               variant="outlined"
               defaultValue={currentTask?.title || ""}
               error={!!errors.name}
-              helperText={errors.name}
               InputLabelProps={{
-                style: { color: "#383D3B" }, // Color del label
+                style: { color: "#383D3B" },
               }}
             />
+            {errors.name && (
+              <span style={{ color: "red", fontSize: "0.9rem" }}>{errors.name}</span>
+            )}
+
             <TextField
               margin="dense"
               name="description"
@@ -583,11 +592,14 @@ function TeacherDashboard({ programId }) {
               variant="outlined"
               defaultValue={currentTask?.description || ""}
               error={!!errors.description}
-              helperText={errors.description}
               InputLabelProps={{
-                style: { color: "#383D3B" }, // Color del label
+                style: { color: "#383D3B" },
               }}
             />
+            {errors.description && (
+              <span style={{ color: "red", fontSize: "0.9rem" }}>{errors.description}</span>
+            )}
+
             <TextField
               margin="dense"
               name="dueDate"
@@ -601,9 +613,10 @@ function TeacherDashboard({ programId }) {
                 style: { color: "#383D3B" },
               }}
               error={!!errors.dueDate}
-              helperText={errors.dueDate}
-              
             />
+            {errors.dueDate && (
+              <span style={{ color: "red", fontSize: "0.9rem" }}>{errors.dueDate}</span>
+            )}
             <TextField
               margin="dense"
               name="videoUrl"
@@ -629,14 +642,14 @@ function TeacherDashboard({ programId }) {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}
-                    sx={{
-                      color: "#FFFFFF", // Color del texto
-                      backgroundColor: "#FF6347", // Color de fondo
-                      "&:hover": {
-                        backgroundColor: "#FF4500", // Color de fondo al pasar el mouse
-                      },
-                    }}
-                  >Cancelar</Button>
+              sx={{
+                color: "#FFFFFF", // Color del texto
+                backgroundColor: "#FF6347", // Color de fondo
+                "&:hover": {
+                  backgroundColor: "#FF4500", // Color de fondo al pasar el mouse
+                },
+              }}
+            >Cancelar</Button>
             <Button type="submit" variant="contained" color="primary">
               Guardar
             </Button>
@@ -656,7 +669,7 @@ function TeacherDashboard({ programId }) {
           p: 4,
         }}>
           <IconButton
-            aria-label="close"  
+            aria-label="close"
             onClick={handleCloseMaterial}
             sx={{
               position: 'absolute',

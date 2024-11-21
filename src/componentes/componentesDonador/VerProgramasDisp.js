@@ -91,10 +91,13 @@ const ProgramasDisp = () => {
     pause: 'pausado',
     unactive: 'inactivo'
   };
-
+  
   const filteredPrograms = program.filter((program) => {
     const search = searchTerm.toLowerCase();
-
+  
+    // Obtener la traducción del estado actual del programa
+    const translatedStatus = statusTranslation[program.status];
+  
     return (
       (program.name && program.name.toLowerCase().includes(search)) ||
       (program.description && program.description.toLowerCase().includes(search)) ||
@@ -103,9 +106,9 @@ const ProgramasDisp = () => {
       (program.objectives && program.objectives.toLowerCase().includes(search)) ||
       (program.coordinator_name && program.coordinator_name.toLowerCase().includes(search)) ||
       (program.status && program.status.toLowerCase().includes(search)) ||
-      (program.donations && program.donations.toString().toLowerCase().includes(search))
+      (translatedStatus && translatedStatus.toLowerCase().includes(search))
     );
-  });
+  });  
 
   return (
     <>

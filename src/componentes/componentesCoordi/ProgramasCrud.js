@@ -114,7 +114,6 @@ const CrudProgramas = () => {
     );
   });
 
-
   useEffect(() => {
     fetchPrograms();
   }, []);
@@ -178,6 +177,12 @@ const CrudProgramas = () => {
     const validationErrors = {};
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
+
+    if (!isEditing || (isEditing && program.nombre !== originalProgram.nombre)) {
+      if (!program.nombre || program.nombre.trim().length < 5) {
+        validationErrors.nombre = 'El nombre es obligatorio y debe tener al menos 5 caracteres.';
+      }
+    }
 
     if (!isEditing || (isEditing && program.descripcion !== originalProgram.descripcion)) {
       if (!program.descripcion || program.descripcion.length < 10) {
@@ -463,7 +468,8 @@ const CrudProgramas = () => {
             {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
-                className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
+                className="max-w-sm rounded-xl shadow-lg overflow-hidden m-2"
+                style={{ backgroundColor: '#383D3B' }} // Fondo oscuro para las tarjetas
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -473,32 +479,50 @@ const CrudProgramas = () => {
                   alt={program.name}
                 />
                 <div className="p-4">
-                  <h2 className="text-white text-xl font-bold">{program.name}</h2>
+                  <h2 className="text-xl font-bold" style={{ color: '#EEE5E9' }}>
+                    {program.name}
+                  </h2>
                   <div className="flex items-center mt-2">
-                    <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}></span>
-                    <span className="ml-2 text-gray-400 capitalize">{program.status}</span>
+                    <span
+                      className={`inline-block w-3 h-3 rounded-full ${getStatusColor(program.status)}`}
+                    ></span>
+                    <span className="ml-2 capitalize" style={{ color: '#7C7C7C' }}>
+                      {program.status}
+                    </span>
                   </div>
-                  <p className="text-gray-400 mt-2">
-                    {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
+                  <p className="mt-2" style={{ color: 'white' }}>
+                    {program.description && program.description.length > 100
+                      ? `${program.description.substring(0, 100)}...`
+                      : program.description}
                   </p>
-                  <div className="mt-2">
-                    <span className="text-green-600">Presupuesto: {program.donations ? `$${program.donations}` : "No asignado"}</span>
-                  </div>
 
+                  <div className="mt-2">
+                    <span style={{ color: '#4CAF50' }}>
+                      Presupuesto: ${program.budget || 0}
+                    </span>
+                  </div>
                   <div className="flex mt-4 justify-between">
                     <motion.button
-                      className="bg-gray-700 text-white px-4 py-2 rounded"
-                      whileHover={{ backgroundColor: '#636363', scale: 1.1 }}
+                      className="px-4 py-2 rounded"
+                      style={{
+                        backgroundColor: '#0097A7',
+                        color: '#EEE5E9',
+                      }}
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setSelectedProgram(program)}
                     >
                       Más info
                     </motion.button>
 
-                    <div className='flex space-x-2'>
+                    <div className="flex space-x-2">
                       {/* Botón de editar */}
                       <motion.button
-                        className="bg-blue-500 text-white p-2 rounded-full"
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#4A90E2',
+                          color: '#EEE5E9',
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleOpenEditModal(program)}
@@ -508,7 +532,11 @@ const CrudProgramas = () => {
 
                       {/* Botón de eliminar */}
                       <motion.button
-                        className="bg-red-500 text-white p-2 rounded-full"
+                        className="p-2 rounded-full"
+                        style={{
+                          backgroundColor: '#E63946',
+                          color: '#EEE5E9',
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleDeleteConfirm(program.id)}

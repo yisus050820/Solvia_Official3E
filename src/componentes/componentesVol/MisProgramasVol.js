@@ -6,6 +6,7 @@ import TeacherDashboard from './InterfazVoluntario';
 
 const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name, objective, end_date, start_date }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalViewOpen, setIsModalViewOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const modalContentRef = useRef(null);
   const [atBottom, setAtBottom] = useState(true);
@@ -15,8 +16,13 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
     setIsModalOpen(true);
   };
 
+  const handleOpenViewModal = () => {
+    setIsModalViewOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsModalViewOpen(false);
     setShowDashboard(false);
   };
 
@@ -83,7 +89,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <motion.button
               className="px-4 py-2 rounded"
               whileHover={{ scale: 1.1 }}
-              onClick={() => handleOpenModal(false)}
+              onClick={() => handleOpenViewModal(false)}
               style={{
                 backgroundColor: '#0097A7',
                 color: 'white',
@@ -124,41 +130,63 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
               ref={modalContentRef}
               onScroll={handleScroll}
               style={{
-                backgroundColor: '#383D3B',
+                backgroundColor: '#2F4F4F', // Fondo diferente para distinguir
                 maxHeight: '90vh',
-                maxWidth: '800Px', // Ajusta el ancho intermedio entre 3xl (768px) y 4xl (1024px)
+                maxWidth: '800px',
                 overflowY: 'auto',
               }}
             >
+              <TeacherDashboard programId={programId} />
+              <motion.button
+                className="mt-4 px-4 py-2 rounded transition duration-300 font-bold shadow-md"
+                whileHover={{ scale: 1.05 }}
+                onClick={handleCloseModal}
+                style={{
+                  backgroundColor: '#DC143C', // Botón rojo distinto
+                  color: '#FFF',
+                }}
+              >
+                Cerrar
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-              {showDashboard ? (
-                <TeacherDashboard programId={programId} />
-              ) : (
-                <>
-                  <h2 className="text-white text-3xl font-bold">{title}</h2>
-                  <h4 className="text-gray-400 mb-4 font-semibold">{coordinator_name}</h4>
-                  <img
-                    className="w-full h-48 object-cover shadow-md rounded"
-                    src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
-                    alt={name}
-                  />
-                  <p className="mt-4" style={{ color: 'white' }}>
-                    Descripción: {description}
-                  </p>
-                  <p className="mt-4" style={{ color: 'white' }}>
-                    Objetivo: {objective}
-                  </p>
-                  <p className="mt-4" style={{ color: 'white' }}>
-                    Fecha de Inicio:  {start_date.split('T')[0]}
-                  </p>
-                  <p className="mt-4" style={{ color: 'white' }}>
-                    Fecha de Inicio:  {end_date.split('T')[0]}
-                  </p>
-                  <div className="mt-2">
-                    <span style={{ color: '#92DCE5' }}>Presupuesto: ${donations || 0}</span>
-                  </div>
-                </>
-              )}
+      <AnimatePresence>
+        {isModalViewOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
+              <h2 className="text-white text-3xl font-bold">{title}</h2>
+              <h4 className="text-gray-400 mb-4 font-semibold">{coordinator_name}</h4>
+              <img
+                className="w-full h-48 object-cover shadow-md rounded"
+                src={imageUrl ? `http://localhost:5000${imageUrl}` : "https://via.placeholder.com/150"}
+                alt={name}
+              />
+              <p className="mt-4" style={{ color: 'white' }}>
+                Descripción: {description}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Objetivo: {objective}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio: {start_date.split('T')[0]}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Fin: {end_date.split('T')[0]}
+              </p>
               <motion.button
                 className="mt-4 px-4 py-2 rounded transition duration-300 font-bold shadow-md"
                 whileHover={{ scale: 1.05 }}
