@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Typography } from '@mui/material';
 import TeacherDashboard from './InterfazVoluntario';
 
-const ProgramCard = ({ title, description, participants, donations, imageUrl, programId }) => {
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const modalContentRef = useRef(null);
@@ -36,6 +36,19 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
     }
   }, [atBottom]);
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-500';
+      case 'pause':
+        return 'bg-yellow-500';
+      case 'unactive':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   return (
     <>
       <motion.div
@@ -53,6 +66,10 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
         />
         <div className="p-4">
           <h2 style={{ color: '#EEE5E9' }} className="text-xl font-bold">{title}</h2>
+          <div className="flex items-center mt-2">
+            <span className={`inline-block w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
+            <span className="ml-2 text-gray-400 capitalize">{status}</span>
+          </div>
           <p style={{ color: 'white' }} className="mt-2">
             {description && description.length > 100 ? `${description.substring(0, 100)}...` : description}
           </p>
@@ -60,7 +77,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
             <span className="text-green-400">Participantes: {participants}</span>
           </div>
           <div className="mt-2">
-            <span className="text-green-600">Donaciones: ${donations}</span>  
+            <span className="text-green-600">Presupuesto: ${donations}</span>  
           </div>
           <div className="flex mt-4 space-x-4">
             <motion.button
@@ -203,6 +220,7 @@ const MisProgramasVol = () => {
           <ProgramCard
             key={program.id}
             title={program.name}
+            status={program.status}
             description={program.description}
             participants={program.participants}
             donations={program.donations}

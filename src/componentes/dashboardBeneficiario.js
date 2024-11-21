@@ -13,6 +13,8 @@ import { ChatBubbleOutline, Feedback } from '@mui/icons-material';
 import MessageIcon from '@mui/icons-material/Message';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { Avatar } from '@mui/material';
+
 
 
 import PerfilUsuario from './componentesAdmin/ConfigDePerfil';
@@ -106,7 +108,7 @@ const demoTheme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#383D3B', // Color de la barra lateral
+          backgroundColor: '#2B4A48', // Color de la barra lateral
           color: '#EEE5E9',
         },
       },
@@ -114,13 +116,30 @@ const demoTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#383D3B', // Color de la barra superior
+          backgroundColor: '#2B4A48', // Color de la barra superior
           color: '#EEE5E9', // Color del texto en la barra superior
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            backgroundColor: '#92DCE5', // Color de fondo cuando está seleccionado
+            color: '#2B4A48', // Color del texto cuando está seleccionado
+            '&:hover': {
+              backgroundColor: '#81C7CE', // Color al pasar el cursor sobre el seleccionado
+            },
+          },
+          '&:hover': {
+            backgroundColor: '#607D8B', // Color al pasar el cursor sobre elementos no seleccionados
+          },
         },
       },
     },
   },
 });
+
 
 function DemoPageContent({ pathname }) {
   return (
@@ -178,7 +197,11 @@ function DashboardBeneficiario(props) {
     <AppProvider
       navigation={NAVIGATION}
       branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="SOLVIA logo" />,
+        logo: (
+          <Avatar sx={{ bgcolor: 'primary.main', color: 'white' }}>
+            S
+          </Avatar>
+        ),
         title: 'SOLVIA',
       }}
       router={router}
