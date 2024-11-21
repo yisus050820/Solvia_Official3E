@@ -29,6 +29,12 @@ const CrudProgramas = () => {
   const [loading, setLoading] = useState(true); const [atBottom, setAtBottom] = useState(true);
   const userListRef = useRef(null);
 
+  const handleLogout = () => {
+    localStorage.clear(); // Limpiar datos almacenados
+    delete axios.defaults.headers.common['Authorization']; // Limpiar encabezados globales
+    window.location.href = '/index'; // Redirigir a la página de inicio
+  };
+  
   // Manejador del evento de scroll
   const handleScroll = () => {
     const userListContainer = userListRef.current;
@@ -397,6 +403,25 @@ const CrudProgramas = () => {
 
   return (
     <>
+          <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed', // El botón se mantiene fijo en la parte superior derecha
+          top: '20px', // Ajusta la distancia desde el borde superior
+          right: '20px', // Ajusta la distancia desde el borde derecho
+          backgroundColor: '#ff0000', // Color rojo brillante
+          color: 'white', // Color del texto
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)', // Sombra para visibilidad
+          zIndex: 9999, // Asegura que el botón se vea por encima de otros elementos
+        }}
+      >
+        Cerrar sesión
+      </button>
       <div className="w-full px-6 py-0.1 mx-auto mt-2">
         {/* Título encima del contenido */}
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>

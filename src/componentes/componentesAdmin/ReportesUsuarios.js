@@ -64,6 +64,12 @@ const ReportesUsuarios = () => {
     return () => clearInterval(intervalId);
 
   }, []);
+  
+  const handleLogout = () => {
+    localStorage.clear(); 
+    delete axios.defaults.headers.common['Authorization']; 
+    window.location.href = '/index'; 
+  };
 
   const formatMonth = (monthString) => {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -160,6 +166,26 @@ const ReportesUsuarios = () => {
 
   return (
     <div className="max-w-6xl mx-auto mt-2" ref={pdfRef}>
+          {/* Botón de cerrar sesión */}
+          <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+          color: 'white',
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 9999,
+        }}
+      >
+        Cerrar sesión
+      </button>
       {/* Título encima del contenido */}
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Reporte Usuarios

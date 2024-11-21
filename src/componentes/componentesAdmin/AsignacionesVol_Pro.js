@@ -32,6 +32,12 @@ const AsignacionesVol_Pro = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.clear(); // Limpiar datos almacenados
+    delete axios.defaults.headers.common['Authorization']; // Limpiar encabezados globales
+    window.location.href = '/index'; // Redirigir a la página de inicio
+  };
+
   useEffect(() => {
     const userListContainer = userListRef.current;
     if (userListContainer && atBottom) {
@@ -257,6 +263,26 @@ const AsignacionesVol_Pro = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+    {/* Botón de cerrar sesión */}
+    <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+          color: 'white',
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 9999,
+        }}
+      >
+        Cerrar sesión
+      </button>
       {/* Título "Asignación" */}
       <Typography variant="h3" align="center" color='primary' gutterBottom>
         Asignación

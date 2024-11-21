@@ -18,6 +18,12 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
       setAtBottom(userListContainer.scrollHeight - userListContainer.scrollTop === userListContainer.clientHeight);
     }
   };
+
+  const handleLogout = () => {
+    localStorage.clear(); // Limpiar datos almacenados
+    delete axios.defaults.headers.common['Authorization']; // Limpiar encabezados globales
+    window.location.href = '/index'; // Redirigir a la página de inicio
+  };
   
   useEffect(() => {
     const userListContainer = userListRef.current;
@@ -78,6 +84,26 @@ const ProgramCard = ({ title, description, participants, donations, status, imag
 
   return (
     <>
+      <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed', // El botón se mantiene fijo en la parte superior derecha
+          top: '20px', // Ajusta la distancia desde el borde superior
+          right: '20px', // Ajusta la distancia desde el borde derecho
+          backgroundColor: '#ff0000', // Color rojo brillante
+          color: 'white', // Color del texto
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)', // Sombra para visibilidad
+          zIndex: 9999, // Asegura que el botón se vea por encima de otros elementos
+        }}
+      >
+        Cerrar sesión
+      </button>
+      
       <motion.div
         className="max-w-sm rounded-xl shadow-lg overflow-hidden m-4"
         style={{ backgroundColor: '#383D3B' }} // Fondo principal oscuro
