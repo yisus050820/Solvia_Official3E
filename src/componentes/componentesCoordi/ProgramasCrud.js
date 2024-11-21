@@ -81,7 +81,7 @@ const CrudProgramas = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
-  };  
+  };
 
   const sortedProgram = [...program].sort((a, b) => {
     if (sortBy === "name") return a.name.localeCompare(b.name);
@@ -99,10 +99,10 @@ const CrudProgramas = () => {
     pause: 'pausado',
     unactive: 'inactivo'
   };
-  
+
   const filteredPrograms = sortedProgram.filter((program) => {
     const translatedStatus = statusTranslation[program.status] || program.status; // Traducir status
-  
+
     return (
       (program.name && program.name.toLowerCase().includes(searchQuery)) ||
       (program.description && program.description.toLowerCase().includes(searchQuery)) ||
@@ -113,7 +113,7 @@ const CrudProgramas = () => {
       (translatedStatus && translatedStatus.toLowerCase().includes(searchQuery))
     );
   });
-  
+
 
   useEffect(() => {
     fetchPrograms();
@@ -386,10 +386,10 @@ const CrudProgramas = () => {
   return (
     <>
       <div
-      ref={containerRef}
-      className="overflow-y-auto"
-      style={{ maxHeight: '80vh', padding: '1rem' }} // Contenedor con scroll vertical
-    >
+        ref={containerRef}
+        className="overflow-y-auto"
+        style={{ maxHeight: '80vh', padding: '1rem' }} // Contenedor con scroll vertical
+      >
         {/* Título encima del contenido */}
         <Typography variant="h3" align="center" color="primary" sx={{ marginBottom: 0 }}>
           Gestionar Programas
@@ -401,18 +401,18 @@ const CrudProgramas = () => {
               Ver en tarjetas
             </Typography>
             <Switch
-                checked={mostrarCards}
-                onChange={() => setMostrarCards(!mostrarCards)}
-                sx={{
-                  '& .MuiSwitch-thumb': {
-                    backgroundColor: '#92DCE5', // Aqua
-                  },
-                  '& .MuiSwitch-track': {
-                    backgroundColor: '#7C7C7C', // Gris oscuro
-                  },
-                }}
-              />
-                        <TextField
+              checked={mostrarCards}
+              onChange={() => setMostrarCards(!mostrarCards)}
+              sx={{
+                '& .MuiSwitch-thumb': {
+                  backgroundColor: '#92DCE5', // Aqua
+                },
+                '& .MuiSwitch-track': {
+                  backgroundColor: '#7C7C7C', // Gris oscuro
+                },
+              }}
+            />
+            <TextField
               label="Buscar..."
               variant="outlined"
               sx={{
@@ -460,7 +460,7 @@ const CrudProgramas = () => {
 
         {mostrarCards ? (
           <div className="flex justify-center flex-wrap mt-2">
-              {filteredPrograms.map((program) => (
+            {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
                 className="max-w-sm bg-gray-800 rounded-xl shadow-lg overflow-hidden m-2"
@@ -481,7 +481,6 @@ const CrudProgramas = () => {
                   <p className="text-gray-400 mt-2">
                     {program.description && program.description.length > 100 ? `${program.description.substring(0, 100)}...` : program.description}
                   </p>
-
                   <div className="mt-2">
                     <span className="text-green-600">Presupuesto: {program.donations ? `$${program.donations}` : "No asignado"}</span>
                   </div>
@@ -531,7 +530,6 @@ const CrudProgramas = () => {
                 <th className="p-4">Descripción</th>
                 <th className="p-4">Fecha Inicio</th>
                 <th className="p-4">Fecha Fin</th>
-                <th className="p-4">Objetivos</th>
                 <th className="p-4">Coordinador</th>
                 <th className="p-4">Presupuesto</th>
                 <th className="p-4">Estado</th>
@@ -539,13 +537,12 @@ const CrudProgramas = () => {
               </tr>
             </thead>
             <motion.tbody layout className="bg-[#383D3B]">
-            {filteredPrograms.map((item) => (
+              {filteredPrograms.map((item) => (
                 <motion.tr key={item.id} className="border-b border-gray-700">
                   <td className="p-4">{item.name}</td>
                   <td className="p-4">{truncateDescription(item.description)}</td>
                   <td className="p-4">{item.start_date.split('T')[0]}</td>
                   <td className="p-4">{item.end_date.split('T')[0]}</td>
-                  <td className="p-4">{truncateDescription(item.objectives)}</td>
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">{item.donations ? `$${item.donations}` : "No asignado"}</td>
                   <td className="p-4">
@@ -694,41 +691,53 @@ const CrudProgramas = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-  {selectedProgram && (
-    <motion.div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-gray-800 text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-        initial={{ y: "-100vh" }}
-        animate={{ y: "0" }}
-        exit={{ y: "-100vh" }}
-      >
-        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
-        <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
-        <img 
-          className="w-full h-48 object-cover shadow-md rounded"
-          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
-        />
-        <p className="text-gray-400 mt-4">{selectedProgram.description}</p> {/* Muestra la descripción completa */}
-        <div className="mt-2">
-          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
-        </div>
-        {/* Botón para cerrar la ventana */}
-        <motion.button 
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-          whileHover={{ backgroundColor: '#4A90E2' }}
-          onClick={() => setSelectedProgram(null)}  // Cierra el modal
-        >
-          Cerrar
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="p-8 rounded-xl shadow-lg max-w-lg w-full"
+              style={{ backgroundColor: '#383D3B' }} // Fondo oscuro del modal
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+            >
+              <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+              <h4 className="text-white-900 mb-4 font-semibold">Coordinador: {selectedProgram.coordinator_name}</h4>
+              <img
+                className="w-full h-48 object-cover shadow-md rounded"
+                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : "https://via.placeholder.com/150"}
+              />
+              <p className="mt-4" style={{ color: 'white' }}>
+                Descripción: {selectedProgram.description}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Objetivo: {selectedProgram.objectives}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio: {selectedProgram.start_date ? selectedProgram.start_date.split('T')[0] : 'No definida'}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Fin: {selectedProgram.end_date ? selectedProgram.end_date.split('T')[0] : 'No definida'}
+              </p>
+              <div className="mt-2">
+                <span className="text-green-600">Presupuesto: ${selectedProgram.donations || 0}</span>
+              </div>
+              {/* Botón para cerrar la ventana */}
+              <motion.button
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                whileHover={{ backgroundColor: '#4A90E2' }}
+                onClick={() => setSelectedProgram(null)}  // Cierra el modal
+              >
+                Cerrar
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
 
       {/* Ventana emergente para editar un registro existente */}

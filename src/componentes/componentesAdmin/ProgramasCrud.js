@@ -816,7 +816,7 @@ const CrudProgramas = () => {
                 Descripción: {selectedProgram.description}
               </p>
               <p className="mt-4" style={{ color: 'white' }}>
-                Objetivo: {selectedProgram.objetivos}
+                Objetivo: {selectedProgram.objectives}
               </p>
               <p className="mt-4" style={{ color: 'white' }}>
                 Fecha de Inicio:  {selectedProgram.start_date.split('T')[0]}

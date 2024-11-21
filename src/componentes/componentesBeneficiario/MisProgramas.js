@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Typography } from '@mui/material';
 import StudentDashboard from './InterfazBeneficiario';
 
-const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name, objetive, end_date, start_date }) => {
+const ProgramCard = ({ title, description, participants, donations, imageUrl, programId, status, name, coordinator_name, objective, end_date, start_date }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [atBottom, setAtBottom] = useState(true);
@@ -134,7 +134,7 @@ const ProgramCard = ({ title, description, participants, donations, imageUrl, pr
                     Descripción: {description}
                   </p>
                   <p className="mt-4" style={{ color: 'white' }}>
-                    Objetivo: {objetive}
+                    Objetivo: {objective}
                   </p>
                   <p className="mt-4" style={{ color: 'white' }}>
                     Fecha de Inicio:  {start_date.split('T')[0]}
@@ -193,7 +193,7 @@ const MisProgramas = () => {
               donations: donationsRes.data.total,
               imageUrl: program.program_image,
               coordinator_name: program.coordinator_name || 'No disponible',
-              objetive: program.objetives,
+              objective: program.objectives,  
               start_date: program.start_date,
               end_date: program.end_date
             };
@@ -227,7 +227,7 @@ const MisProgramas = () => {
             status={program.status}
             imageUrl={program.imageUrl}
             programId={program.id}
-            objetive={program.objetive}
+            objective={program.objectives}
             start_date={program.start_date}
             end_date ={program.end_date}
           />

@@ -58,7 +58,7 @@ const ProgramasDisp = () => {
       setLoading(false);
       return;
     }
-    
+
     axios.get('http://localhost:5000/programas')
       .then(response => {
         setProgram(response.data);
@@ -94,7 +94,7 @@ const ProgramasDisp = () => {
 
   const filteredPrograms = program.filter((program) => {
     const search = searchTerm.toLowerCase();
-  
+
     return (
       (program.name && program.name.toLowerCase().includes(search)) ||
       (program.description && program.description.toLowerCase().includes(search)) ||
@@ -105,7 +105,7 @@ const ProgramasDisp = () => {
       (program.status && program.status.toLowerCase().includes(search)) ||
       (program.donations && program.donations.toString().toLowerCase().includes(search))
     );
-  });  
+  });
 
   return (
     <>
@@ -119,20 +119,20 @@ const ProgramasDisp = () => {
               Ver en tarjetas
             </Typography>
             <Switch
-                checked={mostrarCards}
-                onChange={() => setMostrarCards(!mostrarCards)}
-                sx={{
-                  '& .MuiSwitch-thumb': {
-                    backgroundColor: '#92DCE5', // Aqua
-                  },
-                  '& .MuiSwitch-track': {
-                    backgroundColor: '#7C7C7C', // Gris oscuro
-                  },
-                }}
-              />
+              checked={mostrarCards}
+              onChange={() => setMostrarCards(!mostrarCards)}
+              sx={{
+                '& .MuiSwitch-thumb': {
+                  backgroundColor: '#92DCE5', // Aqua
+                },
+                '& .MuiSwitch-track': {
+                  backgroundColor: '#7C7C7C', // Gris oscuro
+                },
+              }}
+            />
           </div>
           <div className="flex items-center space-x-2">
-          <TextField
+            <TextField
               fullWidth
               label="Buscar..."
               variant="outlined"
@@ -154,19 +154,19 @@ const ProgramasDisp = () => {
                   top: '-6px',
                 },
               }}
-              
+
               onChange={handleSearchChange}
             />
           </div>
         </div>
 
         {mostrarCards ? (
-            <div
-          ref={programListRef} 
-          onScroll={handleScroll} 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 120px)' }} 
-        >
+          <div
+            ref={programListRef}
+            onScroll={handleScroll}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto"
+            style={{ maxHeight: 'calc(100vh - 120px)' }}
+          >
             {filteredPrograms.map((program) => (
               <motion.div
                 key={program.id}
@@ -194,7 +194,7 @@ const ProgramasDisp = () => {
                   <div className="flex mt-4 justify-between">
                     <motion.button
                       className="bg-[#0097A7] text-white px-4 py-2 rounded"
-                      whileHover={{  scale: 1.1 }}
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setSelectedProgram(program)}
                     >
@@ -232,13 +232,12 @@ const ProgramasDisp = () => {
                   <td className="p-4">{item.coordinator_name}</td>
                   <td className="p-4">
                     <span
-                      className={`text-lg font-bold ${
-                        item.status === 'active'
-                          ? 'text-green-500'
-                          : item.status === 'pause'
+                      className={`text-lg font-bold ${item.status === 'active'
+                        ? 'text-green-500'
+                        : item.status === 'pause'
                           ? 'text-yellow-500'
                           : 'text-red-500'
-                      }`}
+                        }`}
                     >
                       {item.status === 'active' ? 'Activo' : item.status === 'pause' ? 'Pausado' : 'Inactivo'}
                     </span>
@@ -252,46 +251,58 @@ const ProgramasDisp = () => {
 
       {/* Modal para más información */}
       <AnimatePresence>
-  {selectedProgram && (
-    <motion.div
-      className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-[#383d3b] text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
-        initial={{ y: "-100vh" }}
-        animate={{ y: "0" }}
-        exit={{ y: "-100vh" }}
-        ref={modalContentRef}
-        onScroll={handleScroll}
-        style={{ maxHeight: '90vh', overflowY: 'auto' }}
-      >
-        <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
-        <h4 className="text-white-900 mb-4 font-semibold">
-          Coordinador: {selectedProgram.coordinator_name}
-        </h4>
-        <img
-          className="w-full h-48 object-cover shadow-md rounded"
-          src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : defaultProgramPicture}
-          alt={selectedProgram.name}
-        />
-        <p className="text-white">{selectedProgram.description}</p>
-        <div className="mt-2">
-          <span className="text-green-600">Donaciones: ${selectedProgram.donations || 0}</span>
-        </div>
-        <motion.button
-          className="mt-4 bg-[#E63946] text-white px-4 py-2 rounded"
-          whileHover={{ scale: 1.1 }}
-          onClick={() => setSelectedProgram(null)}
-        >
-          Cerrar
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-[#383d3b] text-white p-8 rounded-xl shadow-lg max-w-lg w-full"
+              initial={{ y: "-100vh" }}
+              animate={{ y: "0" }}
+              exit={{ y: "-100vh" }}
+              ref={modalContentRef}
+              onScroll={handleScroll}
+              style={{ maxHeight: '90vh', overflowY: 'auto' }}
+            >
+              <h2 className="text-white text-3xl font-bold">{selectedProgram.name}</h2>
+              <h4 className="text-white-900 mb-4 font-semibold">
+                Coordinador: {selectedProgram.coordinator_name}
+              </h4>
+              <img
+                className="w-full h-48 object-cover shadow-md rounded"
+                src={selectedProgram.program_image ? `http://localhost:5000${selectedProgram.program_image}` : defaultProgramPicture}
+                alt={selectedProgram.name}
+              />
+              <p className="mt-4" style={{ color: 'white' }}>
+                Descripción: {selectedProgram.description}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Objetivo: {selectedProgram.objectives}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Inicio: {selectedProgram.start_date ? selectedProgram.start_date.split('T')[0] : 'No definida'}
+              </p>
+              <p className="mt-4" style={{ color: 'white' }}>
+                Fecha de Fin: {selectedProgram.end_date ? selectedProgram.end_date.split('T')[0] : 'No definida'}
+              </p>
+              <div className="mt-2">
+
+                <span className="text-green-600">Presupuesto: ${selectedProgram.donations || 0}</span>
+              </div>
+              <motion.button
+                className="mt-4 bg-[#E63946] text-white px-4 py-2 rounded"
+                whileHover={{ scale: 1.1 }}
+                onClick={() => setSelectedProgram(null)}
+              >
+                Cerrar
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
 
       <Snackbar

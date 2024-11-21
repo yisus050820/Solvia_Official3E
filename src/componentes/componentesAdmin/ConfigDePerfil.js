@@ -428,7 +428,7 @@ const PerfilUsuario = () => {
                   onClick={toggleEdit}
                 >
                   <FaEdit className="mr-2" />
-                  
+                  Editar
                 </motion.button>
                 <motion.button
                   className="px-6 py-3 rounded-lg font-bold text-white"
@@ -438,7 +438,7 @@ const PerfilUsuario = () => {
                   onClick={handleLogout}
                 >
                   <FaDoorOpen className="mr-2" />
-                  
+                  Salir
                 </motion.button>
               </>
             ) : (
