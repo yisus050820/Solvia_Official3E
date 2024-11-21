@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './componentes/theme'; 
+import WeglotLoader from './WeglotLoader';
 
 import Registro from './componentes/Registro';
 import Login from './componentes/Login';
@@ -64,6 +65,7 @@ function App() {
 
   return (
     <AnimatePresence mode="wait">
+      <WeglotLoader />
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/donar" element={<Donar />} />
