@@ -31,40 +31,43 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 ### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Solvia
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Solvia es un proyecto desarrollado para una ONG dedicada a combatir la desigualdad social y mejorar la educación. Esta aplicación CRUD permite gestionar información clave de la organización, facilitando la administración de programas, beneficiarios y recursos educativos.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Descripción
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+La aplicación permite realizar operaciones de Crear, Leer, Actualizar y Eliminar (CRUD) sobre los datos de la ONG. Con una interfaz intuitiva y responsive, Solvia busca optimizar la gestión interna y potenciar el impacto social de la organización.
 
-## Learn More
+## Tecnologías Utilizadas
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- ⚛️ **React**
+- 🎨 **Tailwind CSS**
+- 🖌️ **Material-UI (MUI)**
 
-### Code Splitting
+### Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- 🟢 **Node.js**
+- 🌐 **Express**
 
-### Analyzing the Bundle Size
+### Base de Datos
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- 🛢️ **MySQL**
 
-### Making a Progressive Web App
+## Instalación
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Prerrequisitos
 
-### Advanced Configuration
+- Tener 🟢 [Node.js](https://nodejs.org/) instalado.
+- Tener 🛢️ [MySQL](https://www.mysql.com/) instalado y configurado.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Pasos para la Instalación
 
-### Deployment
+1. **Clonar el repositorio**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+   ```bash
+   git clone https://github.com/tu_usuario/solvia.git
+   cd solvia
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
