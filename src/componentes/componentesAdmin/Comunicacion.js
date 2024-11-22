@@ -20,6 +20,12 @@ const Comunicacion = () => {
     setAdminSeleccionado(e.target.value);
   };
 
+  const handleLogout = () => {
+    localStorage.clear(); // Limpiar datos almacenados
+    delete axios.defaults.headers.common['Authorization']; // Limpiar encabezados globales
+    window.location.href = '/index'; // Redirigir a la página de inicio
+  };
+
   // Función para manejar el cambio en el campo de texto
   const handleTextChange = (e) => {
     setMensaje(e.target.value);
@@ -77,6 +83,26 @@ const Comunicacion = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+                  {/* Botón de cerrar sesión */}
+    <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+          color: 'white',
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 9999,
+        }}
+      >
+        Cerrar sesión
+      </button>
       {/* Título "Asignación" */}
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Contacto

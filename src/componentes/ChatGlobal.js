@@ -11,6 +11,11 @@ export default function ChatGlobal() {
   const [loading, setLoading] = useState(true);
   const [atBottom, setAtBottom] = useState(true);  // Estado para verificar si el usuario está al final
 
+  const handleLogout = () => {
+    localStorage.clear(); 
+    delete axios.defaults.headers.common['Authorization']; 
+    window.location.href = '/index'; 
+  };
   // Obtener el id del usuario logueado desde el backend del chat
   useEffect(() => {
 
@@ -103,6 +108,26 @@ export default function ChatGlobal() {
         maxWidth: '1200px', // Ancho máximo para pantallas grandes
       }}
     >
+                                          {/* Botón de cerrar sesión */}
+                                          <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+          color: 'white',
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 9999,
+        }}
+      >
+        Cerrar sesión
+      </button>
       {/* Header */}
       <div style={{ backgroundColor: '#7C7C7C' }} className="p-4 text-center"> {/* Fondo gris medio */}
         <h1 className="text-xl font-bold">Chat Grupal</h1>

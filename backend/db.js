@@ -2,10 +2,10 @@ const mysql = require('mysql');
 
 // Opciones de configuración para la conexión MySQL
 const db_config = {
-  host: 'bpxqggqrrmrfnvahmelg-mysql.services.clever-cloud.com',
-  user: 'umomai2qvitbrwfs',
-  password: '6jEsbYlmDV0dF6PNEi04',
-  database: 'bpxqggqrrmrfnvahmelg'
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'solvia'
 };
 
 let connection;

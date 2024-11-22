@@ -19,6 +19,13 @@ const CrudUsuariosCoordi = () => {
     return `• ${truncated}`;
   };
 
+  const handleLogout = () => {
+    localStorage.clear(); 
+    delete axios.defaults.headers.common['Authorization']; 
+    window.location.href = '/index'; 
+  };
+
+
   // Función para truncar descripciones a 50 caracteres
   const truncateDescription = (description) => {
     if (!description) return '';
@@ -97,6 +104,26 @@ const CrudUsuariosCoordi = () => {
 
   return (
     <div className="w-full px-6 py-0.1 mx-auto mt-2">
+                      {/* Botón de cerrar sesión */}
+                      <button
+        onClick={handleLogout}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+          color: 'white',
+          border: 'none',
+          padding: '10px 15px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 9999,
+        }}
+      >
+        Cerrar sesión
+      </button>
       <Typography variant="h3" align="center" color="primary" gutterBottom>
         Usuarios
       </Typography>

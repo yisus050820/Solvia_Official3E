@@ -33,6 +33,12 @@ const handleEliminar = (id) => {
     setCurrentId(id);
 };
 
+const handleLogout = () => {
+    localStorage.clear(); 
+    delete axios.defaults.headers.common['Authorization']; 
+    window.location.href = '/index'; 
+};
+
 const confirmDelete = () => {
     setAsignaciones(asignaciones.filter(asignacion => asignacion.id !== currentId));
     setIsDeleteConfirmOpen(false);
@@ -50,6 +56,26 @@ return (
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
     >
+                        {/* Botón de cerrar sesión */}
+                        <button
+        onClick={handleLogout}
+        style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+          backgroundColor: '#ff0000', // Rojo brillante
+        color: 'white',
+        border: 'none',
+        padding: '10px 15px',
+        borderRadius: '5px',
+        fontSize: '14px',
+        cursor: 'pointer',
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
+        zIndex: 9999,
+        }}
+    >
+        Cerrar sesión
+    </button>
     <Card sx={{ backgroundColor: '#1e293b', color: '#fff', padding: '20px', borderRadius: '15px' }}>
         <CardContent>
         <Typography variant="h4" color="white" gutterBottom>
