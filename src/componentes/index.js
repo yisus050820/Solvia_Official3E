@@ -27,43 +27,19 @@ export default function LandingPage() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/feed')
-      .then(response => setTestimonials(response.data))
-      .catch(error => console.error('Error al obtener testimonios:', error));
+    axios
+      .get('http://localhost:5000/feed')
+      .then((response) => setTestimonials(response.data))
+      .catch((error) => console.error('Error al obtener testimonios:', error));
   }, []);
 
+  // Cambiar imagen automáticamente cada 5 segundos
   useEffect(() => {
-    let isMounted = true;
     const imageTimer = setInterval(() => {
-      if (isMounted) {
-        setCurrentImage((prev) => (prev + 1) % testimonials.length);
-      }
+      setCurrentImage((prev) => (prev + 1) % carouselImages.length);
     }, 5000);
-    return () => {
-      isMounted = false;
-      clearInterval(imageTimer);
-    };
-  }, [testimonials]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const animateCarousel = async () => {
-      if (isMounted) {
-        await controls.start({ x: `-${100 / 3}%`, transition: { duration: 10, ease: 'linear' } });
-        if (isMounted) controls.set({ x: '0%' });  
-        animateCarousel();
-      }
-    };
-
-    if (isMounted) {
-      animateCarousel();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [controls]);
+    return () => clearInterval(imageTimer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#383D3B] text-[#EEE5E9]">
